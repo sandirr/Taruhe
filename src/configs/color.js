@@ -1,0 +1,1 @@
+export const primeColor= '#006d6d'
