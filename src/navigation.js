@@ -68,15 +68,23 @@ const AppFeature = () => {
       <AppStack.Screen
         name={strings.Menu2}
         component={Product}
-        // options={{
-        //   headerStyle: {
-        //     backgroundColor: "red",
-        //   },
-        // }}
+        options={{ headerShown: false }}
       />
-      <AppStack.Screen name={strings.Menu3} component={Service} />
-      <AppStack.Screen name={strings.Menu4} component={Tourism} />
-      <AppStack.Screen name={strings.Menu5} component={Account} />
+      <AppStack.Screen
+        name={strings.Menu3}
+        component={Service}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name={strings.Menu4}
+        component={Tourism}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name={strings.Menu5}
+        component={Account}
+        options={{ headerShown: false }}
+      />
     </AppStack.Navigator>
   );
 };

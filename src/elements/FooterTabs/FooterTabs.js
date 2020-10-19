@@ -44,12 +44,12 @@ export default function FooterTabs(props) {
     if (direction === "up")
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 800,
+        duration: 500,
       }).start();
     if (direction === "down")
       Animated.timing(fadeAnim, {
         toValue: -50,
-        duration: 800,
+        duration: 500,
       }).start();
   }, [direction]);
   return (
