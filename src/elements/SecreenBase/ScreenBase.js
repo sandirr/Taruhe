@@ -1,14 +1,6 @@
 import React from "react";
-import { Container, View, Text } from "native-base";
-import {
-  Dimensions,
-  StatusBar,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import strings from "../../assets/Dictionary";
+import { Container, View } from "native-base";
+import { StatusBar, StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   children: { backgroundColor: "#fff", flex: 1, position: "relative" },

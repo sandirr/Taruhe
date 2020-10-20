@@ -1,74 +1,34 @@
-import React from "react";
-import { Text, Icon, Item, Input, Tabs, Tab } from "native-base";
-import { ScrollView, View, StyleSheet, Image } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import React, { useState } from "react";
+import { Text, Tabs, Tab } from "native-base";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  Image,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
 import FooterTabs from "../../elements/FooterTabs/FooterTabs";
-import ScreenBase from "../../elements/SecreenBase/ScreenBase";
+import ScreenBase from "../../elements/SecreenBase";
 import { Rating } from "react-native-ratings";
+import Header from "../../elements/Header";
+import EtcAct from "../../elements/EtcAct";
 
 export default function Product({ navigation }) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [search, setSearch] = useState("");
   return (
     <ScreenBase screen={strings.Menu2} navigation={navigation}>
-      <View
-        style={{
-          backgroundColor: "#fff",
-          paddingTop: 45,
-          paddingHorizontal: 20,
-        }}
-      >
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons
-              name="chevron-back"
-              style={{ color: primeColor, fontSize: 26, fontWeight: "bold" }}
-            />
-          </TouchableOpacity>
-          <Text style={{ fontWeight: "bold", fontSize: 24, color: primeColor }}>
-            {strings.Menu2}
-          </Text>
-          <Ionicons
-            name="ellipsis-vertical"
-            style={{ color: primeColor, fontSize: 24 }}
-          />
-        </View>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: 15,
-          }}
-        >
-          <Item
-            rounded
-            style={{
-              width: "82%",
-              backgroundColor: "#f3f3f3",
-              borderColor: "#f3f3f3",
-              height: 45,
-            }}
-          >
-            <Icon active name="search-outline" style={{ color: primeColor }} />
-            <Input
-              placeholder={strings.Search}
-              placeholderTextColor={primeColor}
-              style={{ color: primeColor, fontFamily: "roboto_thin" }}
-            />
-          </Item>
-          <Icon name="filter" style={{ color: primeColor, marginRight: 7 }} />
-        </View>
-      </View>
+      <Header
+        title={strings.Menu2}
+        openEtc={(e) => setModalVisible(e)}
+        navigation={navigation}
+        searchValue={search}
+        onChangeSearch={(e) => setSearch(e)}
+      />
       <Tabs
         tabContainerStyle={{
           elevation: 0,
@@ -81,7 +41,7 @@ export default function Product({ navigation }) {
           tabStyle={{ backgroundColor: "#fff" }}
           activeTabStyle={{ backgroundColor: "#fff" }}
           activeTextStyle={{ color: primeColor }}
-          heading="Kloting"
+          heading={strings.Clothing}
         >
           <DataList />
         </Tab>
@@ -90,7 +50,7 @@ export default function Product({ navigation }) {
           tabStyle={{ backgroundColor: "#fff" }}
           activeTabStyle={{ backgroundColor: "#fff" }}
           activeTextStyle={{ color: primeColor }}
-          heading="Aksesoris"
+          heading={strings.Accessories}
         >
           <DataList />
         </Tab>
@@ -99,7 +59,7 @@ export default function Product({ navigation }) {
           tabStyle={{ backgroundColor: "#fff" }}
           activeTabStyle={{ backgroundColor: "#fff" }}
           activeTextStyle={{ color: primeColor }}
-          heading="Kuliner"
+          heading={strings.Culinar}
         >
           <DataList />
         </Tab>
@@ -108,12 +68,18 @@ export default function Product({ navigation }) {
           tabStyle={{ backgroundColor: "#fff" }}
           activeTabStyle={{ backgroundColor: "#fff" }}
           activeTextStyle={{ color: primeColor }}
-          heading="Mampir"
+          heading={strings.Musical}
         >
           <DataList />
         </Tab>
       </Tabs>
       <FooterTabs screen={strings.Menu2} navigation={navigation} />
+
+      <EtcAct
+        modalVisible={modalVisible}
+        openEtc={(e) => setModalVisible(e)}
+        navigation={navigation}
+      />
     </ScreenBase>
   );
 }

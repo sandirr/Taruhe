@@ -5,7 +5,7 @@ import Navigation from "./src/navigation";
 const App = () => {
   useEffect(() => {
     SplashScreen.hide();
-    console.disableYellowBox = true;
+    // console.disableYellowBox = true;
   }, []);
   // LogBox.ignoreAllLogs(disable);
   return <Navigation />;

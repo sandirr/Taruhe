@@ -1,10 +1,10 @@
-import React, { useState, useRef } from "react";
-import { Dimensions, StyleSheet, Animated, Image } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import { Dimensions, StyleSheet, Animated, Image, LogBox } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import strings from "../../assets/Dictionary";
 import { Text, Item, Input, Icon, View } from "native-base";
 import { primeColor } from "../../configs/color";
-import ScreenBase from "../../elements/SecreenBase/ScreenBase";
+import ScreenBase from "../../elements/SecreenBase";
 import FooterTabs from "../../elements/FooterTabs/FooterTabs";
 import { useKeyboard } from "react-native-keyboard-height";
 import { Rating } from "react-native-ratings";
@@ -15,6 +15,9 @@ const screenWidth = Dimensions.get("screen").width;
 
 const Home = (props) => {
   const scrollA = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    LogBox.ignoreLogs(["Animated: `useNativeDriver`"]);
+  }, []);
   const { navigation } = props;
   const [bgSearch, setBgSearch] = useState("transparent");
   const [colorSearch, setColorSearch] = useState("#fff");

@@ -8,6 +8,14 @@ const strings = new LocalizedStrings({
     Menu4: "Pariwisata",
     Menu5: "Akun",
     Search: "Pencarian",
+
+    Clothing: "Pakaian",
+    Accessories: "Aksesoris",
+    Culinar: "Kuliner",
+    Musical: "Musik",
+
+    ArtShow: "Pertunjukan Seni",
+    Travel: "Perjalanan",
   },
   en: {
     Menu1: "Home",
@@ -16,6 +24,14 @@ const strings = new LocalizedStrings({
     Menu4: "Tourism",
     Menu5: "Account",
     Search: "Search",
+
+    Clothing: "Clothing",
+    Accessories: "Accessories",
+    Culinar: "Culinar",
+    Musical: "Musical",
+
+    ArtShow: "Art Show",
+    Travel: "Travel",
   },
 });
 
