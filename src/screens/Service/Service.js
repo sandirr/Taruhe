@@ -13,8 +13,20 @@ import EtcAct from "../../elements/EtcAct";
 export default function Service({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [currentDirection, setDirection] = useState("up");
+
+  const handleScroll = (e) => {
+    let currentOffset = e.nativeEvent.contentOffset.y;
+    let direction = currentOffset > offset + 20 ? "down" : "up";
+    if (currentOffset > offset + 20 || currentOffset + 20 < offset) {
+      setOffset(currentOffset);
+      setDirection(direction);
+    }
+  };
+
   return (
-    <ScreenBase screen={strings.Menu3} navigation={navigation}>
+    <ScreenBase>
       <Header
         title={strings.Menu3}
         openEtc={(e) => setModalVisible(e)}
@@ -37,7 +49,7 @@ export default function Service({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.ArtShow}
         >
-          <DataList />
+          <DataList whenScroll={handleScroll} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -46,10 +58,14 @@ export default function Service({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Travel}
         >
-          <DataList />
+          <DataList whenScroll={handleScroll} />
         </Tab>
       </Tabs>
-      <FooterTabs screen={strings.Menu3} navigation={navigation} />
+      <FooterTabs
+        screen={strings.Menu3}
+        navigation={navigation}
+        direction={currentDirection}
+      />
       <EtcAct
         modalVisible={modalVisible}
         openEtc={(e) => setModalVisible(e)}
@@ -59,7 +75,7 @@ export default function Service({ navigation }) {
   );
 }
 
-export const DataList = () => {
+export const DataList = ({ whenScroll }) => {
   return (
     <ScrollView
       style={{
@@ -67,6 +83,8 @@ export const DataList = () => {
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
       }}
+      onScroll={(e) => whenScroll(e)}
+      showsVerticalScrollIndicator={false}
     >
       <View
         style={{
@@ -183,7 +201,7 @@ const styles = StyleSheet.create({
   },
   item: {
     width: "97%",
-    borderRadius: 15,
+    borderRadius: 20,
     overflow: "hidden",
     backgroundColor: "#fff",
 
@@ -196,6 +214,8 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
 
     elevation: 8,
+
+    paddingBottom: 15,
   },
   imageItem: { width: "100%", height: 155 },
   titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 20 },
@@ -215,6 +235,5 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 12,
     marginTop: 5,
-    marginBottom: 10,
   },
 });

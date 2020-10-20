@@ -20,8 +20,19 @@ import EtcAct from "../../elements/EtcAct";
 export default function Product({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [currentDirection, setDirection] = useState("up");
+
+  const handleScroll = (e) => {
+    let currentOffset = e.nativeEvent.contentOffset.y;
+    let direction = currentOffset > offset + 20 ? "down" : "up";
+    if (currentOffset > offset + 20 || currentOffset + 20 < offset) {
+      setOffset(currentOffset);
+      setDirection(direction);
+    }
+  };
   return (
-    <ScreenBase screen={strings.Menu2} navigation={navigation}>
+    <ScreenBase>
       <Header
         title={strings.Menu2}
         openEtc={(e) => setModalVisible(e)}
@@ -43,7 +54,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Clothing}
         >
-          <DataList />
+          <DataList whenScroll={handleScroll} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -52,7 +63,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Accessories}
         >
-          <DataList />
+          <DataList whenScroll={handleScroll} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -61,7 +72,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Culinar}
         >
-          <DataList />
+          <DataList whenScroll={handleScroll} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -70,7 +81,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Musical}
         >
-          <DataList />
+          <DataList whenScroll={handleScroll} />
         </Tab>
       </Tabs>
       <FooterTabs screen={strings.Menu2} navigation={navigation} />
@@ -84,7 +95,7 @@ export default function Product({ navigation }) {
   );
 }
 
-export const DataList = () => {
+export const DataList = ({ whenScroll }) => {
   return (
     <ScrollView
       style={{
@@ -92,6 +103,8 @@ export const DataList = () => {
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
       }}
+      onScroll={(e) => whenScroll(e)}
+      showsVerticalScrollIndicator={false}
     >
       <View
         style={{
@@ -208,7 +221,7 @@ const styles = StyleSheet.create({
   },
   item: {
     width: "92%",
-    borderRadius: 15,
+    borderRadius: 20,
     overflow: "hidden",
     backgroundColor: "#fff",
 
@@ -221,6 +234,8 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
 
     elevation: 8,
+
+    paddingBottom: 15,
   },
   imageItem: { width: "100%", height: 155 },
   titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 20 },
@@ -240,6 +255,5 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 12,
     marginTop: 5,
-    marginBottom: 10,
   },
 });

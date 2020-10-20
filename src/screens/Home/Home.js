@@ -10,8 +10,8 @@ import { useKeyboard } from "react-native-keyboard-height";
 import { Rating } from "react-native-ratings";
 import ListFeatured from "./ListFeatured";
 
-const screenHeight = Dimensions.get("screen").height;
-const screenWidth = Dimensions.get("screen").width;
+const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
 const Home = (props) => {
   const scrollA = useRef(new Animated.Value(0)).current;
@@ -41,8 +41,8 @@ const Home = (props) => {
       setColorSearch("#fff");
       setIconSearch("#fff");
     }
-    var currentOffset = e.nativeEvent.contentOffset.y;
-    var direction = currentOffset > offset + 20 ? "down" : "up";
+    let currentOffset = e.nativeEvent.contentOffset.y;
+    let direction = currentOffset > offset + 20 ? "down" : "up";
     if (currentOffset > offset + 20 || currentOffset + 20 < offset) {
       setOffset(currentOffset);
       setDirection(direction);
@@ -63,11 +63,7 @@ const Home = (props) => {
 
   const [viewHeight, setViewHeight] = useState(screenHeight);
   return (
-    <ScreenBase
-      screen={strings.Menu1}
-      navigation={navigation}
-      direction={currentDirection}
-    >
+    <ScreenBase>
       <View
         style={[
           styles.searchItem,
@@ -269,11 +265,11 @@ const styles = StyleSheet.create({
   contentContainer: {
     width: "50%",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 15,
   },
   item: {
     width: "92%",
-    borderRadius: 15,
+    borderRadius: 20,
     overflow: "hidden",
     backgroundColor: "#fff",
 
@@ -286,6 +282,8 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
 
     elevation: 8,
+
+    paddingBottom: 15,
   },
   imageItem: { width: "100%", height: 155 },
   titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 20 },
@@ -305,7 +303,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginLeft: 12,
     marginTop: 5,
-    marginBottom: 10,
   },
   shadowSearch: {
     shadowColor: "#000",

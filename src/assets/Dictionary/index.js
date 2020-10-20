@@ -16,6 +16,12 @@ const strings = new LocalizedStrings({
 
     ArtShow: "Pertunjukan Seni",
     Travel: "Perjalanan",
+
+    Welcome: "Selamat Datang",
+    tWelcome:
+      "Lapak pertama yang menyediakan layanan pertunjukan budaya di seluruh Indonesia",
+    RegisterForFree: "DAFTAR GRATIS",
+    Login: "MASUK",
   },
   en: {
     Menu1: "Home",
@@ -32,6 +38,12 @@ const strings = new LocalizedStrings({
 
     ArtShow: "Art Show",
     Travel: "Travel",
+
+    Welcome: "Welcome",
+    tWelcome:
+      "First market place to provide art and cultural performance service throughout Indonesia",
+    RegisterForFree: "REGISTER FOR FREE",
+    Login: "LOGIN",
   },
 });
 
