@@ -19,7 +19,7 @@ export default function Service({ navigation }) {
   const handleScroll = (e) => {
     let currentOffset = e.nativeEvent.contentOffset.y;
     let direction = currentOffset > offset + 20 ? "down" : "up";
-    if (currentOffset > offset + 20 || currentOffset + 20 < offset) {
+    if (currentOffset > offset + 20 || currentOffset + 20 < offset + 20) {
       setOffset(currentOffset);
       setDirection(direction);
     }
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   imageItem: { width: "100%", height: 155 },
-  titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 20 },
+  titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 22 },
   containerItemLoc: {
     display: "flex",
     flexDirection: "row",

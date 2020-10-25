@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
   },
   imageItem: { width: "100%", height: 155 },
-  titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 20 },
+  titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 22 },
   containerItemLoc: {
     display: "flex",
     flexDirection: "row",

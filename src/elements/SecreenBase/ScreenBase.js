@@ -6,12 +6,12 @@ const styles = StyleSheet.create({
   children: { backgroundColor: "#fff", flex: 1, position: "relative" },
 });
 export default function ScreenBase(props) {
-  const { children } = props;
+  const { children, barStyle } = props;
   return (
     <Container>
       <StatusBar
         backgroundColor="transparent"
-        barStyle="dark-content"
+        barStyle={barStyle || "dark-content"}
         translucent
       />
       <View style={styles.children}>{children}</View>

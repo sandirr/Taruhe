@@ -18,46 +18,6 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
 
-// const AppTabs = () => {
-//   return (
-//     <Tab.Navigator
-//       screenOptions={({ route }) => ({
-//         tabBarIcon: ({ focused, color, size }) => {
-//           let iconName;
-
-//           if (route.name === 'Beranda') {
-//             iconName = focused
-//               ? 'home'
-//               : 'home-outline';
-//           } else if (route.name === 'Jasa') {
-//             iconName = focused ? 'people' : 'people-outline';
-//           } else if (route.name === 'Produk') {
-//             iconName = focused ? 'cube' : 'cube-outline';
-//           } else if (route.name === 'Pariwisata') {
-//             iconName = focused ? 'trail-sign' : 'trail-sign-outline';
-//           } else if (route.name === 'Akun') {
-//             iconName = focused ? 'person' : 'person-outline';
-//           }
-
-//           // You can return any component that you like here!
-//           return <Ionicons name={iconName} size={size} color={color} style={{ marginBottom: -5 }} />;
-//         },
-//       })}
-//       tabBarOptions={{
-//         activeTintColor: '#006d6d',
-//         inactiveTintColor: 'gray',
-//         style: { paddingBottom: 5 }
-//       }}
-//     >
-//       <Tab.Screen name="Beranda" component={Home} />
-//       <Tab.Screen name="Produk" component={Product} />
-//       <Tab.Screen name="Jasa" component={Service} />
-//       <Tab.Screen name="Pariwisata" component={Tourism} />
-//       <Tab.Screen name="Akun" component={Account} />
-//     </Tab.Navigator>
-//   )
-// }
-
 const AppFeature = () => {
   return (
     <AppStack.Navigator>
@@ -104,8 +64,16 @@ export default function navigation() {
           component={Loading}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="AppCore"
           component={AppFeature}

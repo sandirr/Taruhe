@@ -17,11 +17,28 @@ const strings = new LocalizedStrings({
     ArtShow: "Pertunjukan Seni",
     Travel: "Perjalanan",
 
+    Natural: "Alam",
+    Cultural: "Budaya",
+
     Welcome: "Selamat Datang",
-    tWelcome:
+    aboutTaruhe:
       "Lapak pertama yang menyediakan layanan pertunjukan budaya di seluruh Indonesia",
     RegisterForFree: "DAFTAR GRATIS",
     Login: "MASUK",
+
+    // Page Login
+    Password: "Kata Sandi",
+    ForgotPass: "Lupa password",
+    ResetHere: "Atur ulang di sini",
+    RegisterNew: "BUAT AKUN BARU",
+    NotHaveAccount: "Belum punya akun",
+    InputPassword: "Masukkan kata sandi",
+    InputUsername: "Masukkan username",
+
+    // Page Register
+    InputEmail: "Masukkan email",
+    AlreadyHaveAccount: "Sudah punya akun",
+    Register: "DAFTAR",
   },
   en: {
     Menu1: "Home",
@@ -39,11 +56,28 @@ const strings = new LocalizedStrings({
     ArtShow: "Art Show",
     Travel: "Travel",
 
+    Natural: "Natural",
+    Cultural: "Cultural",
+
     Welcome: "Welcome",
-    tWelcome:
+    aboutTaruhe:
       "First market place to provide art and cultural performance service throughout Indonesia",
     RegisterForFree: "REGISTER FOR FREE",
     Login: "LOGIN",
+
+    // Page Login
+    Password: "Password",
+    ForgotPass: "Forgot your password",
+    ResetHere: "Reset here",
+    RegisterNew: "CREATE AN ACCOUNT",
+    NotHaveAccount: "Don`t have an account",
+    InputPassword: "Type your password",
+    InputUsername: "Type your username",
+
+    // Page Register
+    InputEmail: "Type your email",
+    AlreadyHaveAccount: "Already have an account",
+    Register: "REGISTER",
   },
 });
 
