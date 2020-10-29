@@ -37,8 +37,8 @@ export default function Login({ navigation }) {
               {strings.Login[0] + strings.Login.toLowerCase().slice(1)}
             </Text>
             <Image
-              style={{ width: 40, height: 40 }}
-              source={require("../../assets/images/taruhe_icon.png")}
+              style={{ width: 83, height: 25, marginTop:5, marginRight:5 }}
+              source={require("../../assets/images/taruhe_splash.png")}
             />
           </View>
 
@@ -81,14 +81,25 @@ export default function Login({ navigation }) {
           </Button>
 
           <View style={styles.forgotPass}>
-            <Text>{strings.ForgotPass} ?</Text>
+            <Text>{strings.ForgotPass}?</Text>
             <TouchableOpacity>
               <Text style={styles.reset}>{strings.ResetHere}</Text>
             </TouchableOpacity>
           </View>
 
+          <View style={{flexDirection:'row', justifyContent:'center', marginTop:25}}>
+            <Image
+                style={{ width:40, height:40, marginHorizontal:15 }}
+                source={require("../../assets/images/facebook.png")}
+              />
+            <Image
+                style={{ width:38, height:38, marginHorizontal:15 }}
+                source={require("../../assets/images/google.png")}
+            />
+          </View>
+
           <Text style={{ alignSelf: "center", marginBottom: 8, marginTop: 25 }}>
-            {strings.NotHaveAccount} ?
+            {strings.NotHaveAccount}?
           </Text>
 
           <Button
@@ -123,8 +134,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f3f3f3",
     marginTop: screenHeight * 0.1,
-    borderTopRightRadius: 25,
-    borderTopLeftRadius: 25,
+    borderTopRightRadius: 18,
+    borderTopLeftRadius: 18,
     padding: 45,
     minHeight: screenHeight,
   },

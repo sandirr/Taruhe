@@ -39,6 +39,11 @@ const strings = new LocalizedStrings({
     InputEmail: "Masukkan email",
     AlreadyHaveAccount: "Sudah punya akun",
     Register: "DAFTAR",
+
+    Description: 'Deskripsi',
+    ReadMore: 'Lebih banyak',
+    Order: 'Pesan',
+    ShowLess: 'Lebih sedikit'
   },
   en: {
     Menu1: "Home",
@@ -78,6 +83,11 @@ const strings = new LocalizedStrings({
     InputEmail: "Type your email",
     AlreadyHaveAccount: "Already have an account",
     Register: "REGISTER",
+
+    Description: 'Description',
+    ReadMore: 'Read more',
+    Order: 'Order',
+    ShowLess: 'Show less'
   },
 });
 

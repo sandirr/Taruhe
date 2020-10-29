@@ -37,8 +37,8 @@ export default function Register({ navigation }) {
               {strings.Register[0] + strings.Register.toLowerCase().slice(1)}
             </Text>
             <Image
-              style={{ width: 40, height: 40 }}
-              source={require("../../assets/images/taruhe_icon.png")}
+              style={{ width: 83, height: 25, marginTop:5, marginRight:5 }}
+              source={require("../../assets/images/taruhe_splash.png")}
             />
           </View>
 
@@ -88,7 +88,7 @@ export default function Register({ navigation }) {
           </Button>
 
           <Text style={{ alignSelf: "center", marginBottom: 8, marginTop: 25 }}>
-            {strings.AlreadyHaveAccount} ?
+            {strings.AlreadyHaveAccount}?
           </Text>
 
           <Button
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f3f3f3",
     marginTop: screenHeight * 0.1,
-    borderTopRightRadius: 25,
-    borderTopLeftRadius: 25,
+    borderTopRightRadius: 18,
+    borderTopLeftRadius: 18,
     padding: 45,
     minHeight: screenHeight,
   },

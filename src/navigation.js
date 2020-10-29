@@ -2,7 +2,6 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Ionicons from "react-native-vector-icons/Ionicons";
 import Home from "./screens/Home";
 import Loading from "./screens/Loading";
 import Login from "./screens/Login";
@@ -13,6 +12,7 @@ import Tourism from "./screens/Tourism";
 import Account from "./screens/Account";
 import strings from "./assets/Dictionary";
 import Welcome from "./screens/Welcome";
+import DetailItem from "./screens/DetailItem";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -47,7 +47,12 @@ const AppFeature = () => {
         options={{ headerShown: false }}
       />
       <AppStack.Screen
-        name="welcome"
+        name="DetailItem"
+        component={DetailItem}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="Welcome"
         component={Welcome}
         options={{ headerShown: false }}
       />
