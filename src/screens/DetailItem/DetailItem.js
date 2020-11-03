@@ -42,7 +42,7 @@ const Home = (props) => {
                                     <Ionicons name="home" style={{ color: '#fff', fontSize: 12 }} />
                                     <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>Kalea Bulukumba Store</Text>
                                 </View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                     <StarRating
                                         disabled
                                         maxStars={5}
@@ -51,12 +51,6 @@ const Home = (props) => {
                                         fullStarColor="#fdcc0d"
                                         emptyStarColor="#fdcc0d"
                                         halfStarColor="#fdcc0d"
-                                        style={{
-                                            display: 'flex',
-                                            alignSelf: 'flex-start',
-                                            marginLeft: 12,
-                                            marginTop: 5,
-                                        }}
                                     />
                                     <Text style={{
                                         fontSize: 10,
@@ -64,7 +58,7 @@ const Home = (props) => {
                                         marginLeft: 5,
                                     }}>
                                         (123)
-                    </Text>
+                                    </Text>
                                 </View>
                             </View>
                         </ImageBackground>
@@ -162,7 +156,7 @@ const styles = StyleSheet.create({
         ],
     }),
     scrollView: {
-        backgroundColor: '#eee',
+        backgroundColor: '#f3f3f3',
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
         paddingTop: 25,

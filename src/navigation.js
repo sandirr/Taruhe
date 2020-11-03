@@ -43,7 +43,7 @@ const AppFeature = () => {
       />
       <AppStack.Screen
         name={strings.Menu5}
-        component={Welcome}
+        component={Account}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
@@ -63,7 +63,7 @@ const AppFeature = () => {
 export default function navigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="AppCore">
+      <Stack.Navigator initialRouteName="Loading">
         <Stack.Screen
           name="Loading"
           component={Loading}

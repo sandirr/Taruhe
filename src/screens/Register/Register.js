@@ -19,123 +19,135 @@ const screenHeight = Dimensions.get("window").height;
 export default function Register({ navigation }) {
   const [passwordVisible, setPasswordVisisble] = useState(false);
   return (
-    <ScreenBase barStyle="light-content">
-      <View style={styles.root}>
-        <ScrollView
-          contentContainerStyle={styles.loginContainer}
-          showsVerticalScrollIndicator={false}
+    <ScreenBase barStyle="dark-content">
+      <ScrollView contentContainerStyle={styles.loginContainer} showsVerticalScrollIndicator={false}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 15,
+          }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 25,
-            }}
+          <Text style={{ fontSize: 24, color: "#555", fontWeight: "bold" }}>
+            {strings.Register[0] + strings.Register.toLowerCase().slice(1)}
+          </Text>
+          <Image
+            style={{ width: 83, height: 25, marginTop: 5, marginRight: 5 }}
+            source={require("../../assets/images/taruhe_splash.png")}
+          />
+        </View>
+
+        <Text style={styles.label}>Username</Text>
+        <Item rounded style={styles.inputItem}>
+          <Input
+            placeholder={strings.InputUsername}
+            textContentType="username"
+          />
+        </Item>
+        <Text style={styles.label}>Email</Text>
+        <Item rounded style={styles.inputItem}>
+          <Input
+            placeholder={strings.InputEmail}
+            textContentType="username"
+          />
+        </Item>
+        <Text style={styles.label}>{strings.Password}</Text>
+        <Item rounded style={styles.inputItem}>
+          <Input
+            placeholder={strings.InputPassword}
+            secureTextEntry={!passwordVisible}
+            textContentType="password"
+          />
+          <TouchableOpacity
+            onPress={() => setPasswordVisisble(!passwordVisible)}
           >
-            <Text style={{ fontSize: 24, color: "#555", fontWeight: "bold" }}>
-              {strings.Register[0] + strings.Register.toLowerCase().slice(1)}
-            </Text>
-            <Image
-              style={{ width: 83, height: 25, marginTop:5, marginRight:5 }}
-              source={require("../../assets/images/taruhe_splash.png")}
+            <Icon
+              name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+              style={{ color: "#555" }}
             />
-          </View>
-
-          <Text style={styles.label}>Username</Text>
-          <Item regular style={styles.inputItem}>
-            <Input
-              placeholder={strings.InputUsername}
-              textContentType="username"
-            />
-          </Item>
-          <Text style={styles.label}>Email</Text>
-          <Item regular style={styles.inputItem}>
-            <Input
-              placeholder={strings.InputEmail}
-              textContentType="username"
-            />
-          </Item>
-          <Text style={styles.label}>{strings.Password}</Text>
-          <Item regular style={styles.inputItem}>
-            <Input
-              placeholder={strings.InputPassword}
-              secureTextEntry={!passwordVisible}
-              textContentType="password"
-            />
-            <TouchableOpacity
-              onPress={() => setPasswordVisisble(!passwordVisible)}
-            >
-              <Icon
-                name={passwordVisible ? "eye-off-outline" : "eye-outline"}
-                style={{ color: "#555" }}
-              />
-            </TouchableOpacity>
-          </Item>
-
-          <Button
-            style={[
-              {
-                backgroundColor: primeColor,
-                marginTop: 35,
-              },
-              styles.button,
-            ]}
+          </TouchableOpacity>
+        </Item>
+        <Text style={styles.label}>{strings.Retype} {strings.Password.toLowerCase()}</Text>
+        <Item rounded style={styles.inputItem}>
+          <Input
+            placeholder={strings.InputPassword}
+            secureTextEntry={!passwordVisible}
+            textContentType="password"
+          />
+          <TouchableOpacity
+            onPress={() => setPasswordVisisble(!passwordVisible)}
           >
-            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-              {strings.Register}
-            </Text>
-          </Button>
+            <Icon
+              name={passwordVisible ? "eye-off-outline" : "eye-outline"}
+              style={{ color: "#555" }}
+            />
+          </TouchableOpacity>
+        </Item>
 
-          <Text style={{ alignSelf: "center", marginBottom: 8, marginTop: 25 }}>
-            {strings.AlreadyHaveAccount}?
+        <Button
+          rounded
+          style={[
+            {
+              backgroundColor: primeColor,
+              marginTop: 35,
+            },
+            styles.button,
+          ]}
+        >
+          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+            {strings.Register}
+          </Text>
+        </Button>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 25 }}>
+          <Image
+            style={{ width: 40, height: 40, marginHorizontal: 15 }}
+            source={require("../../assets/images/facebook.png")}
+          />
+          <Image
+            style={{ width: 38, height: 38, marginHorizontal: 15 }}
+            source={require("../../assets/images/google.png")}
+          />
+        </View>
+
+        <Text style={{ alignSelf: "center", marginBottom: 8, marginTop: 25 }}>
+          {strings.AlreadyHaveAccount}?
           </Text>
 
-          <Button
-            style={[
-              {
-                backgroundColor: "#ccc",
-              },
-              styles.button,
-            ]}
-            onPress={() => navigation.navigate("Login")}
-          >
-            <Text style={{ color: "#555", fontWeight: "bold", fontSize: 16 }}>
-              {strings.Login}
-            </Text>
-          </Button>
-        </ScrollView>
-      </View>
+        <Button
+          rounded
+          style={[
+            {
+              backgroundColor: "#ccc",
+            },
+            styles.button,
+          ]}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={{ color: "#555", fontWeight: "bold", fontSize: 16 }}>
+            {strings.Login}
+          </Text>
+        </Button>
+      </ScrollView>
     </ScreenBase>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    backgroundColor: primeColor,
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
-    top: 0,
-  },
   loginContainer: {
     flex: 1,
     backgroundColor: "#f3f3f3",
-    marginTop: screenHeight * 0.1,
-    borderTopRightRadius: 18,
-    borderTopLeftRadius: 18,
     padding: 45,
     minHeight: screenHeight,
   },
   label: {
     color: "#555",
-    marginTop: 20,
+    marginTop: 18,
     marginBottom: 8,
     marginLeft: 3,
   },
   inputItem: {
-    borderRadius: 20,
     paddingHorizontal: 5,
     paddingVertical: 3,
     marginLeft: -1,
@@ -145,15 +157,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderLeftWidth: 2,
     borderRightWidth: 2,
+    height: 55
   },
   button: {
     alignSelf: "center",
-    width: "100%",
+    width: "90%",
     alignItems: "center",
     display: "flex",
     justifyContent: "center",
-    borderRadius: 20,
-    height: 60,
+    height: 55,
   },
   forgotPass: {
     flexDirection: "row",

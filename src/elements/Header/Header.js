@@ -18,12 +18,11 @@ export default function Header(props) {
       style={{
         backgroundColor: "#fff",
         paddingTop: 45,
-        paddingHorizontal: 20,
+        paddingHorizontal: 28,
       }}
     >
       <View
         style={{
-          display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
@@ -31,7 +30,7 @@ export default function Header(props) {
       >
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons
-            name="chevron-back"
+            name="caret-back"
             style={{ color: primeColor, fontSize: 26, fontWeight: "bold" }}
           />
         </TouchableOpacity>
@@ -64,7 +63,7 @@ export default function Header(props) {
             width: "82%",
             backgroundColor: "#f3f3f3",
             borderColor: "#f3f3f3",
-            height: 45,
+            height: 40,
           }}
         >
           <Icon active name="search-outline" style={{ color: primeColor }} />

@@ -34,6 +34,7 @@ const strings = new LocalizedStrings({
     NotHaveAccount: "Belum punya akun",
     InputPassword: "Masukkan kata sandi",
     InputUsername: "Masukkan username",
+    Retype: "Tulis ulang",
 
     // Page Register
     InputEmail: "Masukkan email",
@@ -78,6 +79,7 @@ const strings = new LocalizedStrings({
     NotHaveAccount: "Don`t have an account",
     InputPassword: "Type your password",
     InputUsername: "Type your username",
+    Retype: 'Re - type',
 
     // Page Register
     InputEmail: "Type your email",

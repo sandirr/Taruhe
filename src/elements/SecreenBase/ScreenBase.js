@@ -10,8 +10,8 @@ export default function ScreenBase(props) {
   return (
     <Container>
       <StatusBar
-        backgroundColor="transparent"
-        barStyle={barStyle || "dark-content"}
+        backgroundColor="rgba(255,255,255,.2)"
+        barStyle="dark-content"
         translucent
       />
       <View style={styles.children}>{children}</View>

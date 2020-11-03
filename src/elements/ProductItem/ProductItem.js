@@ -1,7 +1,6 @@
 import React from 'react'
 import { StyleSheet, Image, Pressable } from 'react-native';
 import { Text, View } from 'native-base';
-import { Rating } from 'react-native-ratings';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StarRating from 'react-native-star-rating';
 
@@ -23,8 +22,10 @@ export default function ProductItem({ type, toDetail }) {
                         disabled
                         maxStars={5}
                         rating={2.5}
-                        starSize={14}
+                        starSize={12}
                         fullStarColor="#fdcc0d"
+                        emptyStarColor="#fdcc0d"
+                        halfStarColor="#fdcc0d"
                         style={styles.rating}
                     />
                     <Text style={styles.numberRate}>

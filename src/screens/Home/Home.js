@@ -64,7 +64,7 @@ const Home = (props) => {
             width: '75%',
             backgroundColor: colorSearch,
             borderColor: colorSearch,
-            height: 45,
+            height: 40,
           }}
         >
           <Icon active name="search-outline" style={{ color: primeColor }} />
