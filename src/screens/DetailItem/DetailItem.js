@@ -6,6 +6,7 @@ import ScreenBase from '../../elements/SecreenBase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StarRating from 'react-native-star-rating';
 import strings from '../../assets/Dictionary';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -107,27 +108,27 @@ const Home = (props) => {
                             flexDirection: 'row', justifyContent: 'space-between', marginTop: 21
                         }}>
                             <View style={{
-                                width: '60%', height: 200, justifyContent: 'space-between'
+                                width: '60%', height: 220, justifyContent: 'space-between'
                             }}>
                                 <Image
                                     source={require('../../assets/images/sarung.jpg')}
-                                    style={{ height: 95, width: '100%', borderRadius: 18 }}
+                                    style={{ height: 105, width: '100%', borderRadius: 18 }}
                                 />
                                 <Image
                                     source={require('../../assets/images/sarung.jpg')}
-                                    style={{ height: 95, width: '100%', borderRadius: 18 }}
+                                    style={{ height: 105, width: '100%', borderRadius: 18 }}
                                 />
                             </View>
                             <View style={{ width: '37%' }}>
                                 <Image
                                     source={require('../../assets/images/sarung.jpg')}
-                                    style={{ height: 200, width: '100%', borderRadius: 18 }}
+                                    style={{ height: 220, width: '100%', borderRadius: 18 }}
                                 />
                             </View>
                         </View>
 
                         <View style={{ marginTop: 21 }}>
-                            <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 20, paddingHorizontal: 28, alignItems: 'center' }}>
+                            <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16, paddingHorizontal: 28, alignItems: 'center' }}>
                                 <View style={{ flexDirection: 'row' }}>
                                     <Image
                                         source={require('../../assets/images/sarung.jpg')}
@@ -143,6 +144,28 @@ const Home = (props) => {
                                     <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
                                 </View>
                             </View>
+                        </View>
+
+                        <View style={{ marginTop: 20, height: 180, width: '100%', padding: 5, backgroundColor: '#fff' }}>
+                            <TouchableOpacity style={{ flex: 1 }}>
+                                <MapView
+                                    liteMode
+                                    style={{ flex: 1 }}
+                                    provider={PROVIDER_GOOGLE}
+                                    showsUserLocation
+                                    initialRegion={{
+                                        latitude: 37.78825,
+                                        longitude: -122.4324,
+                                        latitudeDelta: 1,
+                                        longitudeDelta: 1
+                                    }}
+                                >
+                                    <Marker
+                                        coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+                                        title="Kalea Official"
+                                    />
+                                </MapView>
+                            </TouchableOpacity>
                         </View>
 
                     </View>
