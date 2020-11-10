@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
   },
   textContainer: { position: "absolute", bottom: 50, left: 25 },
   titleFeatured: {
-    fontWeight: "bold",
+    fontWeight: '700',
     color: "#fff",
     fontSize: 24,
     textShadowColor: "#555",

@@ -44,7 +44,26 @@ const strings = new LocalizedStrings({
     Description: 'Deskripsi',
     ReadMore: 'Lebih banyak',
     Order: 'Pesan',
-    ShowLess: 'Lebih sedikit'
+    ShowLess: 'Lebih sedikit',
+
+    // Account Setting
+    AccountSetting: 'Pengaturan Akun',
+    MyAccount: 'Akun Saya',
+    MyProfile: 'Profil Saya',
+    MyAddress: 'Alamat Saya',
+    MyFavorite: 'Favorit Saya',
+    Wishlist: 'Wishlist',
+    FavoriteStore: 'Toko Favorit',
+    Settings: 'Pengaturan',
+    ShareApp: 'Bagikan Aplikasi',
+    RateUs: 'Nilai Kami',
+    Language: 'Bahasa',
+    Support: 'Bantuan',
+    HelpCenter: 'Pusat Bantuan',
+    About: 'Tentang',
+    LogOut: 'Keluar',
+
+    Favorite: 'Favorit'
   },
   en: {
     Menu1: "Home",
@@ -89,7 +108,26 @@ const strings = new LocalizedStrings({
     Description: 'Description',
     ReadMore: 'Read more',
     Order: 'Order',
-    ShowLess: 'Show less'
+    ShowLess: 'Show less',
+
+    // Account Setting
+    AccountSetting: 'Account Setting',
+    MyAccount: 'My Account',
+    MyProfile: 'My Profile',
+    MyAddress: 'My Addresses',
+    MyFavorite: 'My Favorite',
+    Wishlist: 'Wishlist',
+    FavoriteStore: 'Favorite Store',
+    Settings: 'Settings',
+    ShareApp: 'Share Application',
+    RateUs: 'Rate Us',
+    Language: 'Language',
+    Support: 'Support',
+    HelpCenter: 'Help Center',
+    About: 'About',
+    LogOut: 'Log Out',
+
+    Favorite: 'Favorite'
   },
 });
 

@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
         paddingBottom: 15,
     }),
     imageItem: { width: '100%', height: 155 },
-    titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 22 },
+    titleItem: { fontSize: 16, marginHorizontal: 12, marginTop: 5, height: 22, fontWeight: '700', color: '#555' },
     containerItemLoc: {
         display: 'flex',
         flexDirection: 'row',
@@ -71,9 +71,10 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     loc: {
-        fontFamily: 'roboto_thin',
+        fontFamily: 'Poppins-Thin',
         fontSize: 12,
         marginLeft: 5,
+        color: '#555'
     },
     rating: {
         display: 'flex',

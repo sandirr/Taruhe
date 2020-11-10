@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Pressable } from 'react-native';
-import { View, H3, Text, Button } from 'native-base';
+import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { View, H3, Text, Button, Icon } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -37,9 +37,11 @@ const Home = (props) => {
                             style={{ height: screenHeight * 0.3, width: screenWidth }}
                         >
                             <View style={{ position: 'absolute', bottom: 45, left: 35 }}>
-                                <Text style={{ fontSize: 24, fontWeight: 'bold', color: "#fff" }}>Tope (Kain Kajang)</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 3 }}>
-                                    <Ionicons name="home" style={{ color: '#fff', fontSize: 12 }} />
+                                <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>Tope (Kain Kajang)</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image
+                                        source={require('../../assets/images/storefront.png')}
+                                    />
                                     <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>Kalea Bulukumba Store</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
@@ -70,7 +72,7 @@ const Home = (props) => {
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Ionicons name="pricetag-outline" style={{ fontSize: 30 }} />
                                 <View style={{ marginLeft: 10 }}>
-                                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#555' }}>Rp. 875.000</Text>
+                                    <Text style={{ fontSize: 20, fontWeight: '700', color: '#555' }}>Rp. 875.000</Text>
                                     <View style={{
                                         flexDirection: 'row', alignItems: 'center', marginLeft: -2
                                     }}>
@@ -82,12 +84,27 @@ const Home = (props) => {
                                             Bulukumba
                                         </Text>
                                     </View>
-                                    <Text style={{ fontSize: 10, color: '#bb2205', fontWeight: 'bold' }}>22% Off</Text>
+                                    <Text style={{ fontSize: 10, color: '#bb2205', fontWeight: '700' }}>22% Off</Text>
                                 </View>
                             </View>
                         </View>
+
+                        <View style={{ marginTop: 21 }}>
+                            <H3 style={{ fontWeight: '700', color: '#555' }}>{strings.Description}</H3>
+                            <Text style={[{
+                                textAlign: 'justify', color: '#555', fontSize: 14
+                            }, readMore ? null : { height: 42 }]}>
+                                What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn
+                                </Text>
+                            <TouchableOpacity onPress={() => setReadMore(!readMore)}>
+                                <Text style={styles.readMore}>
+                                    {readMore ? strings.ShowLess : strings.ReadMore}...
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
                         <View style={{
-                            flexDirection: 'row', justifyContent: 'space-between', marginTop: 32
+                            flexDirection: 'row', justifyContent: 'space-between', marginTop: 21
                         }}>
                             <View style={{
                                 width: '60%', height: 200, justifyContent: 'space-between'
@@ -108,32 +125,38 @@ const Home = (props) => {
                                 />
                             </View>
                         </View>
-                        <View style={{ marginTop: 32 }}>
-                            <H3 style={{ fontWeight: 'bold', color: '#555' }}>{strings.Description}</H3>
-                            <Text style={[{
-                                textAlign: 'justify', color: '#555', fontSize: 14
-                            }, readMore ? null : { height: 42 }]}>
-                                What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn
-                                </Text>
-                            <TouchableOpacity onPress={() => setReadMore(!readMore)}>
-                                <Text style={styles.readMore}>
-                                    {readMore ? strings.ShowLess : strings.ReadMore}...
-                                </Text>
-                            </TouchableOpacity>
+
+                        <View style={{ marginTop: 21 }}>
+                            <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 20, paddingHorizontal: 28, alignItems: 'center' }}>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Image
+                                        source={require('../../assets/images/sarung.jpg')}
+                                        style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
+                                    />
+                                    <View style={{ marginLeft: 10 }}>
+                                        <Text style={{ fontSize: 20, color: '#555' }}>Kalea Official</Text>
+                                        <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>Susi Pudjiastuti</Text>
+                                    </View>
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Ionicons name="heart" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
+                                    <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
+                                </View>
+                            </View>
                         </View>
+
                     </View>
                 </View>
             </Animated.ScrollView>
-            <Button style={styles.buttonOrder}>
-                <Text style={styles.textOrder}>
-                    {strings.Order}
-                </Text>
-                <View style={styles.nextBtn}>
-                    <Ionicons name="chevron-forward" size={24} style={{
-                        color: primeColor
-                    }} />
+            <View style={styles.floatingOrder}>
+                <View style={styles.favorite}>
+                    <Ionicons name="heart-outline" style={styles.heart} />
+                    <Text style={{ fontSize: 8, color: primeColor }}>{strings.Favorite}</Text>
                 </View>
-            </Button>
+                <Button style={styles.buttonOrder}>
+                    <Text style={{ fontSize: 14 }}>{strings.Order}</Text>
+                </Button>
+            </View>
         </ScreenBase>
     );
 };
@@ -177,17 +200,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#ccc',
         paddingHorizontal: 18,
         paddingVertical: 12,
-        borderRadius: 18
+        borderRadius: 50
     },
-    buttonOrder: {
-        position: 'absolute', bottom: 15, backgroundColor: primeColor,
-        width: '65%', alignSelf: 'center', paddingHorizontal: 15, borderRadius: 50, flexDirection: 'row',
-        alignItems: 'center', justifyContent: 'space-between', height: 75
-    },
-    textOrder: {
-        fontSize: 32, color: '#fff', marginLeft: 28, marginBottom: 3, textTransform: 'capitalize'
-    },
-    nextBtn: { backgroundColor: '#fff', borderRadius: 50, padding: 14 },
+    floatingOrder: { backgroundColor: '#fff', position: 'absolute', bottom: 0, right: 0, left: 0, paddingHorizontal: 24, paddingVertical: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    favorite: { justifyContent: 'center', alignItems: 'center' },
+    heart: { color: primeColor, fontSize: 28, marginBottom: -5 },
+    buttonOrder: { backgroundColor: primeColor, width: screenWidth * 0.75, justifyContent: 'center', height: 35, borderRadius: 50 },
     readMore: {
         textDecorationLine: 'underline', color: '#555', fontSize: 14
     }

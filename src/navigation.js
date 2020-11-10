@@ -9,12 +9,11 @@ import Product from "./screens/Product";
 import Register from "./screens/Register";
 import Service from "./screens/Service";
 import Tourism from "./screens/Tourism";
-import Account from "./screens/Account";
+import AccountSetting from "./screens/AccountSetting";
 import strings from "./assets/Dictionary";
 import Welcome from "./screens/Welcome";
 import DetailItem from "./screens/DetailItem";
 
-const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
 
@@ -43,7 +42,12 @@ const AppFeature = () => {
       />
       <AppStack.Screen
         name={strings.Menu5}
-        component={Account}
+        component={AccountSetting}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="AccountSetting"
+        component={AccountSetting}
         options={{ headerShown: false }}
       />
       <AppStack.Screen

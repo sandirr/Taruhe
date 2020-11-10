@@ -9,6 +9,7 @@ const App = () => {
   }, []);
   // LogBox.ignoreAllLogs(disable);
   return <Navigation />;
+
 };
 
 export default App;

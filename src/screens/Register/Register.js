@@ -29,7 +29,7 @@ export default function Register({ navigation }) {
             marginBottom: 15,
           }}
         >
-          <Text style={{ fontSize: 24, color: "#555", fontWeight: "bold" }}>
+          <Text style={{ fontSize: 24, color: "#555", fontWeight: '700' }}>
             {strings.Register[0] + strings.Register.toLowerCase().slice(1)}
           </Text>
           <Image
@@ -95,7 +95,7 @@ export default function Register({ navigation }) {
             styles.button,
           ]}
         >
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+          <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
             {strings.Register}
           </Text>
         </Button>
@@ -125,7 +125,7 @@ export default function Register({ navigation }) {
           ]}
           onPress={() => navigation.navigate("Login")}
         >
-          <Text style={{ color: "#555", fontWeight: "bold", fontSize: 16 }}>
+          <Text style={{ color: "#555", fontWeight: '700', fontSize: 16 }}>
             {strings.Login}
           </Text>
         </Button>
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: "#555",
-    marginTop: 18,
+    marginTop: 15,
     marginBottom: 8,
     marginLeft: 3,
   },
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   },
   reset: {
     color: "#000",
-    fontWeight: "bold",
+    fontWeight: '700',
     textDecorationLine: "underline",
   },
 });

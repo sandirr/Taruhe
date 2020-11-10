@@ -31,10 +31,10 @@ export default function Header(props) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons
             name="caret-back"
-            style={{ color: primeColor, fontSize: 26, fontWeight: "bold" }}
+            style={{ color: primeColor, fontSize: 26 }}
           />
         </TouchableOpacity>
-        <Text style={{ fontWeight: "bold", fontSize: 24, color: primeColor }}>
+        <Text style={{ fontWeight: '700', fontSize: 24, color: primeColor }}>
           {title}
         </Text>
         <TouchableOpacity
@@ -70,7 +70,7 @@ export default function Header(props) {
           <Input
             placeholder={strings.Search}
             placeholderTextColor={primeColor}
-            style={{ color: primeColor, fontFamily: "roboto_thin" }}
+            style={{ color: primeColor }}
             value={searchValue}
             onChangeText={(e) => onChangeSearch(e)}
           />

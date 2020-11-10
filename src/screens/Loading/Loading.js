@@ -1,34 +1,58 @@
-import React, { useEffect, useState } from 'react'
-import { Container, Text } from 'native-base'
-import { StatusBar, AsyncStorage } from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons'
+import React from 'react';
+import {
+    View,
+    Text,
+    StatusBar,
+} from 'react-native';
+import { Spinner } from 'native-base';
 import strings from '../../assets/Dictionary'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { primeColor } from '../../configs/color';
 
-export default function Loading({ navigation }) {
-    const [activeLanguage, setActiveLanguage] = useState('')
-    useEffect(() => {
-        if (activeLanguage) {
-            navigation.navigate(strings.Menu1)
-        }
-        getLanguage();
-    }, [activeLanguage])
+export default class Loading extends React.Component {
+    constructor(props) {
+        super(props);
+    }
 
-    const getLanguage = async () => {
+    componentDidMount() {
+        this._bootstrapAsync()
+    }
+
+    // Fetch the token from storage then navigate to our appropriate place
+    _bootstrapAsync = async () => {
         const language = await AsyncStorage.getItem('language');
         if (!language) {
             strings.setLanguage('id')
             await AsyncStorage.setItem('language', 'id')
-            setActiveLanguage('id')
+            this.props.navigation.navigate('AppCore')
         } else {
             strings.setLanguage(language)
-            setActiveLanguage(language)
+            this.props.navigation.navigate('AppCore')
         }
+        // This will switch to the App screen or Auth screen and this loading
+        // screen will be unmounted and thrown away.
+    };
+
+    // Render any loading content that you like here
+    render() {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                <StatusBar
+                    backgroundColor="rgba(255,255,255,.2)"
+                    barStyle="dark-content"
+                    translucent
+                />
+                <View>
+                    <Text style={{ fontSize: 16 }}>Hi, Taruhers</Text>
+                </View>
+                <Spinner color={primeColor} />
+            </View>
+        );
     }
-    return (
-        <Container>
-            <StatusBar barStyle="dark-content" backgroundColor="transparent" />
-            <Ionicons name="alarm" />
-            <Text>Loading</Text>
-        </Container>
-    )
 }

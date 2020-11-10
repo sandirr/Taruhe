@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
-// import FooterTabs from "../../elements/FooterTabs/FooterTabs";
 import ScreenBase from "../../elements/SecreenBase";
 
 const screenWidth = Dimensions.get("window").width;
@@ -44,7 +43,7 @@ export default function Welcome({ navigation }) {
             ]}
             onPress={() => navigation.navigate("Register")}
           >
-            <Text style={{ color: "#555", fontWeight: "bold" }}>
+            <Text style={{ color: "#555", fontWeight: '700' }}>
               {strings.RegisterForFree}
             </Text>
           </Button>
@@ -57,13 +56,12 @@ export default function Welcome({ navigation }) {
             ]}
             onPress={() => navigation.navigate("Login")}
           >
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>
+            <Text style={{ color: "#fff", fontWeight: '700' }}>
               {strings.Login}
             </Text>
           </Button>
         </View>
       </ScrollView>
-      {/* <FooterTabs screen={strings.Menu5} navigation={navigation} /> */}
     </ScreenBase>
   );
 }
@@ -83,7 +81,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: screenHeight * 0.09,
   },
-  welcomeText: { fontSize: 24, fontWeight: "bold", color: "#555" },
+  welcomeText: { fontSize: 24, fontWeight: '700', color: "#555" },
   aboutTaruhe: { textAlign: "center", paddingHorizontal: screenWidth * 0.1 },
   button: {
     alignSelf: "center",
