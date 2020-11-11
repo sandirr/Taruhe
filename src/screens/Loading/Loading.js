@@ -24,10 +24,10 @@ export default class Loading extends React.Component {
         if (!language) {
             strings.setLanguage('id')
             await AsyncStorage.setItem('language', 'id')
-            this.props.navigation.navigate('AppCore')
+            this.props.navigation.replace('AppCore')
         } else {
             strings.setLanguage(language)
-            this.props.navigation.navigate('AppCore')
+            this.props.navigation.replace('AppCore')
         }
         // This will switch to the App screen or Auth screen and this loading
         // screen will be unmounted and thrown away.

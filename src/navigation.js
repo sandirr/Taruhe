@@ -13,6 +13,8 @@ import AccountSetting from "./screens/AccountSetting";
 import strings from "./assets/Dictionary";
 import Welcome from "./screens/Welcome";
 import DetailItem from "./screens/DetailItem";
+import Account from "./screens/Account";
+import Profile from "./screens/Profile";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -42,7 +44,12 @@ const AppFeature = () => {
       />
       <AppStack.Screen
         name={strings.Menu5}
-        component={AccountSetting}
+        component={Account}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="Profile"
+        component={Profile}
         options={{ headerShown: false }}
       />
       <AppStack.Screen

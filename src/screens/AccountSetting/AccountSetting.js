@@ -18,7 +18,7 @@ export default function AccountSetting({ navigation }) {
         await AsyncStorage.setItem('language', val)
     }
     return (
-        <ScreenBase>
+        <ScreenBase barStyle="dark-content">
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon
@@ -51,9 +51,6 @@ export default function AccountSetting({ navigation }) {
                     <ListItem itemDivider style={styles.menuItem}>
                         <Text>{strings.Wishlist}</Text>
                     </ListItem>
-                    {/* <ListItem itemDivider style={styles.menuItem}>
-                        <Text>{strings.FavoriteStore}</Text>
-                    </ListItem> */}
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.Settings}</Text>
                     </ListItem>
@@ -95,11 +92,6 @@ export default function AccountSetting({ navigation }) {
                         navigation.navigate('Welcome')
                     }}>
                         <Text>{strings.LogOut}</Text>
-                        {/* <Left>
-                            <Icon style={{ transform: [{ rotate: '180deg' }], }} name="log-out-outline" />
-                        </Left>
-                        <Body>
-                        </Body> */}
                     </ListItem>
                 </List>
                 <Text style={{ fontSize: 12, alignSelf: 'center', color: 'gray', marginTop: 14 }}>Taruhe v 1.0.0</Text>

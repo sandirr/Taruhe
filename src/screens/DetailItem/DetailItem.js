@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity } from 'react-native';
-import { View, H3, Text, Button, Icon } from 'native-base';
+import { View, H3, Text, Button } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StarRating from 'react-native-star-rating';
 import strings from '../../assets/Dictionary';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import getDirections from 'react-native-google-maps-directions'
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -18,7 +19,26 @@ const Home = (props) => {
     }, []);
     const { navigation } = props;
     const [readMore, setReadMore] = useState(false)
+    const handleGetDirections = ({ latitude, longitude }) => {
+        const data = {
+            destination: {
+                latitude,
+                longitude
+            },
+            params: [
+                {
+                    key: "travelmode",
+                    value: "driving"        // may be "walking", "bicycling" or "transit" as well
+                },
+                {
+                    key: "dir_action",
+                    value: "navigate"       // this instantly initializes navigation using the given travel mode
+                }
+            ],
+        }
 
+        getDirections(data)
+    }
     return (
         <ScreenBase>
             <Animated.ScrollView
@@ -42,6 +62,7 @@ const Home = (props) => {
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image
                                         source={require('../../assets/images/storefront.png')}
+                                        style={{ height: 12, width: 12 }}
                                     />
                                     <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>Kalea Bulukumba Store</Text>
                                 </View>
@@ -147,7 +168,7 @@ const Home = (props) => {
                         </View>
 
                         <View style={{ marginTop: 20, height: 180, width: '100%', padding: 5, backgroundColor: '#fff' }}>
-                            <TouchableOpacity style={{ flex: 1 }}>
+                            <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections({ latitude: 37.78825, longitude: -122.4324 })} >
                                 <MapView
                                     liteMode
                                     style={{ flex: 1 }}

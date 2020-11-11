@@ -63,7 +63,13 @@ const strings = new LocalizedStrings({
     About: 'Tentang',
     LogOut: 'Keluar',
 
-    Favorite: 'Favorit'
+    Favorite: 'Favorit',
+
+    History: 'History',
+    Share: 'Bagikan',
+    RateUs: 'Beri Rating',
+    VEP: 'Lihat dan ubah profil',
+    MyStore: 'Toko Saya'
   },
   en: {
     Menu1: "Home",
@@ -127,7 +133,13 @@ const strings = new LocalizedStrings({
     About: 'About',
     LogOut: 'Log Out',
 
-    Favorite: 'Favorite'
+    Favorite: 'Favorite',
+
+    History: 'History',
+    Share: 'Share',
+    RateUs: 'Rate Us',
+    VEP: 'View and edit profile',
+    MyStore: 'My Store'
   },
 });
 
