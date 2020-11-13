@@ -151,6 +151,7 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     paddingHorizontal: 20,
     marginTop: -25,
+    // height: screenHeight
   },
   scrollHandler: {
     marginTop: 10,
@@ -160,7 +161,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   scrollContainer: {
-    // minHeight: screenHeight,
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',

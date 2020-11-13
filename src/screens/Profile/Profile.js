@@ -1,14 +1,43 @@
 import React, { useState } from 'react'
-import { Icon, Left, List, ListItem, Right, Text, View } from 'native-base'
+import { Icon, Input, Item, Label, Left, List, ListItem, Right, Text, View } from 'native-base'
 import ScreenBase from '../../elements/SecreenBase';
-import { Dimensions, Image, Modal, StyleSheet, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback } from 'react-native';
+import { Image, Modal, StyleSheet, TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback, ImageBackground } from 'react-native';
 import { primeColor } from '../../configs/color';
 import strings from '../../assets/Dictionary';
+import ImagePicker from 'react-native-image-picker';
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
 export default function Profile({ navigation }) {
-    const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible, setModalVisible] = useState('');
+    const [imageUri, setImageUri] = useState({ uri: '' })
+    const uploadImage = () => {
+        const options = {
+            quality: 0.7,
+            allowsEditing: true,
+            mediaType: 'photo',
+            noData: true,
+            storageOptions: {
+                skipBackup: true,
+                waitUntilSaved: true,
+                path: 'images',
+                cameraRoll: true,
+            },
+        };
+
+        ImagePicker.showImagePicker(options, (response) => {
+
+            if (response.didCancel) {
+                // console.log('User cancelled image picker');
+            } else if (response.error) {
+                // console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                // console.log('User tapped custom button: ', response.customButton);
+            } else {
+                const source = { uri: response.uri };
+                setImageUri(source)
+            }
+
+        })
+    }
     return (
         <ScreenBase barStyle="dark-content">
             <View style={styles.header}>
@@ -28,9 +57,9 @@ export default function Profile({ navigation }) {
             </View>
             <View style={{ flex: 1, backgroundColor: '#f3f3f3', paddingTop: 30 }}>
                 <List>
-                    <ListItem onPress={() => setModalVisible(true)} itemDivider style={styles.menuItem}>
+                    <ListItem onPress={() => setModalVisible('Picture')} itemDivider style={styles.menuItem}>
                         <Left>
-                            <Text>Profile Pictures</Text>
+                            <Text>Profile Picture</Text>
                         </Left>
                         <Right>
                             <Image
@@ -39,7 +68,10 @@ export default function Profile({ navigation }) {
                             />
                         </Right>
                     </ListItem>
-                    <ListItem onPress={() => setModalVisible(true)} itemDivider style={styles.menuItem}>
+                    <ListItem
+                        onPress={() => setModalVisible('Username')}
+                        itemDivider
+                        style={styles.menuItem}>
                         <Left>
                             <Text>Username</Text>
                         </Left>
@@ -47,7 +79,8 @@ export default function Profile({ navigation }) {
                             <Text style={{ color: 'gray', fontStyle: 'italic' }}>A. Irsandi</Text>
                         </Right>
                     </ListItem>
-                    <ListItem onPress={() => setModalVisible(true)} itemDivider style={styles.menuItem}>
+                    <ListItem onPress={() =>
+                        setModalVisible('Gender')} itemDivider style={styles.menuItem}>
                         <Left>
                             <Text>Gender</Text>
                         </Left>
@@ -55,7 +88,7 @@ export default function Profile({ navigation }) {
                             <Text style={{ color: 'gray', fontStyle: 'italic' }}>Male</Text>
                         </Right>
                     </ListItem>
-                    <ListItem onPress={() => setModalVisible(true)} itemDivider
+                    <ListItem onPress={() => setModalVisible('Birthday')} itemDivider
                         style={styles.menuItem}>
                         <Left>
                             <Text>Birthday</Text>
@@ -66,29 +99,64 @@ export default function Profile({ navigation }) {
                     </ListItem>
                 </List>
                 <List style={{ marginTop: 40 }}>
-                    <ListItem onPress={() => setModalVisible(true)} itemDivider style={styles.menuItem}>
+                    <ListItem
+                        onPress={() => setModalVisible('Change Email')}
+                        itemDivider
+                        style={styles.menuItem}>
                         <Text>Change Email</Text>
                     </ListItem>
-                    <ListItem onPress={() => setModalVisible(true)} itemDivider style={styles.menuItem}>
+                    <ListItem
+                        onPress={() => setModalVisible('Change Password')}
+                        itemDivider
+                        style={styles.menuItem}>
                         <Text>Change Password</Text>
                     </ListItem>
                 </List>
             </View>
             <Modal animationType="slide"
                 transparent={true}
-                visible={modalVisible}
+                visible={modalVisible ? true : false}
             >
-                <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+                <TouchableWithoutFeedback onPress={() => setModalVisible('')}>
                     <View style={styles.modalOverlay} />
                 </TouchableWithoutFeedback>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Hello World!</Text>
-
+                        {modalVisible === 'Picture' ?
+                            <TouchableOpacity
+                                onPress={uploadImage}
+                            >
+                                <ImageBackground
+                                    source={imageUri.uri ? { uri: imageUri.uri } : require('../../assets/images/sarung.jpg')}
+                                    style={{ height: 80, width: 80, justifyContent: 'flex-end' }}
+                                >
+                                    <View style={{
+                                        alignItems: 'center',
+                                        backgroundColor: 'rgba(255,255,255,.3)',
+                                        borderTopLeftRadius: 50,
+                                        borderTopRightRadius: 50,
+                                        height: 30,
+                                        justifyContent: 'center'
+                                    }}>
+                                        <Text style={{ color: '#fff', fontSize: 12 }}>Ubah</Text>
+                                    </View>
+                                </ImageBackground>
+                            </TouchableOpacity>
+                            : modalVisible === 'Change Email' ? (
+                                null)
+                                : modalVisible === 'Change Password' ? (
+                                    null)
+                                    : <Item floatingLabel>
+                                        <Label>
+                                            {modalVisible}
+                                        </Label>
+                                        <Input />
+                                    </Item>
+                        }
                         <TouchableHighlight
-                            style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                            style={{ ...styles.saveBtn, backgroundColor: "#2196F3" }}
                             onPress={() => {
-                                setModalVisible(false);
+                                setModalVisible('');
                             }}
                         >
                             <Text style={styles.textStyle}>Simpan</Text>
@@ -101,16 +169,37 @@ export default function Profile({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    itemDivider: { backgroundColor: '#f3f3f3', borderBottomColor: '#ccc', borderBottomWidth: 1 },
-    menuItem: { borderBottomColor: '#ccc', borderBottomWidth: 1, backgroundColor: '#dcdee2' },
-    textDivider: { fontSize: 14, color: 'gray', fontWeight: '700' },
-    header: { flexDirection: 'row', alignItems: 'center', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 32, backgroundColor: '#f3f3f3', justifyContent: 'space-between' },
+    itemDivider: {
+        backgroundColor: '#f3f3f3',
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1
+    },
+    menuItem: {
+        borderBottomColor: '#ccc',
+        borderBottomWidth: 1,
+        backgroundColor: '#dcdee2'
+    },
+    textDivider: {
+        fontSize: 14,
+        color: 'gray',
+        fontWeight: '700'
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingTop: 45,
+        paddingBottom: 15,
+        paddingHorizontal: 32,
+        backgroundColor: '#f3f3f3',
+        justifyContent: 'space-between'
+    },
     centeredView: {
         flex: 1,
         marginTop: 22
     },
     modalView: {
         margin: 20,
+        marginTop: 50,
         backgroundColor: "white",
         borderRadius: 20,
         padding: 28,
@@ -124,11 +213,13 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5
     },
-    openButton: {
+    saveBtn: {
         backgroundColor: primeColor,
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 18,
+        elevation: 2,
+        marginTop: 16,
     },
     textStyle: {
         color: "white",

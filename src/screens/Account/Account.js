@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native'
 import { Icon, Text, View, List, ListItem, Left, Body, Right } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
@@ -20,23 +20,28 @@ export default function Account({ navigation }) {
                         />
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.storeName}>Kalea Official</Text>
-                            <TouchableOpacity onPress={() => navigation.push('Profile')}>
+                            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
                                 <Text style={styles.toProfile}>{strings.VEP}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.push('AccountSetting')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('AccountSetting')}>
                         <Icon name="settings-outline" style={{ color: '#fff' }} />
                     </TouchableOpacity>
                 </View>
             </View>
+
             <View style={styles.myStore}>
-                <Image
-                    source={require('../../assets/images/storefront.png')}
-                    tintColor={primeColor}
-                    style={{ height: 42, width: 42 }}
-                />
-                <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('StoreAccount')}>
+                    <Image
+                        source={require('../../assets/images/storefront.png')}
+                        tintColor={primeColor}
+                        style={{ height: 42, width: 42 }}
+                    />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('StoreAccount')}>
+                    <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.featureContainer}>
@@ -76,7 +81,7 @@ export default function Account({ navigation }) {
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.MyAccount}</Text>
                     </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem}>
+                    <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.push('Profile')}>
                         <Left>
                             <Icon style={{ fontSize: 22 }} name="person-outline" />
                         </Left>
