@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Component } from 'react';
 import {
     Dimensions,
     StyleSheet,
@@ -6,18 +6,216 @@ import {
     LogBox,
     TouchableOpacity,
     Image,
+    ToastAndroid,
+    Modal,
+    StatusBar,
 } from 'react-native';
 import strings from '../../assets/Dictionary';
-import { Item, Input, Icon, View, Button, Text } from 'native-base';
+import { Item, Input, Icon, View, Button, Text, Textarea, Fab } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import { ScrollView } from 'react-native-gesture-handler';
 import SellingItem from '../../elements/SellingItem';
+import Geolocation from '@react-native-community/geolocation';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import { currentLocation } from '../../configs/location';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const StoreAccount = (props) => {
+const StoreAccount = ({ navigation }) => {
+    return (
+        <FormStore navigation={navigation} />
+    );
+}
+
+class FormStore extends Component {
+    state = {
+        currentPosition: {},
+        permission: true,
+        position: {}
+    }
+
+    componentDidMount() {
+        this.getCurrentPosition()
+    }
+
+    getAddressFromCoordinates = ({ latitude, longitude }) => {
+        return new Promise((resolve) => {
+            const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=$AIzaSyC6X5ljOipfwatCZAOD9HW1dhbdr9zkLp0&mode=retrieveAddresses&prox=${latitude},${longitude}`
+            fetch(url)
+                .then(res => res.json())
+                .then((resJson) => {
+                    if (resJson
+                        && resJson.Response
+                        && resJson.Response.View
+                        && resJson.Response.View[0]
+                        && resJson.Response.View[0].Result
+                        && resJson.Response.View[0].Result[0]) {
+                        console.log(resJson.Response.View[0].Result[0].Location.Address.Label)
+                        resolve(resJson.Response.View[0].Result[0].Location.Address.Label)
+                    } else {
+                        resolve()
+                    }
+                })
+                .catch((e) => {
+                    console.log('Error in getAddressFromCoordinates', e)
+                    resolve()
+                })
+        })
+    }
+
+    getCurrentPosition = () => {
+        Geolocation.getCurrentPosition((position) => {
+            setTimeout(() => {
+                this.setState({ permission: true, currentPosition: position.coords })
+            }, 10)
+        }, error => {
+            console.log(error)
+            this.setState({ permission: false })
+        })
+    }
+
+    render() {
+        const { currentPosition, permission, position } = this.state;
+        return (
+            <ScreenBase barStyle="dark-content">
+                <ScrollView contentContainerStyle={{
+                    flex: 1,
+                    backgroundColor: '#f3f3f3',
+                    padding: 45,
+                    minHeight: screenHeight
+                }}>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: 25,
+                        }}
+                    >
+                        <Text style={{ fontSize: 24, color: "#555", fontWeight: '700' }}>
+                            {strings.MyStore}
+                        </Text>
+                        <Image
+                            style={{ width: 100, height: 25, marginTop: 5, marginRight: 5 }}
+                            source={require("../../assets/images/taruhe_splash.png")}
+                        />
+                    </View>
+                    <View>
+                        <Text style={styles.label}>Nama Toko</Text>
+                        <Item rounded style={styles.inputItem}>
+                            <Input
+                                textContentType="organizationName"
+                            />
+                        </Item>
+                        <Text style={styles.label}>Lokasi Toko</Text>
+                        <View style={{ width: '100%', height: 160, position: 'relative' }}>
+                            <MapView
+                                style={{ flex: 1 }}
+                                provider={PROVIDER_GOOGLE}
+                                showsUserLocation={true}
+                                followUserLocation={true}
+                                region={{
+                                    latitude: currentPosition.latitude || 0,
+                                    longitude: currentPosition.longitude || 0,
+                                    latitudeDelta: 0.005,
+                                    longitudeDelta: 0.005,
+                                }}
+                                zoomEnabled={true}
+                            >
+                            </MapView>
+                            <Fab
+                                style={{
+                                    position: 'absolute',
+                                    right: 5,
+                                    backgroundColor: primeColor,
+                                    width: 35,
+                                    height: 35
+                                }}
+                                onPress={this.getCurrentPosition}
+                            >
+                                <Icon name="locate" />
+                            </Fab>
+                        </View>
+                        <Text style={styles.label}>Nomor Handphone</Text>
+                        <Item rounded style={styles.inputItem}>
+                            <Input
+                                textContentType="telephoneNumber"
+                                keyboardType="number-pad"
+                            />
+                        </Item>
+                        <Text style={styles.label}>Detail Toko</Text>
+                        <Textarea
+                            style={{
+                                borderColor: primeColor,
+                                borderWidth: 2,
+                                borderRadius: 18,
+                                padding: 10
+                            }}
+                            rowSpan={5}
+                        />
+                    </View>
+                </ScrollView>
+                <Modal visible={!permission} transparent animationType="slide">
+                    {!permission &&
+                        <View style={{
+                            flex: 1,
+                            justifyContent: "flex-end",
+                            alignItems: 'center',
+                            backgroundColor: 'transparent'
+                        }}>
+                            <View style={{
+                                backgroundColor: '#fff',
+                                width: '90%',
+                                borderRadius: 18,
+                                paddingVertical: 20,
+                                paddingHorizontal: 45,
+                                marginBottom: 20,
+                                borderColor: '#ccc',
+                                borderWidth: 1
+                            }}>
+                                <Text style={{
+                                    textAlign: 'center',
+                                    fontWeight: '700'
+                                }}>
+                                    Anda harus mengaktifkan GPS/Lokasi terlebih dahulu
+                            </Text>
+                                <View style={{
+                                    flexDirection: 'row',
+                                    justifyContent: 'center',
+                                    marginTop: 12
+                                }}>
+                                    <Button
+                                        rounded
+                                        style={{
+                                            marginHorizontal: 10,
+                                            backgroundColor: primeColor
+                                        }}
+                                        small
+                                        onPress={() => this.props.navigation.goBack()}
+                                    >
+                                        <Text style={{ textTransform: 'capitalize' }}>Kembali</Text>
+                                    </Button>
+                                    <Button
+                                        rounded
+                                        style={{ marginHorizontal: 10, backgroundColor: primeColor }}
+                                        small
+                                        onPress={this.getCurrentPosition}
+                                    >
+                                        <Text style={{ textTransform: 'capitalize' }}>Selesai</Text>
+                                    </Button>
+                                </View>
+                            </View>
+                        </View>
+                    }
+                </Modal>
+            </ScreenBase>
+        );
+    }
+}
+
+const Store = ({ navigation }) => {
     const scrollA = useRef(new Animated.Value(0)).current;
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
@@ -27,7 +225,6 @@ const StoreAccount = (props) => {
         'Service'
     ])
     const [activeTab, setActiveTab] = useState(tabs[0])
-    const { navigation } = props;
     const [isScroll, setIsScroll] = useState(false)
     const handleScroll = (e) => {
         const { contentSize, contentInset, contentOffset } = e.nativeEvent
@@ -62,10 +259,12 @@ const StoreAccount = (props) => {
                                     <Icon name="caret-back" style={styles.iconBack} />
                                 </TouchableOpacity>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Button rounded small bordered
-                                        style={styles.followBtn}>
-                                        <Text style={styles.followText} >Follow</Text>
-                                    </Button>
+                                    {activeTab === tabs[1] &&
+                                        <Button rounded small bordered
+                                            style={styles.followBtn}>
+                                            <Text style={styles.followText} >Follow</Text>
+                                        </Button>
+                                    }
                                     <Icon name="ellipsis-vertical" style={styles.etc} />
                                 </View>
                             </View>
@@ -75,6 +274,14 @@ const StoreAccount = (props) => {
                                     source={require('../../assets/images/sarung.jpg')}
                                     style={{ height: 120, width: 120 }}
                                 />
+                                {activeTab === tabs[0] &&
+                                    <View style={styles.editBtn}>
+                                        <Icon name="create-outline" style={{
+                                            fontSize: 22,
+                                            marginTop: 4
+                                        }} />
+                                    </View>
+                                }
                             </View>
 
                             <View style={styles.userInfo}>
@@ -83,21 +290,30 @@ const StoreAccount = (props) => {
                             </View>
 
                             <View style={styles.contactContainer}>
-                                <TouchableOpacity>
-                                    <View style={styles.toConnect}>
-                                        <Icon name="mail-outline" style={styles.iToConnect} />
-                                    </View>
-                                </TouchableOpacity>
-                                <TouchableOpacity>
-                                    <View style={styles.toConnect}>
-                                        <Icon name="location-outline" style={styles.iToConnect} />
-                                    </View>
-                                </TouchableOpacity>
-                                <TouchableOpacity>
-                                    <View style={styles.toConnect}>
-                                        <Icon name="call-outline" style={styles.iToConnect} />
-                                    </View>
-                                </TouchableOpacity>
+                                {activeTab === tabs[0]
+                                    ?
+                                    <Button style={{ backgroundColor: '#fff' }} rounded>
+                                        <Icon name="add-circle-outline" style={styles.iToConnect} />
+                                    </Button>
+                                    :
+                                    <>
+                                        <TouchableOpacity>
+                                            <View style={styles.toConnect}>
+                                                <Icon name="mail-outline" style={styles.iToConnect} />
+                                            </View>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity>
+                                            <View style={styles.toConnect}>
+                                                <Icon name="location-outline" style={styles.iToConnect} />
+                                            </View>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity>
+                                            <View style={styles.toConnect}>
+                                                <Icon name="call-outline" style={styles.iToConnect} />
+                                            </View>
+                                        </TouchableOpacity>
+                                    </>
+                                }
                             </View>
                         </View>
                     </Animated.View>
@@ -139,7 +355,7 @@ const StoreAccount = (props) => {
                     </View>
                 </View>
             </Animated.ScrollView>
-        </ScreenBase>
+        </ScreenBase >
     );
 };
 
@@ -184,7 +400,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingTop: 50,
+        paddingTop: 45,
         paddingHorizontal: 32,
         paddingBottom: 15,
         alignItems: 'center'
@@ -204,7 +420,8 @@ const styles = StyleSheet.create({
         width: 120,
         borderRadius: 60,
         overflow: 'hidden',
-        marginTop: -20
+        marginTop: -20,
+        position: 'relative'
     },
     storeName: {
         fontSize: 24,
@@ -232,7 +449,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         marginHorizontal: 10
     },
-    iToConnect: { fontSize: 24 },
+    iToConnect: { fontSize: 24, color: '#000' },
     itemsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -244,7 +461,33 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#a8c8c7'
     },
-    tabText: { textTransform: 'capitalize', fontSize: 16 }
+    tabText: { textTransform: 'capitalize', fontSize: 16 },
+    editBtn: {
+        backgroundColor: 'rgba(255,255,255,0.5)',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: 35,
+        alignItems: 'center',
+    },
+    label: {
+        color: "#555",
+        marginTop: 20,
+        marginBottom: 8,
+        marginLeft: 3,
+    },
+    inputItem: {
+        paddingHorizontal: 5,
+        paddingVertical: 3,
+        marginLeft: -1,
+        marginRight: -1,
+        borderColor: primeColor,
+        borderBottomWidth: 2,
+        borderTopWidth: 2,
+        borderLeftWidth: 2,
+        borderRightWidth: 2,
+        height: 55
+    },
 });
 
 export default StoreAccount;

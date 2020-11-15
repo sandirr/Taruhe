@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { LogBox } from "react-native";
 import SplashScreen from "react-native-splash-screen";
 import Navigation from "./src/navigation";
 
@@ -7,7 +8,7 @@ const App = () => {
     SplashScreen.hide();
     // console.disableYellowBox = true;
   }, []);
-  // LogBox.ignoreAllLogs(disable);
+  LogBox.ignoreAllLogs(true);
   return <Navigation />;
 
 };

@@ -156,8 +156,10 @@ const Home = (props) => {
                                         style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
                                     />
                                     <View style={{ marginLeft: 10 }}>
-                                        <Text style={{ fontSize: 20, color: '#555' }}>Kalea Official</Text>
-                                        <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>Susi Pudjiastuti</Text>
+                                        <TouchableOpacity onPress={() => navigation.navigate('StoreAccount')}>
+                                            <Text style={{ fontSize: 20, color: '#555' }}>Kalea Official</Text>
+                                            <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>Susi Pudjiastuti</Text>
+                                        </TouchableOpacity>
                                     </View>
                                 </View>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -178,13 +180,14 @@ const Home = (props) => {
                                         latitude: 37.78825,
                                         longitude: -122.4324,
                                         latitudeDelta: 1,
-                                        longitudeDelta: 1
+                                        longitudeDelta: 1,
                                     }}
                                 >
                                     <Marker
                                         coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
                                         title="Kalea Official"
-                                    />
+                                    >
+                                    </Marker>
                                 </MapView>
                             </TouchableOpacity>
                         </View>

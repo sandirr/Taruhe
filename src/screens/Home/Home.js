@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox } from 'react-native';
+import { Dimensions, StyleSheet, Animated, LogBox, TouchableOpacity } from 'react-native';
 import strings from '../../assets/Dictionary';
 import { Item, Input, Icon, View } from 'native-base';
 import { primeColor } from '../../configs/color';
@@ -75,7 +75,9 @@ const Home = (props) => {
           />
         </Item>
         <Icon name="heart" style={{ color: iconSearch }} />
-        <Icon name="mail" style={{ color: iconSearch }} />
+        <TouchableOpacity>
+          <Icon name="mail" style={{ color: iconSearch }} />
+        </TouchableOpacity>
       </View>
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
