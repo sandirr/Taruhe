@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking } from 'react-native';
 import { View, H3, Text, Button } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
@@ -20,24 +20,7 @@ const Home = (props) => {
     const { navigation } = props;
     const [readMore, setReadMore] = useState(false)
     const handleGetDirections = ({ latitude, longitude }) => {
-        const data = {
-            destination: {
-                latitude,
-                longitude
-            },
-            params: [
-                {
-                    key: "travelmode",
-                    value: "driving"        // may be "walking", "bicycling" or "transit" as well
-                },
-                {
-                    key: "dir_action",
-                    value: "navigate"       // this instantly initializes navigation using the given travel mode
-                }
-            ],
-        }
-
-        getDirections(data)
+        Linking.openURL('https://www.google.com/maps/search/?api=1&query=mega rezky residence')
     }
     return (
         <ScreenBase>
@@ -170,21 +153,21 @@ const Home = (props) => {
                         </View>
 
                         <View style={{ marginTop: 20, height: 180, width: '100%', padding: 5, backgroundColor: '#fff' }}>
-                            <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections({ latitude: 37.78825, longitude: -122.4324 })} >
+                            <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections({ latitude: 0.7893, longitude: 113.9213 })} >
                                 <MapView
                                     liteMode
                                     style={{ flex: 1 }}
                                     provider={PROVIDER_GOOGLE}
                                     showsUserLocation
                                     initialRegion={{
-                                        latitude: 37.78825,
-                                        longitude: -122.4324,
+                                        latitude: 0.7893,
+                                        longitude: 113.9213,
                                         latitudeDelta: 1,
                                         longitudeDelta: 1,
                                     }}
                                 >
                                     <Marker
-                                        coordinate={{ latitude: 37.78825, longitude: -122.4324 }}
+                                        coordinate={{ latitude: 0.7893, longitude: 113.9213 }}
                                         title="Kalea Official"
                                     >
                                     </Marker>

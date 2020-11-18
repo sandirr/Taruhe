@@ -9,23 +9,24 @@ import {
     ToastAndroid,
     Modal,
     StatusBar,
+    ScrollView,
+    Pressable
 } from 'react-native';
 import strings from '../../assets/Dictionary';
 import { Item, Input, Icon, View, Button, Text, Textarea, Fab } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
-import { ScrollView } from 'react-native-gesture-handler';
 import SellingItem from '../../elements/SellingItem';
-import Geolocation from '@react-native-community/geolocation';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import { currentLocation } from '../../configs/location';
+// import Geolocation from '@react-native-community/geolocation';
+// import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+// import { currentLocation } from '../../configs/location';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 const StoreAccount = ({ navigation }) => {
     return (
-        <FormStore navigation={navigation} />
+        <Store navigation={navigation} />
     );
 }
 
@@ -36,56 +37,59 @@ class FormStore extends Component {
         position: {}
     }
 
-    componentDidMount() {
-        this.getCurrentPosition()
-    }
+    // componentDidMount() {
+    //     this.getCurrentPosition()
+    // }
 
-    getAddressFromCoordinates = ({ latitude, longitude }) => {
-        return new Promise((resolve) => {
-            const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=$AIzaSyC6X5ljOipfwatCZAOD9HW1dhbdr9zkLp0&mode=retrieveAddresses&prox=${latitude},${longitude}`
-            fetch(url)
-                .then(res => res.json())
-                .then((resJson) => {
-                    if (resJson
-                        && resJson.Response
-                        && resJson.Response.View
-                        && resJson.Response.View[0]
-                        && resJson.Response.View[0].Result
-                        && resJson.Response.View[0].Result[0]) {
-                        console.log(resJson.Response.View[0].Result[0].Location.Address.Label)
-                        resolve(resJson.Response.View[0].Result[0].Location.Address.Label)
-                    } else {
-                        resolve()
-                    }
-                })
-                .catch((e) => {
-                    console.log('Error in getAddressFromCoordinates', e)
-                    resolve()
-                })
-        })
-    }
+    // getAddressFromCoordinates = ({ latitude, longitude }) => {
+    //     return new Promise((resolve) => {
+    //         const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=$AIzaSyC6X5ljOipfwatCZAOD9HW1dhbdr9zkLp0&mode=retrieveAddresses&prox=${latitude},${longitude}`
+    //         fetch(url)
+    //             .then(res => res.json())
+    //             .then((resJson) => {
+    //                 if (resJson
+    //                     && resJson.Response
+    //                     && resJson.Response.View
+    //                     && resJson.Response.View[0]
+    //                     && resJson.Response.View[0].Result
+    //                     && resJson.Response.View[0].Result[0]) {
+    //                     console.log(resJson.Response.View[0].Result[0].Location.Address.Label)
+    //                     resolve(resJson.Response.View[0].Result[0].Location.Address.Label)
+    //                 } else {
+    //                     resolve()
+    //                 }
+    //             })
+    //             .catch((e) => {
+    //                 console.log('Error in getAddressFromCoordinates', e)
+    //                 resolve()
+    //             })
+    //     })
+    // }
 
-    getCurrentPosition = () => {
-        Geolocation.getCurrentPosition((position) => {
-            setTimeout(() => {
-                this.setState({ permission: true, currentPosition: position.coords })
-            }, 10)
-        }, error => {
-            console.log(error)
-            this.setState({ permission: false })
-        })
-    }
+    // getCurrentPosition = () => {
+    //     Geolocation.getCurrentPosition((position) => {
+    //         setTimeout(() => {
+    //             this.setState({ permission: true, currentPosition: position.coords })
+    //         }, 10)
+    //     }, error => {
+    //         console.log(error)
+    //         this.setState({ permission: false })
+    //     })
+    // }
 
     render() {
-        const { currentPosition, permission, position } = this.state;
+        // const { currentPosition, permission, position } = this.state;
         return (
             <ScreenBase barStyle="dark-content">
-                <ScrollView contentContainerStyle={{
-                    flex: 1,
-                    backgroundColor: '#f3f3f3',
-                    padding: 45,
-                    minHeight: screenHeight
-                }}>
+                <ScrollView
+                    contentContainerStyle={{
+                        flex: 1,
+                        backgroundColor: '#f3f3f3',
+                        padding: 45,
+                        minHeight: screenHeight,
+                    }}
+                    showsVerticalScrollIndicator={false}
+                >
                     <View
                         style={{
                             flexDirection: "row",
@@ -110,34 +114,16 @@ class FormStore extends Component {
                             />
                         </Item>
                         <Text style={styles.label}>Lokasi Toko</Text>
-                        <View style={{ width: '100%', height: 160, position: 'relative' }}>
-                            <MapView
-                                style={{ flex: 1 }}
-                                provider={PROVIDER_GOOGLE}
-                                showsUserLocation={true}
-                                followUserLocation={true}
-                                region={{
-                                    latitude: currentPosition.latitude || 0,
-                                    longitude: currentPosition.longitude || 0,
-                                    latitudeDelta: 0.005,
-                                    longitudeDelta: 0.005,
-                                }}
-                                zoomEnabled={true}
-                            >
-                            </MapView>
-                            <Fab
-                                style={{
-                                    position: 'absolute',
-                                    right: 5,
-                                    backgroundColor: primeColor,
-                                    width: 35,
-                                    height: 35
-                                }}
-                                onPress={this.getCurrentPosition}
-                            >
-                                <Icon name="locate" />
-                            </Fab>
-                        </View>
+                        <Textarea
+                            placeholder="Nama jalan/Perumahan, Kelurahan, Kecamatan, Kota, Kode POS"
+                            style={{
+                                borderColor: primeColor,
+                                borderWidth: 2,
+                                borderRadius: 18,
+                                padding: 10
+                            }}
+                            rowSpan={5}
+                        />
                         <Text style={styles.label}>Nomor Handphone</Text>
                         <Item rounded style={styles.inputItem}>
                             <Input
@@ -147,6 +133,7 @@ class FormStore extends Component {
                         </Item>
                         <Text style={styles.label}>Detail Toko</Text>
                         <Textarea
+                            placeholder="Toko ini menyediakan..."
                             style={{
                                 borderColor: primeColor,
                                 borderWidth: 2,
@@ -156,8 +143,29 @@ class FormStore extends Component {
                             rowSpan={5}
                         />
                     </View>
+                    <Button
+                        rounded
+                        style={[
+                            {
+                                backgroundColor: primeColor,
+                                marginVertical: 35,
+                            },
+                            {
+                                alignSelf: "center",
+                                width: "90%",
+                                alignItems: "center",
+                                display: "flex",
+                                justifyContent: "center",
+                                height: 55,
+                            }
+                        ]}
+                    >
+                        <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
+                            Simpan
+                        </Text>
+                    </Button>
                 </ScrollView>
-                <Modal visible={!permission} transparent animationType="slide">
+                {/* <Modal visible={!permission} transparent animationType="slide">
                     {!permission &&
                         <View style={{
                             flex: 1,
@@ -209,7 +217,7 @@ class FormStore extends Component {
                             </View>
                         </View>
                     }
-                </Modal>
+                </Modal> */}
             </ScreenBase>
         );
     }
@@ -224,6 +232,7 @@ const Store = ({ navigation }) => {
         'Product',
         'Service'
     ])
+    const [isAdd, setIsAdd] = useState(false)
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [isScroll, setIsScroll] = useState(false)
     const handleScroll = (e) => {
@@ -292,9 +301,72 @@ const Store = ({ navigation }) => {
                             <View style={styles.contactContainer}>
                                 {activeTab === tabs[0]
                                     ?
-                                    <Button style={{ backgroundColor: '#fff' }} rounded>
-                                        <Icon name="add-circle-outline" style={styles.iToConnect} />
-                                    </Button>
+                                    <>
+                                        {isAdd &&
+                                            <Pressable onPress={() => navigation.navigate('AddItem', { type: 'product' })}>
+                                                <View
+                                                    style={{
+                                                        backgroundColor: '#fff',
+                                                        marginHorizontal: 10,
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        borderRadius: 25,
+                                                        width: 70,
+                                                        paddingVertical: 3
+                                                    }}
+                                                    rounded
+                                                >
+                                                    <Icon name="cube-outline" style={styles.iToConnect} />
+                                                    <Text style={{
+                                                        color: '#000',
+                                                        fontSize: 12,
+                                                        marginTop: -3
+                                                    }}
+                                                    >
+                                                        {strings.Menu2}
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        }
+                                        {!isAdd &&
+                                            <Button
+                                                style={{
+                                                    backgroundColor: '#fff',
+                                                    marginHorizontal: 10,
+                                                }}
+                                                rounded
+                                                onPress={() => setIsAdd(!isAdd)}
+                                            >
+                                                <Icon name="add-circle-outline" style={styles.iToConnect} />
+                                            </Button>
+                                        }
+                                        {isAdd &&
+                                            <Pressable onPress={() => navigation.navigate('AddItem', { type: 'service' })}>
+                                                <View
+                                                    style={{
+                                                        backgroundColor: '#fff',
+                                                        marginHorizontal: 10,
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        borderRadius: 25,
+                                                        width: 70,
+                                                        paddingVertical: 3
+                                                    }}
+                                                    rounded
+                                                >
+                                                    <Icon name="people-outline" style={styles.iToConnect} />
+                                                    <Text style={{
+                                                        color: '#000',
+                                                        fontSize: 12,
+                                                        marginTop: -3
+                                                    }}
+                                                    >
+                                                        {strings.Menu3}
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        }
+                                    </>
                                     :
                                     <>
                                         <TouchableOpacity>

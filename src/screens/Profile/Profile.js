@@ -24,7 +24,6 @@ export default function Profile({ navigation }) {
         };
 
         ImagePicker.showImagePicker(options, (response) => {
-
             if (response.didCancel) {
                 // console.log('User cancelled image picker');
             } else if (response.error) {
@@ -76,7 +75,7 @@ export default function Profile({ navigation }) {
                             <Text>Username</Text>
                         </Left>
                         <Right>
-                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>A. Irsandi</Text>
+                            <Text style={{ color: 'gray', marginLeft: -15 }}>A. Irsandi</Text>
                         </Right>
                     </ListItem>
                     <ListItem onPress={() =>
@@ -85,7 +84,7 @@ export default function Profile({ navigation }) {
                             <Text>Gender</Text>
                         </Left>
                         <Right>
-                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>Male</Text>
+                            <Text style={{ color: 'gray', marginLeft: -15 }}>Male</Text>
                         </Right>
                     </ListItem>
                     <ListItem onPress={() => setModalVisible('Birthday')} itemDivider
@@ -94,7 +93,7 @@ export default function Profile({ navigation }) {
                             <Text>Birthday</Text>
                         </Left>
                         <Right>
-                            <Text style={{ color: 'gray', fontStyle: 'italic' }}>10/09/2020</Text>
+                            <Text style={{ color: 'gray', marginLeft: -15 }}>10/09/2020</Text>
                         </Right>
                     </ListItem>
                 </List>

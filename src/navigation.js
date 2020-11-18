@@ -16,6 +16,7 @@ import DetailItem from "./screens/DetailItem";
 import Account from "./screens/Account";
 import Profile from "./screens/Profile";
 import StoreAccount from "./screens/StoreAccount/StoreAccount";
+import AddItem from "./screens/AddItem";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -61,6 +62,11 @@ const AppFeature = () => {
       <AppStack.Screen
         name="StoreAccount"
         component={StoreAccount}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="AddItem"
+        component={AddItem}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
