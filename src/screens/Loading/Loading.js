@@ -18,17 +18,32 @@ export default class Loading extends React.Component {
         this._bootstrapAsync()
     }
 
+    _removeUid = async () => {
+        await AsyncStorage.removeItem('uid')
+    }
+
     // Fetch the token from storage then navigate to our appropriate place
     _bootstrapAsync = async () => {
-        const language = await AsyncStorage.getItem('language');
-        if (!language) {
-            strings.setLanguage('id')
-            await AsyncStorage.setItem('language', 'id')
-            this.props.navigation.replace('AppCore')
-        } else {
-            strings.setLanguage(language)
-            this.props.navigation.replace('AppCore')
-        }
+        const { navigation } = this.props;
+        let language = await AsyncStorage.getItem('language');
+        // let uid = await AsyncStorage.getItem('uid')
+        // profile.data = JSON.parse(userData);
+
+        strings.setLanguage(language || 'id')
+        await AsyncStorage.setItem('language', language || 'id')
+        navigation.replace('AppCore')
+
+        // fAuth.onAuthStateChanged(function (user) {
+        //     if (user && uid) {
+        //         fDB.ref('users/' + uid).on('value', val => {
+        //             profile.data = val.val()
+        //         })
+        //     } else {
+        //         this._removeUid()
+        //         navigation.replace('AppCore')
+        //     }
+        // });
+
         // This will switch to the App screen or Auth screen and this loading
         // screen will be unmounted and thrown away.
     };

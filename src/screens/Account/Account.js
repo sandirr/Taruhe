@@ -1,14 +1,21 @@
 import React from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable, Alert } from 'react-native'
 import { Icon, Text, View, List, ListItem, Left, Body, Right } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
 import FooterTabs from '../../elements/FooterTabs/FooterTabs'
 import ScreenBase from '../../elements/SecreenBase'
+import { fAuth } from '../../configs/firebase'
+import { profile } from '../../configs/profile'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 export default function Account({ navigation }) {
+    const { data } = profile;
+    const removeUid = async () => {
+        await AsyncStorage.removeItem('uid')
+    }
     return (
         <ScreenBase barStyle="light-content">
             <View style={styles.root}>
@@ -19,8 +26,8 @@ export default function Account({ navigation }) {
                             style={styles.imageProfile}
                         />
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
-                            <Text style={styles.storeName}>Kalea Official</Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+                            <Text style={styles.storeName}>{data.username}</Text>
+                            <TouchableOpacity onPress={() => navigation.push('Profile')}>
                                 <Text style={styles.toProfile}>{strings.VEP}</Text>
                             </TouchableOpacity>
                         </View>
@@ -117,7 +124,12 @@ export default function Account({ navigation }) {
                         </Body>
                     </ListItem>
                     <ListItem icon itemDivider style={styles.menuItem} onPress={() => {
-                        navigation.navigate('Welcome')
+                        fAuth.signOut().then(function () {
+                            removeUid()
+                            profile.data = {}
+                        }).catch(function (error) {
+                            Alert.alert(error.code, error.message)
+                        });
                     }}>
                         <Left>
                             <Icon style={{ transform: [{ rotate: '180deg' }], fontSize: 22 }} name="log-out-outline" />
@@ -127,7 +139,9 @@ export default function Account({ navigation }) {
                         </Body>
                     </ListItem>
                 </List>
-                <Text style={styles.taruheVer}>Taruhe v 1.0.0</Text>
+                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                    <Text style={styles.taruheVer}>Taruhe v 1.0.0</Text>
+                </View>
             </ScrollView>
 
             <FooterTabs
@@ -176,13 +190,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 14,
+        paddingVertical: 10,
         marginTop: -36
     },
     myStoreStr: {
         fontSize: 18,
         color: primeColor,
-        marginLeft: 5,
+        marginLeft: 15,
     },
     featureContainer: {
         backgroundColor: '#dcdee2',

@@ -75,7 +75,7 @@ const Home = (props) => {
           />
         </Item>
         <Icon name="heart" style={{ color: iconSearch }} />
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ListChat')}>
           <Icon name="mail" style={{ color: iconSearch }} />
         </TouchableOpacity>
       </View>

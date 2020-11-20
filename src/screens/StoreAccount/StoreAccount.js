@@ -9,7 +9,6 @@ import {
     ToastAndroid,
     Modal,
     StatusBar,
-    ScrollView,
     Pressable
 } from 'react-native';
 import strings from '../../assets/Dictionary';
@@ -17,6 +16,7 @@ import { Item, Input, Icon, View, Button, Text, Textarea, Fab } from 'native-bas
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import SellingItem from '../../elements/SellingItem';
+import { ScrollView } from 'react-native-gesture-handler';
 // import Geolocation from '@react-native-community/geolocation';
 // import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 // import { currentLocation } from '../../configs/location';
@@ -26,7 +26,7 @@ const screenWidth = Dimensions.get('window').width;
 
 const StoreAccount = ({ navigation }) => {
     return (
-        <Store navigation={navigation} />
+        <FormStore navigation={navigation} />
     );
 }
 

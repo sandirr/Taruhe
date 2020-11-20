@@ -12,49 +12,33 @@ import {
 import { TouchableOpacity } from "react-native-gesture-handler";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
-import { fAuth, fDB } from "../../configs/firebase";
-import { profile } from "../../configs/profile";
+import { fAuth } from "../../configs/firebase";
 import ScreenBase from "../../elements/SecreenBase";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-export default function Login({ navigation }) {
-  const [passwordVisible, setPasswordVisisble] = useState(false);
+export default function ForgotPassword({ navigation }) {
   const [field, setField] = useState({ email: '', password: '' });
-  const [loginDisabled, setLoginDis] = useState(false)
   const changeField = (prop) => (text) => {
     setField({ ...field, [prop]: text });
   }
-  const saveUserProfile = async (data) => {
-    await AsyncStorage.setItem('uid', data)
-  }
   const login = () => {
-    setLoginDis(true)
     const { email, password } = field;
-    fAuth.signInWithEmailAndPassword(email, password).then((res) => {
-      if (res.user.emailVerified) {
-        fDB.ref('users/' + res.user.uid).on('value', val => {
-          saveUserProfile(val.val().uid);
-          profile.data = val.val();
-          navigation.replace('AppCore');
-        })
-      } else {
-        Alert.alert('Email not verified', 'Please check your email inbox and verify your account');
-        fAuth.signOut().then(function () {
-          // Sign-out successful.
-        }).catch(function (error) {
-          // An error happened.
-        });
-        setLoginDis(false)
-      }
-    }).catch(function (error) {
-      setLoginDis(false)
-      let errorCode = error.code;
-      let errorMessage = error.message;
-      Alert.alert(errorCode, errorMessage)
-    });
+    const emailAddress = email;
+    let b = email.replace(/[a-zA-Z0-9.]/g, '');
+    if (b !== '@') {
+      Alert.alert('Email validation !', 'Wrong Email');
+    } else {
+      fAuth.sendPasswordResetEmail(emailAddress).then(function () {
+        setField({ ...field, password: '' })
+        Alert.alert('Permintaan sukses', 'Please check your email inbox')
+      }).catch(function (error) {
+        let errorCode = error.code;
+        let errorMessage = error.message;
+        Alert.alert(errorCode, errorMessage)
+      });
+    }
   }
   return (
     <ScreenBase>
@@ -71,12 +55,12 @@ export default function Login({ navigation }) {
           }}
         >
           <Text style={{ fontSize: 24, color: "#555", fontWeight: '700' }}>
-            {strings.Login[0] + strings.Login.toLowerCase().slice(1)}
+            {strings.ForgotPass}
           </Text>
-          <Image
+          {/* <Image
             style={{ width: 83, height: 25, marginTop: 5, marginRight: 5 }}
             source={require("../../assets/images/taruhe_splash.png")}
-          />
+          /> */}
         </View>
 
         <Text style={styles.label}>Email</Text>
@@ -89,24 +73,6 @@ export default function Login({ navigation }) {
             onChangeText={changeField('email')}
           />
         </Item>
-        <Text style={styles.label}>{strings.Password}</Text>
-        <Item rounded style={styles.inputItem}>
-          <Input
-            value={field.password}
-            placeholder={strings.InputPassword}
-            secureTextEntry={!passwordVisible}
-            textContentType="password"
-            onChangeText={changeField('password')}
-          />
-          <TouchableOpacity
-            onPress={() => setPasswordVisisble(!passwordVisible)}
-          >
-            <Icon
-              name={!passwordVisible ? "eye-off-outline" : "eye-outline"}
-              style={{ color: "#555" }}
-            />
-          </TouchableOpacity>
-        </Item>
 
         <Button
           rounded
@@ -118,49 +84,27 @@ export default function Login({ navigation }) {
             styles.button,
           ]}
           onPress={login}
-          disabled={loginDisabled}
         >
           <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
-            {strings.Login}
+            SELANJUTNYA
           </Text>
         </Button>
-
-        <View style={styles.forgotPass}>
-          <Text>{strings.ForgotPass}?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPass')}>
-            <Text style={styles.reset}>{strings.ResetHere}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 25 }}>
-          <Image
-            style={{ width: 40, height: 40, marginHorizontal: 15 }}
-            source={require("../../assets/images/facebook.png")}
-          />
-          <Image
-            style={{ width: 38, height: 38, marginHorizontal: 15 }}
-            source={require("../../assets/images/google.png")}
-          />
-        </View>
-
-        <Text style={{ alignSelf: "center", marginBottom: 8, marginTop: 25 }}>
-          {strings.NotHaveAccount}?
-          </Text>
-
         <Button
           rounded
           style={[
             {
               backgroundColor: "#ccc",
+              marginTop: 20
             },
             styles.button,
           ]}
-          onPress={() => navigation.navigate("Register")}
+          onPress={() => navigation.navigate("Login")}
         >
           <Text style={{ color: "#555", fontWeight: '700', fontSize: 16 }}>
-            {strings.RegisterNew}
+            {strings.Login}
           </Text>
         </Button>
+
       </ScrollView>
     </ScreenBase>
   );

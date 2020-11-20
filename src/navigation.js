@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "./screens/Home";
 import Loading from "./screens/Loading";
 import Login from "./screens/Login";
@@ -17,11 +16,30 @@ import Account from "./screens/Account";
 import Profile from "./screens/Profile";
 import StoreAccount from "./screens/StoreAccount/StoreAccount";
 import AddItem from "./screens/AddItem";
+import ListChat from "./screens/ListChat";
+import ChatSCreen from "./screens/ChatScreen";
+import { fAuth, fDB } from "./configs/firebase";
+import ForgotPassword from "./screens/ForgotPassword";
+import { profile } from "./configs/profile";
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
 
 const AppFeature = () => {
+  const [isUser, setIsUser] = useState(false)
+  useEffect(() => {
+    fAuth.onAuthStateChanged(function (user) {
+      if (user) {
+        fDB.ref('users/' + user.uid).on('value', val => {
+          profile.data = val.val()
+          setIsUser(true)
+        })
+      } else {
+        setIsUser(false)
+      }
+    });
+  }, [])
   return (
     <AppStack.Navigator>
       <AppStack.Screen
@@ -46,27 +64,42 @@ const AppFeature = () => {
       />
       <AppStack.Screen
         name={strings.Menu5}
-        component={Account}
+        component={isUser ? Account : Welcome}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
         name="Profile"
-        component={Profile}
+        component={isUser ? Profile : Welcome}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="ForgotPass"
+        component={ForgotPassword}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
         name="AccountSetting"
-        component={AccountSetting}
+        component={isUser ? AccountSetting : Welcome}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
         name="StoreAccount"
-        component={StoreAccount}
+        component={isUser ? StoreAccount : Welcome}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
         name="AddItem"
         component={AddItem}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="ListChat"
+        component={isUser ? ListChat : Welcome}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="ChatScreen"
+        component={isUser ? ChatSCreen : Welcome}
         options={{ headerShown: false }}
       />
       <AppStack.Screen
@@ -84,6 +117,24 @@ const AppFeature = () => {
 };
 
 export default function navigation() {
+  const [isUser, setIsUser] = useState(false)
+  const removeUid = async () => {
+    await AsyncStorage.removeItem('uid')
+  }
+  useEffect(() => {
+    fAuth.onAuthStateChanged(function (user) {
+      if (user) {
+        fDB.ref('users/' + user.uid).on('value', val => {
+          profile.data = val.val()
+          setIsUser(true)
+        })
+      } else {
+        removeUid();
+        profile.data = {}
+        setIsUser(false)
+      }
+    });
+  }, [])
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Loading">
@@ -94,12 +145,12 @@ export default function navigation() {
         />
         <Stack.Screen
           name="Login"
-          component={Login}
+          component={isUser ? Home : Login}
           options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Register"
-          component={Register}
+          component={isUser ? Home : Register}
           options={{ headerShown: false }}
         />
         <Stack.Screen
