@@ -167,8 +167,7 @@ export default function Register({ navigation }) {
           </TouchableOpacity>
         </Item>
 
-        <Button
-          rounded
+        <TouchableOpacity
           style={[
             {
               backgroundColor: primeColor,
@@ -182,7 +181,7 @@ export default function Register({ navigation }) {
           <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
             {strings.Register}
           </Text>
-        </Button>
+        </TouchableOpacity>
 
         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 25 }}>
           <Image
@@ -199,8 +198,7 @@ export default function Register({ navigation }) {
           {strings.AlreadyHaveAccount}?
           </Text>
 
-        <Button
-          rounded
+        <TouchableOpacity
           style={[
             {
               backgroundColor: "#ccc",
@@ -212,7 +210,7 @@ export default function Register({ navigation }) {
           <Text style={{ color: "#555", fontWeight: '700', fontSize: 16 }}>
             {strings.Login}
           </Text>
-        </Button>
+        </TouchableOpacity>
       </ScrollView>
     </ScreenBase>
   );
@@ -224,6 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
     padding: 45,
     minHeight: screenHeight,
+    justifyContent: 'center'
   },
   label: {
     color: "#555",
@@ -250,6 +249,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     height: 55,
+    borderRadius: 50
   },
   forgotPass: {
     flexDirection: "row",

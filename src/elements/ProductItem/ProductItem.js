@@ -4,18 +4,18 @@ import { Text, View } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StarRating from 'react-native-star-rating';
 
-export default function ProductItem({ type, toDetail }) {
+export default function ProductItem({ type, toDetail, row }) {
     return (
         <Pressable style={styles.contentContainer(type)} onPress={toDetail}>
             <View style={styles.item(type)}>
                 <Image
-                    source={require('../../assets/images/sarung.jpg')}
+                    source={row?.imagesURL[0]}
                     style={styles.imageItem}
                 />
-                <Text style={styles.titleItem}>Mamanda Thea</Text>
+                <Text style={styles.titleItem}>{row?.title || 'Contoh'}</Text>
                 <View style={styles.containerItemLoc}>
                     <Ionicons name="location-outline" />
-                    <Text style={styles.loc}>Borneo</Text>
+                    <Text style={styles.loc}>{row?.position.district.nama}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 12, marginTop: 3 }}>
                     <StarRating
@@ -74,7 +74,8 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Thin',
         fontSize: 12,
         marginLeft: 5,
-        color: '#555'
+        color: '#555',
+        height: 18
     },
     rating: {
         display: 'flex',

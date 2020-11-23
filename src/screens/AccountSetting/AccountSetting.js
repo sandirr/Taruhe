@@ -39,7 +39,7 @@ export default function AccountSetting({ navigation }) {
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.MyAccount}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('Profile')}>
                         <Text>{strings.MyProfile}</Text>
                     </ListItem>
                     <ListItem itemDivider style={styles.menuItem}>

@@ -6,84 +6,108 @@ import {
     LogBox,
     TouchableOpacity,
     Image,
-    ToastAndroid,
-    Modal,
-    StatusBar,
-    Pressable
+    Pressable,
+    Alert,
+    Linking,
 } from 'react-native';
 import strings from '../../assets/Dictionary';
-import { Item, Input, Icon, View, Button, Text, Textarea, Fab } from 'native-base';
+import { Item, Input, Icon, View, Button, Text, Textarea, Thumbnail, Picker } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import SellingItem from '../../elements/SellingItem';
+import { profile } from '../../configs/profile';
+import { fDB, fStorage } from '../../configs/firebase';
+import ImagePicker from 'react-native-image-picker';
+import Axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
-// import Geolocation from '@react-native-community/geolocation';
-// import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-// import { currentLocation } from '../../configs/location';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const StoreAccount = ({ navigation }) => {
-    return (
-        <FormStore navigation={navigation} />
-    );
+const StoreAccount = ({ navigation, route }) => {
+    if (profile.data.storeName || route.params.type !== 'owner')
+        return (
+            <Store navigation={navigation} route={route} />
+        );
+    else
+        return (
+            <FormStore navigation={navigation} />
+        );
 }
 
 class FormStore extends Component {
     state = {
         currentPosition: {},
         permission: true,
-        position: {}
+        position: { province: {}, district: {}, subDistrict: {} },
+        storeName: '',
+        storeLocation: '',
+        phoneNumber: '',
+        storeDetail: '',
+        province: [],
+        district: [],
+        subDistrict: []
     }
 
-    // componentDidMount() {
-    //     this.getCurrentPosition()
-    // }
+    componentDidMount() {
+        Axios.get('https://ibnux.github.io/data-indonesia/propinsi.json')
+            .then((res) => {
+                this.setState({ province: res.data })
+            })
+    }
 
-    // getAddressFromCoordinates = ({ latitude, longitude }) => {
-    //     return new Promise((resolve) => {
-    //         const url = `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=$AIzaSyC6X5ljOipfwatCZAOD9HW1dhbdr9zkLp0&mode=retrieveAddresses&prox=${latitude},${longitude}`
-    //         fetch(url)
-    //             .then(res => res.json())
-    //             .then((resJson) => {
-    //                 if (resJson
-    //                     && resJson.Response
-    //                     && resJson.Response.View
-    //                     && resJson.Response.View[0]
-    //                     && resJson.Response.View[0].Result
-    //                     && resJson.Response.View[0].Result[0]) {
-    //                     console.log(resJson.Response.View[0].Result[0].Location.Address.Label)
-    //                     resolve(resJson.Response.View[0].Result[0].Location.Address.Label)
-    //                 } else {
-    //                     resolve()
-    //                 }
-    //             })
-    //             .catch((e) => {
-    //                 console.log('Error in getAddressFromCoordinates', e)
-    //                 resolve()
-    //             })
-    //     })
-    // }
+    handleChangeProv = (e) => {
+        this.setState({
+            position: { province: e, district: {}, subDistrict: {} },
+        }, this.handleSearchDistrict)
+    }
 
-    // getCurrentPosition = () => {
-    //     Geolocation.getCurrentPosition((position) => {
-    //         setTimeout(() => {
-    //             this.setState({ permission: true, currentPosition: position.coords })
-    //         }, 10)
-    //     }, error => {
-    //         console.log(error)
-    //         this.setState({ permission: false })
-    //     })
-    // }
+    handleSearchDistrict = () => {
+        Axios.get(`https://ibnux.github.io/data-indonesia/kabupaten/${this.state.position.province.id}.json`)
+            .then((res) => {
+                this.setState({ district: res.data })
+            })
+    }
+
+    handleChangeDis = (e) => {
+        this.setState({
+            position: { ...this.state.position, district: e, subDistrict: {} }
+        }, this.handleSearchSubDistric)
+    }
+
+    handleSearchSubDistric = () => {
+        Axios.get(`https://ibnux.github.io/data-indonesia/kecamatan/${this.state.position.district.id}.json`)
+            .then((res) => {
+                this.setState({ subDistrict: res.data })
+            })
+    }
+
+    handleChangeSubDis = (e) => {
+        this.setState({
+            position: { ...this.state.position, subDistrict: e }
+        })
+    }
+
+    saveStore = () => {
+        const { storeName, storeLocation, phoneNumber, storeDetail, position } = this.state
+        if (storeName && storeLocation && phoneNumber && storeDetail && position.province.nama && position.subDistrict.nama && position.district.nama)
+            fDB.ref('users')
+                .child(profile.data.uid)
+                .update({ ...profile.data, storeName, storeLocation, phoneNumber, storeDetail, position })
+                .then(() => {
+                    Alert.alert('Sukses', 'Your store is ready')
+                    this.props.navigation.goBack()
+                })
+        else
+            Alert.alert('Belum lengkap', 'Lengkapi isian yang tersedia!')
+    }
 
     render() {
-        // const { currentPosition, permission, position } = this.state;
+        const { storeName, storeLocation, phoneNumber, storeDetail, province, district, subDistrict } = this.state
         return (
             <ScreenBase barStyle="dark-content">
                 <ScrollView
                     contentContainerStyle={{
-                        flex: 1,
                         backgroundColor: '#f3f3f3',
                         padding: 45,
                         minHeight: screenHeight,
@@ -110,29 +134,92 @@ class FormStore extends Component {
                         <Text style={styles.label}>Nama Toko</Text>
                         <Item rounded style={styles.inputItem}>
                             <Input
+                                value={storeName}
+                                onChangeText={(text) => this.setState({ storeName: text })}
                                 textContentType="organizationName"
                             />
                         </Item>
                         <Text style={styles.label}>Lokasi Toko</Text>
                         <Textarea
-                            placeholder="Nama jalan/Perumahan, Kelurahan, Kecamatan, Kota, Kode POS"
+                            placeholder="Nama jalan/perumahan/nomor rumah"
                             style={{
                                 borderColor: primeColor,
                                 borderWidth: 2,
                                 borderRadius: 18,
                                 padding: 10
                             }}
-                            rowSpan={5}
+                            rowSpan={3}
+                            value={storeLocation}
+                            onChangeText={(text) => this.setState({ storeLocation: text })}
                         />
+                        <Text style={styles.label}>Provinsi</Text>
+                        <Item picker rounded style={styles.inputItem}>
+                            <Picker
+                                iosIcon={<Icon name="arrow-down" />}
+                                style={{ width: undefined }}
+                                placeholder="Select"
+                                placeholderStyle={{ color: "#bfc6ea" }}
+                                placeholderIconColor="#007aff"
+                                selectedValue={this.state.position?.province}
+                                onValueChange={(val) => this.handleChangeProv(val)}
+                            >
+                                <Picker.Item label="" value="" />
+                                {province.map((loc) => (
+                                    <Picker.Item label={loc.nama} value={loc} key={loc.id} />
+                                ))}
+                            </Picker>
+                        </Item>
+                        <Text style={styles.label}>Kabupaten/Kota</Text>
+                        <Item picker rounded style={styles.inputItem}>
+                            <Picker
+                                iosIcon={<Icon name="arrow-down" />}
+                                style={{ width: undefined }}
+                                placeholder="Select"
+                                placeholderStyle={{ color: "#bfc6ea" }}
+                                placeholderIconColor="#007aff"
+                                selectedValue={this.state.position?.district}
+                                onValueChange={(val) => this.handleChangeDis(val)}
+                            >
+                                <Picker.Item label="" value="" />
+                                {district.length ? district.map((loc) => (
+                                    <Picker.Item label={loc.nama} value={loc} key={loc.id} />
+                                )) :
+                                    <Picker.Item label="Pilih provinsi terlebih dahulu" value="" />
+                                }
+                            </Picker>
+                        </Item>
+                        <Text style={styles.label}>Kecamatan</Text>
+                        <Item picker rounded style={styles.inputItem}>
+                            <Picker
+                                iosIcon={<Icon name="arrow-down" />}
+                                style={{ width: undefined }}
+                                placeholder="Select"
+                                placeholderStyle={{ color: "#bfc6ea" }}
+                                placeholderIconColor="#007aff"
+                                selectedValue={this.state.position?.subDistrict}
+                                onValueChange={(val) => this.handleChangeSubDis(val)}
+                            >
+                                <Picker.Item label="" value="" />
+                                {subDistrict.length ? subDistrict.map((loc) => (
+                                    <Picker.Item label={loc.nama} value={loc} key={loc.id} />
+                                )) :
+                                    <Picker.Item label="Pilih Kabupaten/kota terlebih dahulu" value="" />
+                                }
+                            </Picker>
+                        </Item>
                         <Text style={styles.label}>Nomor Handphone</Text>
                         <Item rounded style={styles.inputItem}>
                             <Input
+                                value={phoneNumber}
+                                onChangeText={(text) => this.setState({ phoneNumber: text })}
                                 textContentType="telephoneNumber"
                                 keyboardType="number-pad"
                             />
                         </Item>
                         <Text style={styles.label}>Detail Toko</Text>
                         <Textarea
+                            value={storeDetail}
+                            onChangeText={(text) => this.setState({ storeDetail: text })}
                             placeholder="Toko ini menyediakan..."
                             style={{
                                 borderColor: primeColor,
@@ -159,71 +246,20 @@ class FormStore extends Component {
                                 height: 55,
                             }
                         ]}
+                        onPress={this.saveStore}
                     >
                         <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
                             Simpan
                         </Text>
                     </Button>
                 </ScrollView>
-                {/* <Modal visible={!permission} transparent animationType="slide">
-                    {!permission &&
-                        <View style={{
-                            flex: 1,
-                            justifyContent: "flex-end",
-                            alignItems: 'center',
-                            backgroundColor: 'transparent'
-                        }}>
-                            <View style={{
-                                backgroundColor: '#fff',
-                                width: '90%',
-                                borderRadius: 18,
-                                paddingVertical: 20,
-                                paddingHorizontal: 45,
-                                marginBottom: 20,
-                                borderColor: '#ccc',
-                                borderWidth: 1
-                            }}>
-                                <Text style={{
-                                    textAlign: 'center',
-                                    fontWeight: '700'
-                                }}>
-                                    Anda harus mengaktifkan GPS/Lokasi terlebih dahulu
-                            </Text>
-                                <View style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    marginTop: 12
-                                }}>
-                                    <Button
-                                        rounded
-                                        style={{
-                                            marginHorizontal: 10,
-                                            backgroundColor: primeColor
-                                        }}
-                                        small
-                                        onPress={() => this.props.navigation.goBack()}
-                                    >
-                                        <Text style={{ textTransform: 'capitalize' }}>Kembali</Text>
-                                    </Button>
-                                    <Button
-                                        rounded
-                                        style={{ marginHorizontal: 10, backgroundColor: primeColor }}
-                                        small
-                                        onPress={this.getCurrentPosition}
-                                    >
-                                        <Text style={{ textTransform: 'capitalize' }}>Selesai</Text>
-                                    </Button>
-                                </View>
-                            </View>
-                        </View>
-                    }
-                </Modal> */}
+
             </ScreenBase>
         );
     }
 }
 
-const Store = ({ navigation }) => {
+const Store = ({ navigation, route }) => {
     const scrollA = useRef(new Animated.Value(0)).current;
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
@@ -231,10 +267,17 @@ const Store = ({ navigation }) => {
     const [tabs] = useState([
         'Product',
         'Service'
-    ])
+    ]);
     const [isAdd, setIsAdd] = useState(false)
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [isScroll, setIsScroll] = useState(false)
+    const [items, setItems] = useState([])
+    const [visited, setVisited] = useState({
+        photoURL: '',
+        username: '',
+        storeName: ''
+    })
+    const [loading, setLoading] = useState(true)
     const handleScroll = (e) => {
         const { contentSize, contentInset, contentOffset } = e.nativeEvent
         const maxOffset = contentSize.height - screenHeight + contentInset.bottom - 50;
@@ -244,7 +287,104 @@ const Store = ({ navigation }) => {
             setIsScroll(false)
         }
     }
+    const { type, uid, storeData } = route.params;
+    const { data } = profile
+    useEffect(() => {
+        if (type === 'owner') {
+            setVisited({ photoURL: data.photoURL, username: data.username, storeName: data.storeName })
+        } else {
+            setVisited({ photoURL: storeData.photoURL, username: storeData.username, storeName: storeData.storeName })
+        }
+    }, [type, profile.data])
 
+    useEffect(() => {
+        setItems([])
+        setLoading(true)
+        fDB.ref(activeTab.toLowerCase())
+            .orderByChild('uid')
+            .equalTo(uid)
+            .on('value', (values) => {
+                if (values.val()) {
+                    let allItems = []
+                    Object.keys(values.val()).map((value) => {
+                        allItems.push(values.val()[value]);
+                    })
+                    setItems(allItems)
+                }
+            }, (error) => {
+                Alert.alert(error.code)
+            })
+        setLoading(false)
+    }, [type, activeTab])
+
+    const updateData = (newData) => {
+        fDB
+            .ref('users')
+            .child(data.uid)
+            .update(newData)
+            .then(() => {
+                Alert.alert('Sukses', 'Perubahan tersimpan, mungkin aplikasi perlu di refresh untuk melihat perubahan');
+                profile.data = newData;
+                setVisited({ photoURL: newData.photoURL, username: newData.username, storeName: newData.storeName })
+            }).catch(err => {
+                Alert.alert(err.code, err.message)
+            })
+    }
+    const uploadImage = () => {
+        const options = {
+            quality: 0.7,
+            allowsEditing: true,
+            mediaType: 'photo',
+            noData: true,
+            storageOptions: {
+                skipBackup: true,
+                waitUntilSaved: true,
+                path: 'images',
+                cameraRoll: true,
+            },
+        };
+        ImagePicker.showImagePicker(options, (response) => {
+            if (response.didCancel) {
+                // console.log('User cancelled image picker');
+            } else if (response.error) {
+                // console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                // console.log('User tapped custom button: ', response.customButton);
+            } else {
+                uploadFile(response.uri)
+            }
+        })
+    }
+    const uploadFile = async (uri) => {
+        const file = await uriToBlob(uri)
+        const extArr = file._data.name.split('.')
+        const ext = extArr[extArr.length - 1]
+        fStorage
+            .ref(`profile_pictures/${data.uid}.${ext}`)
+            .put(file)
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+                updateData({ ...data, photoURL: url })
+            })
+            .catch(error => {
+                Alert.alert(error.code, error.message);
+            })
+    };
+    const uriToBlob = uri => {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                resolve(xhr.response);
+            };
+            xhr.onerror = function () {
+                reject(new Error('Upload Image Failed'));
+            };
+
+            xhr.responseType = 'blob';
+            xhr.open('GET', uri, true);
+            xhr.send(null);
+        });
+    };
     return (
         <ScreenBase barStyle="light-content">
             <Animated.ScrollView
@@ -268,7 +408,7 @@ const Store = ({ navigation }) => {
                                     <Icon name="caret-back" style={styles.iconBack} />
                                 </TouchableOpacity>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    {activeTab === tabs[1] &&
+                                    {type !== 'owner' &&
                                         <Button rounded small bordered
                                             style={styles.followBtn}>
                                             <Text style={styles.followText} >Follow</Text>
@@ -279,27 +419,27 @@ const Store = ({ navigation }) => {
                             </View>
 
                             <View style={styles.avatarContainer}>
-                                <Image
-                                    source={require('../../assets/images/sarung.jpg')}
+                                <Thumbnail
+                                    source={visited.photoURL ? { uri: visited.photoURL } : require('../../assets/images/storefront.png')}
                                     style={{ height: 120, width: 120 }}
                                 />
-                                {activeTab === tabs[0] &&
-                                    <View style={styles.editBtn}>
+                                {type === 'owner' &&
+                                    <TouchableOpacity style={styles.editBtn} onPress={uploadImage}>
                                         <Icon name="create-outline" style={{
                                             fontSize: 22,
                                             marginTop: 4
                                         }} />
-                                    </View>
+                                    </TouchableOpacity>
                                 }
                             </View>
 
                             <View style={styles.userInfo}>
-                                <Text style={styles.storeName}>Kalea OFFICIAL</Text>
-                                <Text style={styles.owner}>Susi Pudjiastuti</Text>
+                                <Text style={styles.storeName}>{visited.storeName}</Text>
+                                <Text style={styles.owner}>{visited.username}</Text>
                             </View>
 
                             <View style={styles.contactContainer}>
-                                {activeTab === tabs[0]
+                                {type === 'owner'
                                     ?
                                     <>
                                         {isAdd &&
@@ -374,12 +514,13 @@ const Store = ({ navigation }) => {
                                                 <Icon name="mail-outline" style={styles.iToConnect} />
                                             </View>
                                         </TouchableOpacity>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress={() =>
+                                            Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${storeData.position.subDistrict.nama}`)}>
                                             <View style={styles.toConnect}>
                                                 <Icon name="location-outline" style={styles.iToConnect} />
                                             </View>
                                         </TouchableOpacity>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress={() => Linking.openURL(`tel:${storeData.phoneNumber}`)}>
                                             <View style={styles.toConnect}>
                                                 <Icon name="call-outline" style={styles.iToConnect} />
                                             </View>
@@ -392,8 +533,9 @@ const Store = ({ navigation }) => {
                 </View>
 
                 <View style={styles.scrollView}>
+                    <View style={styles.scrollHandler} />
                     <View style={styles.itemsContainer}>
-                        <Button small rounded
+                        <TouchableOpacity
                             style={[styles.btnTab, activeTab === tabs[0] &&
                                 { backgroundColor: primeColor }]}
                             onPress={() => setActiveTab(tabs[0])}
@@ -401,8 +543,8 @@ const Store = ({ navigation }) => {
                             <Text style={styles.tabText}>
                                 {strings.Menu2}
                             </Text>
-                        </Button>
-                        <Button small rounded
+                        </TouchableOpacity>
+                        <TouchableOpacity
                             style={[styles.btnTab, , activeTab === tabs[1] &&
                                 { backgroundColor: primeColor }]}
                             onPress={() => setActiveTab(tabs[1])}
@@ -410,19 +552,25 @@ const Store = ({ navigation }) => {
                             <Text style={styles.tabText}>
                                 {strings.Menu3}
                             </Text>
-                        </Button>
+                        </TouchableOpacity>
                     </View>
                     <View style={{ paddingBottom: 50 }}>
                         <ScrollView
                             showsVerticalScrollIndicator={false}
                             scrollEnabled={isScroll}
                         >
-                            <SellingItem />
-                            <SellingItem />
-                            <SellingItem />
-                            <SellingItem />
-                            <SellingItem />
-                            <SellingItem />
+                            {items.length ? items.map(item => (
+                                <SellingItem key={item.id} data={item} />
+                            )) :
+                                loading ?
+                                    <>
+                                        <Text>Loading...</Text>
+                                    </>
+                                    :
+                                    <>
+                                        <Text>Belum ada {activeTab.toLowerCase()}</Text>
+                                    </>
+                            }
                         </ScrollView>
                     </View>
                 </View>
@@ -464,7 +612,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#f3f3f3',
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
-        paddingTop: 18,
         paddingHorizontal: 25,
         marginTop: -25,
         height: (screenHeight - 50)
@@ -475,7 +622,7 @@ const styles = StyleSheet.create({
         paddingTop: 45,
         paddingHorizontal: 32,
         paddingBottom: 15,
-        alignItems: 'center'
+        alignItems: 'center',
     },
     iconBack: { color: '#fff', fontSize: 26 },
     followBtn: {
@@ -531,9 +678,11 @@ const styles = StyleSheet.create({
         width: '48%',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#a8c8c7'
+        backgroundColor: '#a8c8c7',
+        paddingVertical: 7,
+        borderRadius: 50
     },
-    tabText: { textTransform: 'capitalize', fontSize: 16 },
+    tabText: { textTransform: 'capitalize', fontSize: 16, color: '#fff', fontWeight: '700' },
     editBtn: {
         backgroundColor: 'rgba(255,255,255,0.5)',
         position: 'absolute',
@@ -544,9 +693,10 @@ const styles = StyleSheet.create({
     },
     label: {
         color: "#555",
-        marginTop: 20,
-        marginBottom: 8,
+        marginTop: 10,
+        marginBottom: 5,
         marginLeft: 3,
+        fontSize: 14
     },
     inputItem: {
         paddingHorizontal: 5,
@@ -558,7 +708,15 @@ const styles = StyleSheet.create({
         borderTopWidth: 2,
         borderLeftWidth: 2,
         borderRightWidth: 2,
-        height: 55
+        height: 45
+    },
+    scrollHandler: {
+        marginVertical: 10,
+        backgroundColor: 'gray',
+        width: screenWidth * 0.15,
+        height: 5,
+        alignSelf: 'center',
+        borderRadius: 20
     },
 });
 

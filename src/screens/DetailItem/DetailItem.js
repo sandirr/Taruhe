@@ -8,6 +8,7 @@ import StarRating from 'react-native-star-rating';
 import strings from '../../assets/Dictionary';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import getDirections from 'react-native-google-maps-directions'
+import { parser } from '../../configs/helper';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -18,12 +19,13 @@ const Home = (props) => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
     }, []);
     const { navigation } = props;
+    const { detail } = props.route.params
     const [readMore, setReadMore] = useState(false)
-    const handleGetDirections = ({ latitude, longitude }) => {
-        Linking.openURL('https://www.google.com/maps/search/?api=1&query=mega rezky residence')
+    const handleGetDirections = (position) => {
+        Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${position.district.nama}`)
     }
     return (
-        <ScreenBase>
+        <ScreenBase barStyle="dark-content" >
             <Animated.ScrollView
                 showsVerticalScrollIndicator={false}
                 onScroll={Animated.event(
@@ -37,17 +39,18 @@ const Home = (props) => {
                 <View style={styles.bannerContainer}>
                     <Animated.View style={styles.banner(scrollA)}>
                         <ImageBackground
-                            source={require('../../assets/images/sarung.jpg')}
-                            style={{ height: screenHeight * 0.3, width: screenWidth }}
+                            source={detail.imagesURL[0]}
+                            style={{ height: screenHeight * 0.3, width: screenWidth, position: 'relative' }}
                         >
+                            <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,.4)" }} />
                             <View style={{ position: 'absolute', bottom: 45, left: 35 }}>
-                                <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>Tope (Kain Kajang)</Text>
+                                <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>{detail.title}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image
                                         source={require('../../assets/images/storefront.png')}
                                         style={{ height: 12, width: 12 }}
                                     />
-                                    <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>Kalea Bulukumba Store</Text>
+                                    <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>{detail.created_by.storeName}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                     <StarRating
@@ -77,7 +80,7 @@ const Home = (props) => {
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Ionicons name="pricetag-outline" style={{ fontSize: 30 }} />
                                 <View style={{ marginLeft: 10 }}>
-                                    <Text style={{ fontSize: 20, fontWeight: '700', color: '#555' }}>Rp. 875.000</Text>
+                                    <Text style={{ fontSize: 20, fontWeight: '700', color: '#555' }}>Rp. {parser(detail?.price)}</Text>
                                     <View style={{
                                         flexDirection: 'row', alignItems: 'center', marginLeft: -2
                                     }}>
@@ -86,10 +89,10 @@ const Home = (props) => {
                                         <Text style={{
                                             fontSize: 12, color: '#555'
                                         }}>
-                                            Bulukumba
+                                            {detail.position.district.nama}
                                         </Text>
                                     </View>
-                                    <Text style={{ fontSize: 10, color: '#bb2205', fontWeight: '700' }}>22% Off</Text>
+                                    <Text style={{ fontSize: 10, color: '#bb2205', fontWeight: '700' }}>1% Off</Text>
                                 </View>
                             </View>
                         </View>
@@ -98,9 +101,9 @@ const Home = (props) => {
                             <H3 style={{ fontWeight: '700', color: '#555' }}>{strings.Description}</H3>
                             <Text style={[{
                                 textAlign: 'justify', color: '#555', fontSize: 14
-                            }, readMore ? null : { height: 42 }]}>
-                                What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn What is Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesettingn
-                                </Text>
+                            }, readMore ? { minHeight: 42 } : { height: 42 }]}>
+                                {detail.description}
+                            </Text>
                             <TouchableOpacity onPress={() => setReadMore(!readMore)}>
                                 <Text style={styles.readMore}>
                                     {readMore ? strings.ShowLess : strings.ReadMore}...
@@ -115,17 +118,17 @@ const Home = (props) => {
                                 width: '60%', height: 220, justifyContent: 'space-between'
                             }}>
                                 <Image
-                                    source={require('../../assets/images/sarung.jpg')}
+                                    source={detail.imagesURL[0]}
                                     style={{ height: 105, width: '100%', borderRadius: 18 }}
                                 />
                                 <Image
-                                    source={require('../../assets/images/sarung.jpg')}
+                                    source={detail.imagesURL[1] || require('../../assets/images/noimage.jpg')}
                                     style={{ height: 105, width: '100%', borderRadius: 18 }}
                                 />
                             </View>
                             <View style={{ width: '37%' }}>
                                 <Image
-                                    source={require('../../assets/images/sarung.jpg')}
+                                    source={detail.imagesURL[2] || require('../../assets/images/noimage.jpg')}
                                     style={{ height: 220, width: '100%', borderRadius: 18 }}
                                 />
                             </View>
@@ -139,9 +142,9 @@ const Home = (props) => {
                                         style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
                                     />
                                     <View style={{ marginLeft: 10 }}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('StoreAccount')}>
-                                            <Text style={{ fontSize: 20, color: '#555' }}>Kalea Official</Text>
-                                            <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>Susi Pudjiastuti</Text>
+                                        <TouchableOpacity onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detail.created_by })}>
+                                            <Text style={{ fontSize: 20, color: '#555' }}>{detail.created_by.storeName}</Text>
+                                            <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detail.created_by.username}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -153,7 +156,7 @@ const Home = (props) => {
                         </View>
 
                         <View style={{ marginTop: 20, height: 180, width: '100%', padding: 5, backgroundColor: '#fff' }}>
-                            <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections({ latitude: 0.7893, longitude: 113.9213 })} >
+                            <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections(detail.position)} >
                                 <MapView
                                     liteMode
                                     style={{ flex: 1 }}

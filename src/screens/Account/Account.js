@@ -1,6 +1,6 @@
 import React from 'react'
 import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable, Alert } from 'react-native'
-import { Icon, Text, View, List, ListItem, Left, Body, Right } from 'native-base'
+import { Icon, Text, View, List, ListItem, Left, Body, Right, Thumbnail } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
 import FooterTabs from '../../elements/FooterTabs/FooterTabs'
@@ -16,17 +16,23 @@ export default function Account({ navigation }) {
     const removeUid = async () => {
         await AsyncStorage.removeItem('uid')
     }
+    const toMyStore = () => {
+        navigation.navigate('StoreAccount', { type: 'owner', uid: data.uid })
+    }
     return (
         <ScreenBase barStyle="light-content">
             <View style={styles.root}>
                 <View style={styles.photoThumb}>
                     <View style={styles.profileThumb}>
-                        <Image
-                            source={require('../../assets/images/sarung.jpg')}
-                            style={styles.imageProfile}
-                        />
+                        {data?.photoURL ?
+                            <Thumbnail
+                                source={{ uri: data?.photoURL }}
+                                style={styles.imageProfile}
+                            /> :
+                            <Icon name="person-circle" style={{ fontSize: 60 }} />
+                        }
                         <View style={{ marginLeft: 10, marginTop: -5 }}>
-                            <Text style={styles.storeName}>{data.username}</Text>
+                            <Text style={styles.storeName}>{data?.username}</Text>
                             <TouchableOpacity onPress={() => navigation.push('Profile')}>
                                 <Text style={styles.toProfile}>{strings.VEP}</Text>
                             </TouchableOpacity>
@@ -38,18 +44,17 @@ export default function Account({ navigation }) {
                 </View>
             </View>
 
-            <View style={styles.myStore}>
-                <TouchableOpacity onPress={() => navigation.navigate('StoreAccount')}>
-                    <Image
-                        source={require('../../assets/images/storefront.png')}
-                        tintColor={primeColor}
-                        style={{ height: 42, width: 42 }}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('StoreAccount')}>
-                    <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
-                </TouchableOpacity>
-            </View>
+            <Pressable style={styles.myStore} onPress={toMyStore}>
+
+                <Image
+                    source={require('../../assets/images/storefront.png')}
+                    tintColor={primeColor}
+                    style={{ height: 42, width: 42 }}
+                />
+
+                <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
+
+            </Pressable>
 
             <View style={styles.featureContainer}>
                 <View style={{ alignItems: 'center' }}>
@@ -175,7 +180,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    imageProfile: { height: 65, width: 65, borderRadius: 50 },
+    imageProfile: { height: 60, width: 60 },
     storeName: { fontSize: 20, color: '#fff', fontWeight: 'bold' },
     toProfile: {
         fontSize: 12,

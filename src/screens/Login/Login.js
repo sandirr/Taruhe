@@ -57,7 +57,7 @@ export default function Login({ navigation }) {
     });
   }
   return (
-    <ScreenBase>
+    <ScreenBase barStyle="dark-content">
       <ScrollView
         contentContainerStyle={styles.loginContainer}
         showsVerticalScrollIndicator={false}
@@ -108,8 +108,7 @@ export default function Login({ navigation }) {
           </TouchableOpacity>
         </Item>
 
-        <Button
-          rounded
+        <TouchableOpacity
           style={[
             {
               backgroundColor: primeColor,
@@ -123,7 +122,7 @@ export default function Login({ navigation }) {
           <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
             {strings.Login}
           </Text>
-        </Button>
+        </TouchableOpacity>
 
         <View style={styles.forgotPass}>
           <Text>{strings.ForgotPass}?</Text>
@@ -147,8 +146,7 @@ export default function Login({ navigation }) {
           {strings.NotHaveAccount}?
           </Text>
 
-        <Button
-          rounded
+        <TouchableOpacity
           style={[
             {
               backgroundColor: "#ccc",
@@ -160,7 +158,7 @@ export default function Login({ navigation }) {
           <Text style={{ color: "#555", fontWeight: '700', fontSize: 16 }}>
             {strings.RegisterNew}
           </Text>
-        </Button>
+        </TouchableOpacity>
       </ScrollView>
     </ScreenBase>
   );
@@ -171,6 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f3f3f3",
     padding: 45,
+    paddingTop: 70,
     minHeight: screenHeight,
   },
   label: {
@@ -198,6 +197,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     height: 55,
+    borderRadius: 50
   },
   forgotPass: {
     flexDirection: "row",

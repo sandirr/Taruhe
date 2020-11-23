@@ -41,7 +41,7 @@ export default function ForgotPassword({ navigation }) {
     }
   }
   return (
-    <ScreenBase>
+    <ScreenBase barStyle="dark-content">
       <ScrollView
         contentContainerStyle={styles.loginContainer}
         showsVerticalScrollIndicator={false}
@@ -74,8 +74,7 @@ export default function ForgotPassword({ navigation }) {
           />
         </Item>
 
-        <Button
-          rounded
+        <TouchableOpacity
           style={[
             {
               backgroundColor: primeColor,
@@ -88,9 +87,8 @@ export default function ForgotPassword({ navigation }) {
           <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
             SELANJUTNYA
           </Text>
-        </Button>
-        <Button
-          rounded
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[
             {
               backgroundColor: "#ccc",
@@ -103,7 +101,7 @@ export default function ForgotPassword({ navigation }) {
           <Text style={{ color: "#555", fontWeight: '700', fontSize: 16 }}>
             {strings.Login}
           </Text>
-        </Button>
+        </TouchableOpacity>
 
       </ScrollView>
     </ScreenBase>
@@ -115,6 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f3f3f3",
     padding: 45,
+    paddingTop: 70,
     minHeight: screenHeight,
   },
   label: {
@@ -142,6 +141,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     height: 55,
+    borderRadius: 50
   },
   forgotPass: {
     flexDirection: "row",

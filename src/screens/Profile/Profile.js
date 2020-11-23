@@ -100,6 +100,8 @@ export default function Profile({ navigation }) {
             .then(() => {
                 // Alert.alert('Sukses', 'Perubahan tersimpan');
                 setModalVisible('')
+                setImageUri({ uri: '' })
+                profile.data = data
             }).catch(err => {
                 Alert.alert(err.code, err.message)
             })
@@ -129,13 +131,14 @@ export default function Profile({ navigation }) {
                 const source = { uri: response.uri };
                 setImageUri(source)
             }
-
         })
     }
     const uploadFile = async () => {
         const file = await uriToBlob(imageUri.uri);
+        const extArr = file._data.name.split('.')
+        const ext = extArr[extArr.length - 1]
         fStorage
-            .ref(`profile_pictures/${profileData.uid}.png`)
+            .ref(`profile_pictures/${profileData.uid}.${ext}`)
             .put(file)
             .then(snapshot => snapshot.ref.getDownloadURL())
             .then(url => {

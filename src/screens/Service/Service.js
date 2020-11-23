@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Tabs, Tab } from "native-base";
+import React, { useEffect, useState } from "react";
+import { Tabs, Tab, Text } from "native-base";
 import { ScrollView, View, StyleSheet } from "react-native";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
@@ -8,12 +8,41 @@ import ScreenBase from "../../elements/SecreenBase";
 import Header from "../../elements/Header";
 import EtcAct from "../../elements/EtcAct";
 import ProductItem from "../../elements/ProductItem";
+import { fDB } from "../../configs/firebase";
 
 export default function Service({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
   const [offset, setOffset] = useState(0);
   const [currentDirection, setDirection] = useState("up");
+  const [itemsKey] = useState(['ArtShow', 'Travel'])
+
+  const [ArtShow, setArtShow] = useState([])
+  const [Travel, setTravel] = useState([])
+
+
+  useEffect(() => {
+    itemsKey.forEach((item) => {
+      fDB.ref('service')
+        .limitToLast(10)
+        .orderByChild('category')
+        .equalTo(item)
+        .on('value', (values) => {
+          if (values.val()) {
+            let allItems = []
+            Object.keys(values.val()).map((value) => {
+              allItems.push(values.val()[value]);
+            })
+            if (item === 'ArtShow')
+              setArtShow(allItems)
+            else if (item === 'Travel')
+              setTravel(allItems)
+          }
+        }, (error) => {
+          Alert.alert(error.code)
+        })
+    })
+  }, [])
 
   const handleScroll = (e) => {
     let currentOffset = e.nativeEvent.contentOffset.y;
@@ -48,7 +77,7 @@ export default function Service({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.ArtShow}
         >
-          <DataList whenScroll={handleScroll} />
+          <DataList whenScroll={handleScroll} navigation={navigation} data={ArtShow} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -57,7 +86,7 @@ export default function Service({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Travel}
         >
-          <DataList whenScroll={handleScroll} />
+          <DataList whenScroll={handleScroll} navigation={navigation} data={Travel} />
         </Tab>
       </Tabs>
       <FooterTabs
@@ -74,7 +103,7 @@ export default function Service({ navigation }) {
   );
 }
 
-export const DataList = ({ whenScroll }) => {
+export const DataList = ({ whenScroll, navigation, data }) => {
   return (
     <ScrollView
       style={{
@@ -92,9 +121,13 @@ export const DataList = ({ whenScroll }) => {
         }}
       >
         <View style={styles.scrollContainer}>
-          <ProductItem type='lebar' />
-          <ProductItem type='lebar' />
-          <ProductItem type='lebar' />
+          {data.length ?
+            data.map((item) => (
+              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} type="lebar" />
+            ))
+            :
+            <Text>Loading...</Text>
+          }
         </View>
       </View>
     </ScrollView>

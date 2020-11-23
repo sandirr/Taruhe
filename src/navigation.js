@@ -145,12 +145,12 @@ export default function navigation() {
         />
         <Stack.Screen
           name="Login"
-          component={isUser ? Home : Login}
+          component={Login}
           options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Register"
-          component={isUser ? Home : Register}
+          component={Register}
           options={{ headerShown: false }}
         />
         <Stack.Screen

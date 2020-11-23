@@ -17,7 +17,7 @@ const screenHeight = Dimensions.get("window").height;
 
 export default function Welcome({ navigation }) {
   return (
-    <ScreenBase>
+    <ScreenBase barStyle="dark-content">
       <ScrollView
         contentContainerStyle={styles.scrollView}
         showsVerticalScrollIndicator={false}

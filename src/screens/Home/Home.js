@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Dimensions, StyleSheet, Animated, LogBox, TouchableOpacity } from 'react-native';
 import strings from '../../assets/Dictionary';
-import { Item, Input, Icon, View } from 'native-base';
+import { Item, Input, Icon, View, Text } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import FooterTabs from '../../elements/FooterTabs/FooterTabs';
 import ListFeatured from "./ListFeatured";
 import ProductItem from '../../elements/ProductItem';
+import { fDB } from '../../configs/firebase';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -22,6 +23,29 @@ const Home = (props) => {
   const [iconSearch, setIconSearch] = useState('#fff');
   const [offset, setOffset] = useState(0);
   const [currentDirection, setDirection] = useState('up');
+  const [products, setProducts] = useState([])
+  // const [services, setServices] = useState([])
+  // const [keys] = useState(['product', 'service'])
+  // const [items, setItems] = useState([])
+  // useEffect(() => {
+  //   let data = products.concat(services)
+  //   setItems(data)
+  // }, [products, services])
+  useEffect(() => {
+    fDB.ref('product')
+      .limitToLast(10)
+      .on('value', (values) => {
+        if (values.val()) {
+          let allItems = []
+          Object.keys(values.val()).map((value) => {
+            allItems.push(values.val()[value]);
+          })
+          setProducts(allItems)
+        }
+      }, (error) => {
+        Alert.alert(error.code)
+      })
+  }, [])
 
   const handleScroll = (e) => {
     if (e.nativeEvent.contentOffset.y > 40) {
@@ -46,6 +70,16 @@ const Home = (props) => {
       setDirection(direction);
     }
   };
+
+  function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
+    return array
+  }
 
   return (
     <ScreenBase>
@@ -99,12 +133,13 @@ const Home = (props) => {
         </View>
         <View style={styles.scrollView}>
           <View style={styles.scrollContainer}>
-            <ProductItem toDetail={() => navigation.navigate('DetailItem')} />
-            <ProductItem />
-            <ProductItem />
-            <ProductItem />
-            <ProductItem />
-            <ProductItem />
+            {products.length ?
+              products.map((item) => (
+                <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
+              ))
+              :
+              <Text>Loading...</Text>
+            }
           </View>
         </View>
       </Animated.ScrollView>
