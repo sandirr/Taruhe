@@ -300,14 +300,16 @@ const Store = ({ navigation, route }) => {
     useEffect(() => {
         setItems([])
         setLoading(true)
-        fDB.ref(activeTab.toLowerCase())
+        fDB.ref('product_service')
             .orderByChild('uid')
             .equalTo(uid)
             .on('value', (values) => {
                 if (values.val()) {
                     let allItems = []
                     Object.keys(values.val()).map((value) => {
-                        allItems.push(values.val()[value]);
+                        let newData = values.val()[value]
+                        if (newData.type === activeTab.toLowerCase())
+                            allItems.push(newData);
                     })
                     setItems(allItems)
                 }
@@ -408,7 +410,7 @@ const Store = ({ navigation, route }) => {
                                     <Icon name="caret-back" style={styles.iconBack} />
                                 </TouchableOpacity>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    {type !== 'owner' &&
+                                    {uid !== profile.data.uid &&
                                         <Button rounded small bordered
                                             style={styles.followBtn}>
                                             <Text style={styles.followText} >Follow</Text>
@@ -423,7 +425,7 @@ const Store = ({ navigation, route }) => {
                                     source={visited.photoURL ? { uri: visited.photoURL } : require('../../assets/images/storefront.png')}
                                     style={{ height: 120, width: 120 }}
                                 />
-                                {type === 'owner' &&
+                                {uid === profile.data.uid &&
                                     <TouchableOpacity style={styles.editBtn} onPress={uploadImage}>
                                         <Icon name="create-outline" style={{
                                             fontSize: 22,
@@ -439,7 +441,7 @@ const Store = ({ navigation, route }) => {
                             </View>
 
                             <View style={styles.contactContainer}>
-                                {type === 'owner'
+                                {uid === profile.data.uid
                                     ?
                                     <>
                                         {isAdd &&
@@ -560,7 +562,12 @@ const Store = ({ navigation, route }) => {
                             scrollEnabled={isScroll}
                         >
                             {items.length ? items.map(item => (
-                                <SellingItem key={item.id} data={item} />
+                                <SellingItem key={item.id} data={item} toDetail={() => {
+                                    if (type !== 'owner')
+                                        navigation.navigate('DetailItem', { detail: item })
+                                    else
+                                        navigation.navigate('AddItem', { type: item.type, edit: true, item: item })
+                                }} />
                             )) :
                                 loading ?
                                     <>

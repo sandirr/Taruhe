@@ -41,7 +41,7 @@ export default function Product({ navigation }) {
 
   useEffect(() => {
     itemsKey.forEach((item) => {
-      fDB.ref('product')
+      fDB.ref('product_service')
         .limitToLast(10)
         .orderByChild('category')
         .equalTo(item)

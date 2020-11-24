@@ -40,8 +40,8 @@ export default function Profile({ navigation }) {
                     fAuth.signInWithEmailAndPassword(profileData.email, profileData.password)
                         .then(() => {
                             fAuth.currentUser.updateEmail(cE.email).then(() => {
-                                setProfileData({ ...profileData, email: cE.email },
-                                    updateData({ ...profileData, email: cE.email }))
+                                setProfileData({ ...profileData, email: cE.email })
+                                updateData({ ...profileData, email: cE.email })
                                 removeUid()
                                 profile.data = {}
                                 fAuth.currentUser.sendEmailVerification()
@@ -67,8 +67,8 @@ export default function Profile({ navigation }) {
                 fAuth.signInWithEmailAndPassword(profileData.email, profileData.password)
                     .then(() => {
                         fAuth.currentUser.updatePassword(cP.newPassword).then(() => {
-                            setProfileData({ ...profileData, password: cP.newPassword },
-                                updateData({ ...profileData, password: cP.newPassword }))
+                            setProfileData({ ...profileData, password: cP.newPassword })
+                            updateData({ ...profileData, password: cP.newPassword })
                             removeUid()
                             profile.data = {}
                             fAuth.currentUser.sendEmailVerification()
@@ -84,9 +84,8 @@ export default function Profile({ navigation }) {
             }
         } else {
             if (inputValue.toString().length) {
-                setProfileData({ ...profileData, [modalVisible.toLowerCase()]: inputValue },
-                    updateData({ ...profileData, [modalVisible.toLowerCase()]: inputValue }))
-                setModalVisible('')
+                updateData({ ...profileData, [modalVisible.toLowerCase()]: inputValue })
+                setProfileData({ ...profileData, [modalVisible.toLowerCase()]: inputValue })
             } else {
                 Alert.alert('Isi Input', 'Inputan tidak boleh kosong')
             }
@@ -98,7 +97,6 @@ export default function Profile({ navigation }) {
             .child(profileData.uid)
             .update(data)
             .then(() => {
-                // Alert.alert('Sukses', 'Perubahan tersimpan');
                 setModalVisible('')
                 setImageUri({ uri: '' })
                 profile.data = data
@@ -143,8 +141,8 @@ export default function Profile({ navigation }) {
             .then(snapshot => snapshot.ref.getDownloadURL())
             .then(url => {
                 setImageUri({ uri: url })
-                setProfileData({ ...profileData, photoURL: url },
-                    updateData({ ...profileData, photoURL: url }))
+                updateData({ ...profileData, photoURL: url })
+                setProfileData({ ...profileData, photoURL: url })
             })
             .catch(error => {
                 setImageUri({ uri: '' })
@@ -189,7 +187,7 @@ export default function Profile({ navigation }) {
                         setModalVisible('Picture')
                     }} itemDivider style={styles.menuItem}>
                         <Left>
-                            <Text>Profile Picture</Text>
+                            <Text>{strings.ProfilePicture}</Text>
                         </Left>
                         <Right>
                             {profileData.photoURL ?
@@ -209,7 +207,7 @@ export default function Profile({ navigation }) {
                         itemDivider
                         style={styles.menuItem}>
                         <Left>
-                            <Text>Username</Text>
+                            <Text>{strings.username}</Text>
                         </Left>
                         <Right>
                             <Text style={{ color: 'gray', marginLeft: -15 }}>{profileData.username}</Text>
@@ -220,7 +218,7 @@ export default function Profile({ navigation }) {
                         setModalVisible('Gender')
                     }} itemDivider style={styles.menuItem}>
                         <Left>
-                            <Text>Gender</Text>
+                            <Text>{strings.Gender}</Text>
                         </Left>
                         <Right>
                             <Text style={{ color: 'gray', marginLeft: -15 }}>{profileData.gender || '-'}</Text>
@@ -232,7 +230,7 @@ export default function Profile({ navigation }) {
                     }} itemDivider
                         style={styles.menuItem}>
                         <Left>
-                            <Text>Birthday</Text>
+                            <Text>{strings.Birthday}</Text>
                         </Left>
                         <Right>
                             <Text style={{ color: 'gray', marginLeft: -15 }}>
@@ -247,13 +245,13 @@ export default function Profile({ navigation }) {
                         onPress={() => setModalVisible('Change Email')}
                         itemDivider
                         style={styles.menuItem}>
-                        <Text>Change Email</Text>
+                        <Text>{strings.ChangeEmail}</Text>
                     </ListItem>
                     <ListItem
                         onPress={() => setModalVisible('Change Password')}
                         itemDivider
                         style={styles.menuItem}>
-                        <Text>Change Password</Text>
+                        <Text>{strings.ChangePass}</Text>
                     </ListItem>
                 </List>
             </View>
@@ -283,7 +281,7 @@ export default function Profile({ navigation }) {
                                             height: 30,
                                             justifyContent: 'center'
                                         }}>
-                                            <Text style={{ color: '#fff', fontSize: 12 }}>Ubah</Text>
+                                            <Text style={{ color: '#fff', fontSize: 12 }}>{strings.Change}</Text>
                                         </View>
                                     </ImageBackground> :
                                     <Icon name="person-circle" style={{ fontSize: 80, color: '#555' }} />
@@ -295,12 +293,12 @@ export default function Profile({ navigation }) {
                             <>
                                 <Item floatingLabel>
                                     <Label>
-                                        Email yang baru
-                                        </Label>
+                                        {strings.NewEmail}
+                                    </Label>
                                     <Input value={cE.email} onChangeText={(text) => setCE({ ...cE, email: text })} keyboardType="email-address" textContentType="emailAddress" />
                                 </Item>
                                 <Item style={{ marginTop: 10 }}>
-                                    <Input value={cE.password} onChangeText={(text) => setCE({ ...cE, password: text })} textContentType="password" secureTextEntry={!passwordVisible} placeholder="Password" />
+                                    <Input value={cE.password} onChangeText={(text) => setCE({ ...cE, password: text })} textContentType="password" secureTextEntry={!passwordVisible} placeholder={strings.Password} />
                                     <TouchableOpacity
                                         onPress={() => setPasswordVisisble(!passwordVisible)}
                                     >
@@ -316,12 +314,12 @@ export default function Profile({ navigation }) {
                             <>
                                 <Item floatingLabel>
                                     <Label>
-                                        Password baru
+                                        {strings.NewPassword}
                                     </Label>
                                     <Input value={cP.newPassword} onChangeText={(text) => setCP({ ...cP, newPassword: text })} keyboardType="password" textContentType="password" secureTextEntry={!passwordVisible} />
                                 </Item>
                                 <Item style={{ marginTop: 10 }}>
-                                    <Input value={cP.oldPassword} onChangeText={(text) => setCP({ ...cP, oldPassword: text })} textContentType="password" secureTextEntry={!passwordVisible} placeholder="Password sebelumnya" />
+                                    <Input value={cP.oldPassword} onChangeText={(text) => setCP({ ...cP, oldPassword: text })} textContentType="password" secureTextEntry={!passwordVisible} placeholder={strings.PreviousPassword} />
                                     <TouchableOpacity
                                         onPress={() => setPasswordVisisble(!passwordVisible)}
                                     >
@@ -347,10 +345,11 @@ export default function Profile({ navigation }) {
                             <Item picker >
                                 <Picker mode="dropdown" selectedValue={inputValue} onValueChange={(text) => {
                                     setInputValue(text)
-                                }} >
-                                    <Picker.Item label="Tidak ingin memberti tahu" value="-" />
-                                    <Picker.Item label="Male" value="Male" />
-                                    <Picker.Item label="Female" value="Female" />
+                                }}
+                                >
+                                    <Picker.Item label={strings.DontWT} value="-" />
+                                    <Picker.Item label={strings.Male} value="Male" />
+                                    <Picker.Item label={strings.Female} value="Female" />
                                 </Picker>
                             </Item>
                         }
@@ -362,7 +361,7 @@ export default function Profile({ navigation }) {
                                 modalTransparent={false}
                                 animationType={"fade"}
                                 androidMode={"default"}
-                                placeHolderText="Select Date"
+                                placeHolderText={strings.SelectDate}
                                 textStyle={{ color: "green" }}
                                 placeHolderTextStyle={{ color: "#d3d3d3" }}
                                 disabled={false}
@@ -376,7 +375,7 @@ export default function Profile({ navigation }) {
                             style={{ ...styles.saveBtn, backgroundColor: "#2196F3" }}
                             onPress={() => handleUpdateProfile()}
                         >
-                            <Text style={styles.textStyle}>Simpan</Text>
+                            <Text style={styles.textStyle}>{strings.Save}</Text>
                         </TouchableHighlight>
                     </View>
                 </View>

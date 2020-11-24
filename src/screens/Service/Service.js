@@ -23,7 +23,7 @@ export default function Service({ navigation }) {
 
   useEffect(() => {
     itemsKey.forEach((item) => {
-      fDB.ref('service')
+      fDB.ref('product_service')
         .limitToLast(10)
         .orderByChild('category')
         .equalTo(item)

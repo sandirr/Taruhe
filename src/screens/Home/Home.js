@@ -23,7 +23,7 @@ const Home = (props) => {
   const [iconSearch, setIconSearch] = useState('#fff');
   const [offset, setOffset] = useState(0);
   const [currentDirection, setDirection] = useState('up');
-  const [products, setProducts] = useState([])
+  const [productservice, setProductService] = useState([])
   // const [services, setServices] = useState([])
   // const [keys] = useState(['product', 'service'])
   // const [items, setItems] = useState([])
@@ -32,7 +32,7 @@ const Home = (props) => {
   //   setItems(data)
   // }, [products, services])
   useEffect(() => {
-    fDB.ref('product')
+    fDB.ref('product_service')
       .limitToLast(10)
       .on('value', (values) => {
         if (values.val()) {
@@ -40,7 +40,7 @@ const Home = (props) => {
           Object.keys(values.val()).map((value) => {
             allItems.push(values.val()[value]);
           })
-          setProducts(allItems)
+          setProductService(allItems)
         }
       }, (error) => {
         Alert.alert(error.code)
@@ -108,9 +108,19 @@ const Home = (props) => {
             style={{ color: primeColor }}
           />
         </Item>
-        <Icon name="heart" style={{ color: iconSearch }} />
+        <Icon name="heart" style={{
+          color: iconSearch,
+          textShadowColor: "#555",
+          textShadowOffset: { width: -1, height: 1 },
+          textShadowRadius: 5,
+        }} />
         <TouchableOpacity onPress={() => navigation.navigate('ListChat')}>
-          <Icon name="mail" style={{ color: iconSearch }} />
+          <Icon name="mail" style={{
+            color: iconSearch,
+            textShadowColor: "#555",
+            textShadowOffset: { width: -1, height: 1 },
+            textShadowRadius: 5,
+          }} />
         </TouchableOpacity>
       </View>
       <Animated.ScrollView
@@ -133,8 +143,8 @@ const Home = (props) => {
         </View>
         <View style={styles.scrollView}>
           <View style={styles.scrollContainer}>
-            {products.length ?
-              products.map((item) => (
+            {productservice.length ?
+              productservice.map((item) => (
                 <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
               ))
               :

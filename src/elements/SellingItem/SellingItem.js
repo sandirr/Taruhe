@@ -4,7 +4,7 @@ import { Pressable, View, Image, Dimensions, StyleSheet } from 'react-native'
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
-export default function SellingItem({ data }) {
+export default function SellingItem({ data, toDetail }) {
     const parser = (nom) => {
         if (nom) {
             nom = parseInt(nom.toString().replace(/[^0-9]/g, ''));
@@ -14,7 +14,7 @@ export default function SellingItem({ data }) {
             return null;
     };
     return (
-        <Pressable>
+        <Pressable onPress={toDetail}>
             <View style={styles.root}>
                 <Image
                     source={data.imagesURL[0]}

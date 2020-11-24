@@ -1,6 +1,6 @@
-import React from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable, Alert } from 'react-native'
-import { Icon, Text, View, List, ListItem, Left, Body, Right, Thumbnail } from 'native-base'
+import React, { useState } from 'react'
+import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native'
+import { Icon, Text, View, List, ListItem, Left, Body, Right, Thumbnail, Button } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
 import FooterTabs from '../../elements/FooterTabs/FooterTabs'
@@ -13,11 +13,15 @@ const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 export default function Account({ navigation }) {
     const { data } = profile;
+    const [permission, setPermission] = useState(false)
     const removeUid = async () => {
         await AsyncStorage.removeItem('uid')
     }
     const toMyStore = () => {
         navigation.navigate('StoreAccount', { type: 'owner', uid: data.uid })
+    }
+    const logOutPermission = () => {
+        setPermission(true)
     }
     return (
         <ScreenBase barStyle="light-content">
@@ -31,12 +35,10 @@ export default function Account({ navigation }) {
                             /> :
                             <Icon name="person-circle" style={{ fontSize: 60 }} />
                         }
-                        <View style={{ marginLeft: 10, marginTop: -5 }}>
+                        <Pressable onPress={() => navigation.navigate('Profile')} style={{ marginLeft: 10, marginTop: -5 }}>
                             <Text style={styles.storeName}>{data?.username}</Text>
-                            <TouchableOpacity onPress={() => navigation.push('Profile')}>
-                                <Text style={styles.toProfile}>{strings.VEP}</Text>
-                            </TouchableOpacity>
-                        </View>
+                            <Text style={styles.toProfile}>{strings.VEP}</Text>
+                        </Pressable>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AccountSetting')}>
                         <Icon name="settings-outline" style={{ color: '#fff' }} />
@@ -128,14 +130,7 @@ export default function Account({ navigation }) {
                             <Text>{strings.About}</Text>
                         </Body>
                     </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem} onPress={() => {
-                        fAuth.signOut().then(function () {
-                            removeUid()
-                            profile.data = {}
-                        }).catch(function (error) {
-                            Alert.alert(error.code, error.message)
-                        });
-                    }}>
+                    <ListItem icon itemDivider style={styles.menuItem} onPress={logOutPermission}>
                         <Left>
                             <Icon style={{ transform: [{ rotate: '180deg' }], fontSize: 22 }} name="log-out-outline" />
                         </Left>
@@ -148,7 +143,68 @@ export default function Account({ navigation }) {
                     <Text style={styles.taruheVer}>Taruhe v 1.0.0</Text>
                 </View>
             </ScrollView>
-
+            <Modal visible={permission} transparent animationType="slide">
+                {permission &&
+                    <View style={{
+                        flex: 1,
+                        justifyContent: "flex-end",
+                        alignItems: 'center',
+                        backgroundColor: 'transparent'
+                    }}>
+                        <View style={{
+                            backgroundColor: '#fff',
+                            width: '90%',
+                            borderRadius: 18,
+                            paddingVertical: 16,
+                            paddingHorizontal: 45,
+                            marginBottom: 20,
+                            borderColor: '#ccc',
+                            borderWidth: 1
+                        }}>
+                            <Text style={{
+                                textAlign: 'center',
+                                fontWeight: '700',
+                                fontSize: 18
+                            }}>
+                                {strings.SureLogOut}?
+                            </Text>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                marginTop: 16
+                            }}>
+                                <Button
+                                    rounded
+                                    bordered
+                                    style={{
+                                        marginHorizontal: 10,
+                                        borderColor: primeColor
+                                    }}
+                                    small
+                                    onPress={() => setPermission(false)}
+                                >
+                                    <Text style={{ textTransform: 'capitalize', color: primeColor }}>{strings.Cancel}</Text>
+                                </Button>
+                                <Button
+                                    rounded
+                                    style={{ marginHorizontal: 10, backgroundColor: primeColor }}
+                                    small
+                                    onPress={() => {
+                                        fAuth.signOut().then(function () {
+                                            removeUid()
+                                            profile.data = {}
+                                        }).catch(function (error) {
+                                            Alert.alert(error.code, error.message)
+                                        });
+                                    }}
+                                >
+                                    <Text style={{ textTransform: 'capitalize' }}>{strings.LogOut}</Text>
+                                </Button>
+                            </View>
+                        </View>
+                    </View>
+                }
+            </Modal>
             <FooterTabs
                 screen={strings.Menu5}
                 navigation={navigation}

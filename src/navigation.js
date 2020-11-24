@@ -117,24 +117,6 @@ const AppFeature = () => {
 };
 
 export default function navigation() {
-  const [isUser, setIsUser] = useState(false)
-  const removeUid = async () => {
-    await AsyncStorage.removeItem('uid')
-  }
-  useEffect(() => {
-    fAuth.onAuthStateChanged(function (user) {
-      if (user) {
-        fDB.ref('users/' + user.uid).on('value', val => {
-          profile.data = val.val()
-          setIsUser(true)
-        })
-      } else {
-        removeUid();
-        profile.data = {}
-        setIsUser(false)
-      }
-    });
-  }, [])
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Loading">

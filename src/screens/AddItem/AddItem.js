@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import { Alert, Dimensions, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Icon, Input, Item, Label, Picker, Text, Textarea } from 'native-base';
+import { Alert, Dimensions, Image, ImageBackground, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Button, Icon, Input, Item, Label, Picker, Text, Textarea } from 'native-base';
 import ScreenBase from '../../elements/SecreenBase';
 import strings from '../../assets/Dictionary';
 import { primeColor } from '../../configs/color';
 import ImagePicker from 'react-native-image-picker';
 import { profile } from '../../configs/profile';
 import { fDB, fStorage } from '../../configs/firebase';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Axios from 'axios';
 
 const screenHeight = Dimensions.get('window').height;
@@ -23,13 +23,27 @@ class AddItem extends Component {
         position: { province: {}, district: {}, subDistrict: {} },
         province: [],
         district: [],
-        subDistrict: []
+        subDistrict: [],
+        permission: false,
+        disabled: false
     }
     componentDidMount() {
         Axios.get('https://ibnux.github.io/data-indonesia/propinsi.json')
             .then((res) => {
                 this.setState({ province: res.data })
             })
+        if (this.props.route.params.edit) {
+            const item = this.props.route.params.item
+            this.setState({
+                imagesURL: item.imagesURL,
+                title: item.title,
+                category: item.category,
+                price: item.price,
+                description: item.description,
+                location: item.location,
+                position: item.position,
+            })
+        }
     }
 
     handleChangeProv = (e) => {
@@ -140,31 +154,55 @@ class AddItem extends Component {
         this.setState({ imagesURL })
     }
     submitData = () => {
+        this.setState({ disabled: true })
         const { imagesURL, title, category, price, description, location, position } = this.state;
         const id = Date.now();
         if (imagesURL.length && title && category && price && description && location && position.province.nama && position.subDistrict.nama && position.district.nama) {
-            fDB
-                .ref(this.props.route.params.type + '/' + id).set({
-                    imagesURL, title, category, price, description, location, position,
-                    id: id,
-                    created_by: { ...profile.data, password: '', email: '' },
-                    uid: profile.data.uid,
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                }).then(() => {
-                    Alert.alert('Sukses', 'Berhasil menambahkan item')
-                    this.props.navigation.goBack()
-                }).catch((err) => {
-                    Alert.alert(err.code, err.message)
-                })
+            if (this.props.route.params.edit) {
+                const item = this.props.route.params.item
+                fDB
+                    .ref('product_service/' + item.id).set({
+                        imagesURL, title, category, price, description, location, position,
+                        id: item.id,
+                        created_by: { ...profile.data, password: '', email: '' },
+                        type: item.type,
+                        uid: item.uid,
+                        created_at: item.created_at,
+                        updated_at: new Date().toISOString()
+                    }).then(() => {
+                        Alert.alert('Sukses', 'Berhasil mengupdate item')
+                        this.props.navigation.goBack()
+                    }).catch((err) => {
+                        Alert.alert(err.code, err.message)
+                        this.setState({ disabled: false })
+                    })
+            } else {
+                fDB
+                    .ref('product_service/' + id).set({
+                        imagesURL, title, category, price, description, location, position,
+                        id: id,
+                        created_by: { ...profile.data, password: '', email: '' },
+                        type: this.props.route.params.type,
+                        uid: profile.data.uid,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    }).then(() => {
+                        Alert.alert('Sukses', 'Berhasil menambahkan item')
+                        this.props.navigation.goBack()
+                    }).catch((err) => {
+                        Alert.alert(err.code, err.message)
+                        this.setState({ disabled: false })
+                    })
+            }
         }
-        else
+        else {
+            this.setState({ disabled: false })
             Alert.alert('Belum lengkap', 'Mohon lengkapi isian yang disediakan sebelum mengupload produk/jasa anda')
+        }
     }
     render() {
-        const { type } = this.props.route.params;
-        const { imagesURL, title, category, price, description, location, province, district, subDistrict, position } = this.state;
-        console.log(position)
+        const { type, edit, item } = this.props.route.params;
+        const { permission, imagesURL, title, category, price, description, location, province, district, subDistrict, position } = this.state;
         return (
             <ScreenBase barStyle="dark-content">
                 <ScrollView
@@ -195,7 +233,7 @@ class AddItem extends Component {
                     </View>
                     <View>
                         <Item picker rounded style={styles.inputItem} >
-                            {!category && <Label style={{ fontSize: 14, marginLeft: 8 }}>Category</Label>}
+                            {!category && <Label style={{ fontSize: 14, marginLeft: 8 }}>{strings.Category}</Label>}
                             {type === 'product' ?
                                 <Picker
                                     placeholderStyle={{ color: "#bfc6ea" }}
@@ -229,7 +267,7 @@ class AddItem extends Component {
                                 value={title}
                                 onChangeText={(val) => this.setState({ title: val })}
                                 style={{ fontSize: 14 }}
-                                placeholder="Add title"
+                                placeholder={strings.AddTitle}
                             />
                         </Item>
                         <Item rounded style={styles.inputItem}>
@@ -241,11 +279,11 @@ class AddItem extends Component {
                                     this.setState({ price: intVal })
                                 }}
                                 style={{ fontSize: 14 }}
-                                placeholder="Price"
+                                placeholder={strings.Price}
                                 keyboardType="numeric"
                             />
                         </Item>
-                        <Text note style={{ marginTop: 5, marginLeft: 3 }}>Location</Text>
+                        <Text note style={{ marginTop: 5, marginLeft: 3 }}>{strings.Location}</Text>
                         <TouchableOpacity onPress={() => {
                             this.setState({
                                 location: profile.data.storeLocation,
@@ -254,14 +292,14 @@ class AddItem extends Component {
                         }}
                             style={{ paddingVertical: 5 }}
                         >
-                            <Text style={{ fontSize: 12, alignSelf: 'center' }} note>Klik di sini jika lokasi {type} sama dengan lokasi toko</Text>
+                            <Text style={{ fontSize: 12, alignSelf: 'center' }} note>{strings.CHSAP} {type} {strings.CHSAP1}</Text>
                         </TouchableOpacity>
                         <Item rounded style={styles.inputItem}>
                             <Input
                                 value={location}
                                 onChangeText={(val) => this.setState({ location: val })}
                                 style={{ fontSize: 14 }}
-                                placeholder="Street name/home number/etc..."
+                                placeholder={strings.ISN}
                             />
                         </Item>
                         <Item picker rounded style={styles.inputItem} disabled>
@@ -274,7 +312,7 @@ class AddItem extends Component {
                                 selectedValue={position.province}
                                 onValueChange={(val) => this.handleChangeProv(val)}
                             >
-                                <Picker.Item label={this.state.position.province.nama || "Province"} value={this.state.position.province} />
+                                <Picker.Item label={this.state.position.province.nama || strings.Province} value={this.state.position.province} />
                                 {province.map((loc) => (
                                     <Picker.Item label={loc.nama} value={loc} key={loc.id} />
                                 ))}
@@ -290,11 +328,11 @@ class AddItem extends Component {
                                 selectedValue={position?.district}
                                 onValueChange={(val) => this.handleChangeDis(val)}
                             >
-                                <Picker.Item label={this.state.position.district.nama || "District"} value={this.state.position.district} />
+                                <Picker.Item label={this.state.position.district.nama || strings.District} value={this.state.position.district} />
                                 {district.length ? district.map((loc) => (
                                     <Picker.Item label={loc.nama} value={loc} key={loc.id} />
                                 )) :
-                                    <Picker.Item label="Pilih provinsi terlebih dahulu" value="" />
+                                    <Picker.Item label={strings.SPF} value="" />
                                 }
                             </Picker>
                         </Item>
@@ -308,11 +346,11 @@ class AddItem extends Component {
                                 selectedValue={position?.subDistrict}
                                 onValueChange={(val) => this.handleChangeSubDis(val)}
                             >
-                                <Picker.Item label={this.state.position.subDistrict.nama || "Sub District"} value={this.state.position.subDistrict} />
+                                <Picker.Item label={this.state.position.subDistrict.nama || strings.SubDistrict} value={this.state.position.subDistrict} />
                                 {subDistrict.length ? subDistrict.map((loc) => (
                                     <Picker.Item label={loc.nama} value={loc} key={loc.id} />
                                 )) :
-                                    <Picker.Item label="Pilih Kabupaten/kota terlebih dahulu" value="" />
+                                    <Picker.Item label={strings.SDF} value="" />
                                 }
                             </Picker>
                         </Item>
@@ -320,7 +358,7 @@ class AddItem extends Component {
                         <Textarea
                             value={description}
                             onChangeText={(val) => this.setState({ description: val })}
-                            placeholder="Describe what you are offering"
+                            placeholder={strings.DWYO}
                             style={{
                                 borderColor: primeColor,
                                 borderWidth: 2,
@@ -372,7 +410,7 @@ class AddItem extends Component {
                                             color: '#555',
                                         }}
                                     >
-                                        Upload setidaknya 1 foto, maksimal 5 foto
+                                        {strings.UAL}
                                     </Text>
                                 }
                             </View>
@@ -429,13 +467,98 @@ class AddItem extends Component {
                                 }
                             ]}
                             onPress={this.submitData}
+                            disabled={this.state.disabled}
                         >
                             <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
-                                Upload
+                                {edit ? 'Update' : strings.Upload}
                             </Text>
                         </TouchableOpacity>
+                        {edit &&
+                            <TouchableOpacity
+                                style={[
+                                    {
+                                        backgroundColor: '#c05555',
+                                        marginVertical: 5,
+                                        borderRadius: 50
+                                    },
+                                    {
+                                        alignSelf: "center",
+                                        width: "90%",
+                                        alignItems: "center",
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        height: 55,
+                                    }
+                                ]}
+                                onPress={() => this.setState({ permission: true })}
+                            >
+                                <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
+                                    {strings.Delete}
+                                </Text>
+                            </TouchableOpacity>
+                        }
                     </View>
                 </ScrollView>
+                <Modal visible={permission} transparent animationType="slide">
+                    <View style={{
+                        flex: 1,
+                        justifyContent: "flex-end",
+                        alignItems: 'center',
+                        backgroundColor: 'transparent'
+                    }}>
+                        <View style={{
+                            backgroundColor: '#fff',
+                            width: '90%',
+                            borderRadius: 18,
+                            paddingVertical: 16,
+                            paddingHorizontal: 45,
+                            marginBottom: 20,
+                            borderColor: '#ccc',
+                            borderWidth: 1
+                        }}>
+                            <Text style={{
+                                textAlign: 'center',
+                                fontWeight: '700',
+                                fontSize: 18
+                            }}>
+                                Yakin ingin menghapus item?
+                            </Text>
+                            <View style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                marginTop: 16
+                            }}>
+                                <Button
+                                    rounded
+                                    bordered
+                                    style={{
+                                        marginHorizontal: 10,
+                                        borderColor: primeColor
+                                    }}
+                                    small
+                                    onPress={() => this.setState({ permission: false })}
+                                >
+                                    <Text style={{ textTransform: 'capitalize', color: primeColor }}>{strings.Cancel}</Text>
+                                </Button>
+                                <Button
+                                    rounded
+                                    style={{ marginHorizontal: 10, backgroundColor: primeColor }}
+                                    small
+                                    onPress={() => {
+                                        fDB
+                                            .ref('product_service/' + item.id).remove()
+                                            .then(() => {
+                                                Alert.alert('Sukses', 'Item berhasil dihapus')
+                                                this.props.navigation.goBack()
+                                            })
+                                    }}
+                                >
+                                    <Text style={{ textTransform: 'capitalize' }}>{strings.Delete}</Text>
+                                </Button>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </ScreenBase>
         )
     }

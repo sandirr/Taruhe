@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking } from 'react-native';
+import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking, Pressable } from 'react-native';
 import { View, H3, Text, Button } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
@@ -7,7 +7,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import StarRating from 'react-native-star-rating';
 import strings from '../../assets/Dictionary';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import getDirections from 'react-native-google-maps-directions'
+// import getDirections from 'react-native-google-maps-directions'
 import { parser } from '../../configs/helper';
 
 const screenHeight = Dimensions.get('window').height;
@@ -22,7 +22,7 @@ const Home = (props) => {
     const { detail } = props.route.params
     const [readMore, setReadMore] = useState(false)
     const handleGetDirections = (position) => {
-        Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${position.district.nama}`)
+        Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${position.subDistrict.nama}`)
     }
     return (
         <ScreenBase barStyle="dark-content" >
@@ -45,13 +45,13 @@ const Home = (props) => {
                             <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,.4)" }} />
                             <View style={{ position: 'absolute', bottom: 45, left: 35 }}>
                                 <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>{detail.title}</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Pressable onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detail.created_by })} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image
                                         source={require('../../assets/images/storefront.png')}
                                         style={{ height: 12, width: 12 }}
                                     />
                                     <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>{detail.created_by.storeName}</Text>
-                                </View>
+                                </Pressable>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                     <StarRating
                                         disabled
@@ -101,7 +101,7 @@ const Home = (props) => {
                             <H3 style={{ fontWeight: '700', color: '#555' }}>{strings.Description}</H3>
                             <Text style={[{
                                 textAlign: 'justify', color: '#555', fontSize: 14
-                            }, readMore ? { minHeight: 42 } : { height: 42 }]}>
+                            }, readMore ? { minHeight: 40 } : { height: 40 }]}>
                                 {detail.description}
                             </Text>
                             <TouchableOpacity onPress={() => setReadMore(!readMore)}>
