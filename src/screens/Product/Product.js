@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab, Text } from "native-base";
 import {
   ScrollView,
   View,
   StyleSheet,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
@@ -14,6 +15,7 @@ import Header from "../../elements/Header";
 import EtcAct from "../../elements/EtcAct";
 import ProductItem from "../../elements/ProductItem";
 import { fDB } from "../../configs/firebase";
+import { wait } from '../../configs/helper';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -30,16 +32,33 @@ export default function Product({ navigation }) {
   const [Culinar, setCulinar] = useState([])
   const [Musical, setMusical] = useState([])
 
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSize, setDataSize] = useState(6)
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setDataSize(6)
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
   const handleScroll = (e) => {
+    const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent
     let currentOffset = e.nativeEvent.contentOffset.y;
     let direction = currentOffset > offset + 20 ? "down" : "up";
     if (currentOffset > offset + 20 || currentOffset + 20 < offset) {
       setOffset(currentOffset);
       setDirection(direction);
     }
+    if ((layoutMeasurement.height + contentOffset.y) >= (contentSize.height - 20)) {
+      setDataSize(dataSize + 6)
+    }
   };
 
   useEffect(() => {
+    getData()
+  }, [dataSize, search])
+
+  const getData = () => {
     itemsKey.forEach((item) => {
       fDB.ref('product_service')
         .limitToLast(10)
@@ -49,7 +68,11 @@ export default function Product({ navigation }) {
           if (values.val()) {
             let allItems = []
             Object.keys(values.val()).map((value) => {
-              allItems.push(values.val()[value]);
+              let newItem = values.val()[value];
+              let re = new RegExp(search, 'gi');
+              if (newItem.title.match(re)) {
+                allItems.push(newItem);
+              }
             })
             if (item === 'Clothing')
               setClothing(allItems)
@@ -64,7 +87,7 @@ export default function Product({ navigation }) {
           Alert.alert(error.code)
         })
     })
-  }, [])
+  }
 
   return (
     <ScreenBase>
@@ -89,7 +112,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Clothing}
         >
-          <DataList whenScroll={handleScroll} navigation={navigation} data={Clothing} />
+          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Clothing} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -98,7 +121,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Accessories}
         >
-          <DataList whenScroll={handleScroll} navigation={navigation} data={Accessories} />
+          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Accessories} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -107,7 +130,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Culinar}
         >
-          <DataList whenScroll={handleScroll} navigation={navigation} data={Culinar} />
+          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Culinar} />
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -116,7 +139,7 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Musical}
         >
-          <DataList whenScroll={handleScroll} navigation={navigation} data={Musical} />
+          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Musical} />
         </Tab>
       </Tabs>
       <FooterTabs screen={strings.Menu2} navigation={navigation} direction={currentDirection} />
@@ -125,38 +148,47 @@ export default function Product({ navigation }) {
         modalVisible={modalVisible}
         openEtc={(e) => setModalVisible(e)}
         navigation={navigation}
-      />
+      >
+        <Text>Pesanan</Text>
+        <Text>Bantuan</Text>
+        <Text>FAQ</Text>
+        <Text>Pengaturan</Text>
+      </EtcAct>
     </ScreenBase>
   );
 }
 
-export const DataList = ({ whenScroll, data, navigation }) => {
+export const DataList = ({ whenScroll, data, navigation, refreshing, onRefresh }) => {
   return (
     <ScrollView
       contentContainerStyle={{
         backgroundColor: "#f3f3f3",
         borderTopLeftRadius: 18,
         borderTopRightRadius: 18,
-        minHeight: screenHeight
+        flex: 1
       }}
       onScroll={(e) => whenScroll(e)}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <View
         style={{
           paddingHorizontal: 20,
           paddingTop: 25,
+          paddingBottom: 50,
+          flexDirection: "row",
+          flexWrap: "wrap",
         }}
       >
-        <View style={styles.scrollContainer}>
-          {data.length ?
-            data.map((item) => (
-              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-            ))
-            :
-            <Text>Loading...</Text>
-          }
-        </View>
+        {data.length ?
+          data.map((item) => (
+            <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
+          ))
+          :
+          <Text>No Data</Text>
+        }
       </View>
     </ScrollView>
   );
@@ -164,9 +196,6 @@ export const DataList = ({ whenScroll, data, navigation }) => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    paddingBottom: 75,
+
   },
 });

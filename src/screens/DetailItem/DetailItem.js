@@ -9,6 +9,7 @@ import strings from '../../assets/Dictionary';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 // import getDirections from 'react-native-google-maps-directions'
 import { parser } from '../../configs/helper';
+import { profile } from '../../configs/profile';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -142,7 +143,13 @@ const Home = (props) => {
                                         style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
                                     />
                                     <View style={{ marginLeft: 10 }}>
-                                        <TouchableOpacity onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detail.created_by })}>
+                                        <TouchableOpacity onPress={() => {
+                                            if (profile.data.uid === detail.uid) {
+                                                navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
+                                            } else {
+                                                navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detail.created_by })
+                                            }
+                                        }}>
                                             <Text style={{ fontSize: 20, color: '#555' }}>{detail.created_by.storeName}</Text>
                                             <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detail.created_by.username}</Text>
                                         </TouchableOpacity>

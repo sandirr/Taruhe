@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox, TouchableOpacity } from 'react-native';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Dimensions, StyleSheet, Animated, LogBox, TouchableOpacity, RefreshControl } from 'react-native';
 import strings from '../../assets/Dictionary';
 import { Item, Input, Icon, View, Text } from 'native-base';
 import { primeColor } from '../../configs/color';
@@ -8,6 +8,7 @@ import FooterTabs from '../../elements/FooterTabs/FooterTabs';
 import ListFeatured from "./ListFeatured";
 import ProductItem from '../../elements/ProductItem';
 import { fDB } from '../../configs/firebase';
+import { wait } from '../../configs/helper';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -23,31 +24,43 @@ const Home = (props) => {
   const [iconSearch, setIconSearch] = useState('#fff');
   const [offset, setOffset] = useState(0);
   const [currentDirection, setDirection] = useState('up');
-  const [productservice, setProductService] = useState([])
-  // const [services, setServices] = useState([])
-  // const [keys] = useState(['product', 'service'])
-  // const [items, setItems] = useState([])
-  // useEffect(() => {
-  //   let data = products.concat(services)
-  //   setItems(data)
-  // }, [products, services])
+  const [productservice, setProductService] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [dataSize, setDataSize] = useState(6)
+  const [search, setSearch] = useState("");
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setDataSize(6)
+    wait(1000).then(() => setRefreshing(false));
+  }, []);
+
   useEffect(() => {
+    getData()
+  }, [dataSize, search])
+
+  const getData = () => {
     fDB.ref('product_service')
-      .limitToLast(10)
+      .limitToLast(dataSize)
       .on('value', (values) => {
         if (values.val()) {
           let allItems = []
           Object.keys(values.val()).map((value) => {
-            allItems.push(values.val()[value]);
+            let newItem = values.val()[value];
+            let re = new RegExp(search, 'gi');
+            if (newItem.title.match(re)) {
+              allItems.push(newItem);
+            }
           })
           setProductService(allItems)
         }
       }, (error) => {
         Alert.alert(error.code)
       })
-  }, [])
+  }
 
   const handleScroll = (e) => {
+    const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent
     if (e.nativeEvent.contentOffset.y > 40) {
       const alpha = e.nativeEvent.contentOffset.y * 0.009;
       setBgSearch(`rgba(255,255,255,${alpha < 1 ? alpha : 1})`);
@@ -69,17 +82,10 @@ const Home = (props) => {
       setOffset(currentOffset);
       setDirection(direction);
     }
-  };
-
-  function shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
+    if ((layoutMeasurement.height + contentOffset.y) >= (contentSize.height - 20)) {
+      setDataSize(dataSize + 6)
     }
-    return array
-  }
+  };
 
   return (
     <ScreenBase>
@@ -106,6 +112,8 @@ const Home = (props) => {
             placeholder={strings.Search}
             placeholderTextColor={primeColor}
             style={{ color: primeColor }}
+            value={search}
+            onChangeText={(e) => setSearch(e)}
           />
         </Item>
         <Icon name="heart" style={{
@@ -135,6 +143,10 @@ const Home = (props) => {
           }
         )}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+
       >
         <View style={styles.bannerContainer}>
           <Animated.View style={styles.banner(scrollA)}>
@@ -142,15 +154,13 @@ const Home = (props) => {
           </Animated.View>
         </View>
         <View style={styles.scrollView}>
-          <View style={styles.scrollContainer}>
-            {productservice.length ?
-              productservice.map((item) => (
-                <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-              ))
-              :
-              <Text>Loading...</Text>
-            }
-          </View>
+          {productservice.length ?
+            productservice.map((item) => (
+              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
+            )).reverse()
+            :
+            <Text>No Data</Text>
+          }
         </View>
       </Animated.ScrollView>
       <FooterTabs
@@ -196,9 +206,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingTop: 25,
+    paddingBottom: 50,
     paddingHorizontal: 20,
     marginTop: -25,
-    // height: screenHeight
+    flexDirection: 'row',
+    flexWrap: 'wrap'
   },
   scrollHandler: {
     marginTop: 10,
@@ -208,7 +220,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   scrollContainer: {
-    display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingBottom: 75,

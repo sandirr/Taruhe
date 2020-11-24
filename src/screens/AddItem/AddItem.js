@@ -225,6 +225,7 @@ class AddItem extends Component {
                         <Text style={{ fontSize: 24, color: "#555", fontWeight: '700' }}>
                             {type === 'product' && strings.Menu2}
                             {type === 'service' && strings.Menu3}
+                            {type === 'tourism' && strings.Menu4}
                         </Text>
                         <Image
                             style={{ width: 100, height: 25, marginTop: 5, marginRight: 5 }}
@@ -234,7 +235,7 @@ class AddItem extends Component {
                     <View>
                         <Item picker rounded style={styles.inputItem} >
                             {!category && <Label style={{ fontSize: 14, marginLeft: 8 }}>{strings.Category}</Label>}
-                            {type === 'product' ?
+                            {type === 'product' &&
                                 <Picker
                                     placeholderStyle={{ color: "#bfc6ea" }}
                                     placeholderIconColor="#007aff"
@@ -248,7 +249,8 @@ class AddItem extends Component {
                                     <Picker.Item label={strings.Culinar} value='Culinar' />
                                     <Picker.Item label={strings.Musical} value='Musical' />
                                 </Picker>
-                                :
+                            }
+                            {type === 'service' &&
                                 <Picker
                                     placeholderStyle={{ color: "#bfc6ea" }}
                                     placeholderIconColor="#007aff"
@@ -259,6 +261,19 @@ class AddItem extends Component {
                                     <Picker.Item label='' value='' />
                                     <Picker.Item label={strings.ArtShow} value='ArtShow' />
                                     <Picker.Item label={strings.Travel} value='Travel' />
+                                </Picker>
+                            }
+                            {type === 'tourism' &&
+                                <Picker
+                                    placeholderStyle={{ color: "#bfc6ea" }}
+                                    placeholderIconColor="#007aff"
+                                    mode="dropdown"
+                                    selectedValue={category}
+                                    onValueChange={(text) => this.setState({ category: text })}
+                                >
+                                    <Picker.Item label='' value='' />
+                                    <Picker.Item label={strings.Natural} value='Natural' />
+                                    <Picker.Item label={strings.Cultural} value='Cultural' />
                                 </Picker>
                             }
                         </Item>

@@ -1,5 +1,4 @@
 import React from "react";
-import { Text } from "native-base";
 import {
   View,
   StyleSheet,
@@ -9,7 +8,7 @@ import {
 import { primeColor } from "../../configs/color";
 
 export default function EtcAct(props) {
-  const { navigation, openEtc, modalVisible } = props;
+  const { children, openEtc, modalVisible } = props;
   return (
     <Modal
       animationType="fade"
@@ -24,10 +23,7 @@ export default function EtcAct(props) {
       </TouchableWithoutFeedback>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalText}>Pesanan</Text>
-          <Text style={styles.modalText}>Bantuan</Text>
-          <Text style={styles.modalText}>FAQ</Text>
-          <Text style={styles.modalText}>Pengaturan</Text>
+          {children}
         </View>
       </View>
     </Modal>
@@ -45,10 +41,6 @@ const styles = StyleSheet.create({
     margin: 25,
     backgroundColor: "white",
     borderRadius: 20,
-    paddingTop: 15,
-    paddingBottom: 10,
-    paddingLeft: 15,
-    paddingRight: 25,
     alignItems: "flex-start",
     shadowColor: "#000",
     shadowOffset: {

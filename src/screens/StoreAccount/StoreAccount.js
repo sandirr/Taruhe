@@ -20,25 +20,26 @@ import { fDB, fStorage } from '../../configs/firebase';
 import ImagePicker from 'react-native-image-picker';
 import Axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
+import EtcAct from '../../elements/EtcAct';
+import { admin } from '../../configs/adminList';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 const StoreAccount = ({ navigation, route }) => {
-    if (profile.data.storeName || route.params.type !== 'owner')
+    const [editStore, setEditStore] = useState(false)
+    if ((profile.data.storeName || route.params.type !== 'owner') && !editStore)
         return (
-            <Store navigation={navigation} route={route} />
+            <Store navigation={navigation} route={route} handleToEdit={() => setEditStore(true)} />
         );
     else
         return (
-            <FormStore navigation={navigation} />
+            <FormStore navigation={navigation} editable={editStore} />
         );
 }
 
 class FormStore extends Component {
     state = {
-        currentPosition: {},
-        permission: true,
         position: { province: {}, district: {}, subDistrict: {} },
         storeName: '',
         storeLocation: '',
@@ -54,6 +55,17 @@ class FormStore extends Component {
             .then((res) => {
                 this.setState({ province: res.data })
             })
+
+        if (this.props.editable) {
+            const { data } = profile
+            this.setState({
+                position: data.position,
+                storeName: data.storeName,
+                storeLocation: data.storeLocation,
+                phoneNumber: data.phoneNumber,
+                storeDetail: data.storeDetail,
+            })
+        }
     }
 
     handleChangeProv = (e) => {
@@ -103,7 +115,7 @@ class FormStore extends Component {
     }
 
     render() {
-        const { storeName, storeLocation, phoneNumber, storeDetail, province, district, subDistrict } = this.state
+        const { storeName, storeLocation, phoneNumber, storeDetail, province, district, subDistrict, position } = this.state
         return (
             <ScreenBase barStyle="dark-content">
                 <ScrollView
@@ -119,7 +131,7 @@ class FormStore extends Component {
                             flexDirection: "row",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            marginBottom: 25,
+                            marginBottom: 12,
                         }}
                     >
                         <Text style={{ fontSize: 24, color: "#555", fontWeight: '700' }}>
@@ -163,7 +175,7 @@ class FormStore extends Component {
                                 selectedValue={this.state.position?.province}
                                 onValueChange={(val) => this.handleChangeProv(val)}
                             >
-                                <Picker.Item label="" value="" />
+                                <Picker.Item label={position.province?.nama || ''} value={position.province} />
                                 {province.map((loc) => (
                                     <Picker.Item label={loc.nama} value={loc} key={loc.id} />
                                 ))}
@@ -180,7 +192,7 @@ class FormStore extends Component {
                                 selectedValue={this.state.position?.district}
                                 onValueChange={(val) => this.handleChangeDis(val)}
                             >
-                                <Picker.Item label="" value="" />
+                                <Picker.Item label={position.district?.nama || ''} value={position.district} />
                                 {district.length ? district.map((loc) => (
                                     <Picker.Item label={loc.nama} value={loc} key={loc.id} />
                                 )) :
@@ -199,7 +211,7 @@ class FormStore extends Component {
                                 selectedValue={this.state.position?.subDistrict}
                                 onValueChange={(val) => this.handleChangeSubDis(val)}
                             >
-                                <Picker.Item label="" value="" />
+                                <Picker.Item label={position.subDistrict?.nama || ''} value={position.subDistrict} />
                                 {subDistrict.length ? subDistrict.map((loc) => (
                                     <Picker.Item label={loc.nama} value={loc} key={loc.id} />
                                 )) :
@@ -230,12 +242,12 @@ class FormStore extends Component {
                             rowSpan={5}
                         />
                     </View>
-                    <Button
-                        rounded
+                    <TouchableOpacity
                         style={[
                             {
                                 backgroundColor: primeColor,
-                                marginVertical: 35,
+                                marginVertical: 16,
+                                borderRadius: 50
                             },
                             {
                                 alignSelf: "center",
@@ -249,9 +261,9 @@ class FormStore extends Component {
                         onPress={this.saveStore}
                     >
                         <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
-                            Simpan
+                            {strings.Save}
                         </Text>
-                    </Button>
+                    </TouchableOpacity>
                 </ScrollView>
 
             </ScreenBase>
@@ -259,19 +271,21 @@ class FormStore extends Component {
     }
 }
 
-const Store = ({ navigation, route }) => {
+const Store = ({ navigation, route, handleToEdit }) => {
     const scrollA = useRef(new Animated.Value(0)).current;
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
     }, []);
     const [tabs] = useState([
         'Product',
-        'Service'
+        'Service',
+        'Tourism'
     ]);
     const [isAdd, setIsAdd] = useState(false)
     const [activeTab, setActiveTab] = useState(tabs[0])
     const [isScroll, setIsScroll] = useState(false)
     const [items, setItems] = useState([])
+    const [modalVisible, setModalVisible] = useState(false)
     const [visited, setVisited] = useState({
         photoURL: '',
         username: '',
@@ -298,7 +312,6 @@ const Store = ({ navigation, route }) => {
     }, [type, profile.data])
 
     useEffect(() => {
-        setItems([])
         setLoading(true)
         fDB.ref('product_service')
             .orderByChild('uid')
@@ -313,10 +326,11 @@ const Store = ({ navigation, route }) => {
                     })
                     setItems(allItems)
                 }
+                setLoading(false)
             }, (error) => {
                 Alert.alert(error.code)
+                setLoading(false)
             })
-        setLoading(false)
     }, [type, activeTab])
 
     const updateData = (newData) => {
@@ -416,7 +430,9 @@ const Store = ({ navigation, route }) => {
                                             <Text style={styles.followText} >Follow</Text>
                                         </Button>
                                     }
-                                    <Icon name="ellipsis-vertical" style={styles.etc} />
+                                    <TouchableOpacity onPress={() => setModalVisible(true)}>
+                                        <Icon name="ellipsis-vertical" style={styles.etc} />
+                                    </TouchableOpacity>
                                 </View>
                             </View>
 
@@ -453,7 +469,7 @@ const Store = ({ navigation, route }) => {
                                                         flexDirection: 'column',
                                                         alignItems: 'center',
                                                         borderRadius: 25,
-                                                        width: 70,
+                                                        width: 75,
                                                         paddingVertical: 3
                                                     }}
                                                     rounded
@@ -491,7 +507,7 @@ const Store = ({ navigation, route }) => {
                                                         flexDirection: 'column',
                                                         alignItems: 'center',
                                                         borderRadius: 25,
-                                                        width: 70,
+                                                        width: 75,
                                                         paddingVertical: 3
                                                     }}
                                                     rounded
@@ -504,6 +520,32 @@ const Store = ({ navigation, route }) => {
                                                     }}
                                                     >
                                                         {strings.Menu3}
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                        }
+                                        {isAdd && admin.indexOf(profile.data.email) >= 0 &&
+                                            <Pressable onPress={() => navigation.navigate('AddItem', { type: 'tourism' })}>
+                                                <View
+                                                    style={{
+                                                        backgroundColor: '#fff',
+                                                        marginHorizontal: 10,
+                                                        flexDirection: 'column',
+                                                        alignItems: 'center',
+                                                        borderRadius: 25,
+                                                        width: 75,
+                                                        paddingVertical: 3
+                                                    }}
+                                                    rounded
+                                                >
+                                                    <Icon name="trail-sign-outline" style={styles.iToConnect} />
+                                                    <Text style={{
+                                                        color: '#000',
+                                                        fontSize: 12,
+                                                        marginTop: -3
+                                                    }}
+                                                    >
+                                                        {strings.Menu4}
                                                     </Text>
                                                 </View>
                                             </Pressable>
@@ -539,7 +581,9 @@ const Store = ({ navigation, route }) => {
                     <View style={styles.itemsContainer}>
                         <TouchableOpacity
                             style={[styles.btnTab, activeTab === tabs[0] &&
-                                { backgroundColor: primeColor }]}
+                                { backgroundColor: primeColor },
+                            ((type === 'visitor' && admin.indexOf(storeData.email) >= 0) || (type === 'owner' && admin.indexOf(data.email) >= 0)) ?
+                                { width: '32%' } : { width: '48%' }]}
                             onPress={() => setActiveTab(tabs[0])}
                         >
                             <Text style={styles.tabText}>
@@ -547,14 +591,28 @@ const Store = ({ navigation, route }) => {
                             </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                            style={[styles.btnTab, , activeTab === tabs[1] &&
-                                { backgroundColor: primeColor }]}
+                            style={[styles.btnTab, activeTab === tabs[1] &&
+                                { backgroundColor: primeColor },
+                            ((type === 'visitor' && admin.indexOf(storeData.email) >= 0) || (type === 'owner' && admin.indexOf(data.email) >= 0)) ?
+                                { width: '32%' } : { width: '48%' }]}
                             onPress={() => setActiveTab(tabs[1])}
                         >
                             <Text style={styles.tabText}>
                                 {strings.Menu3}
                             </Text>
                         </TouchableOpacity>
+                        {((type === 'visitor' && admin.indexOf(storeData.email) >= 0) || (type === 'owner' && admin.indexOf(data.email) >= 0)) &&
+                            <TouchableOpacity
+                                style={[styles.btnTab, activeTab === tabs[2] &&
+                                    { backgroundColor: primeColor },
+                                { width: '32%' }]}
+                                onPress={() => setActiveTab(tabs[2])}
+                            >
+                                <Text style={styles.tabText}>
+                                    {strings.Menu4}
+                                </Text>
+                            </TouchableOpacity>
+                        }
                     </View>
                     <View style={{ paddingBottom: 50 }}>
                         <ScrollView
@@ -563,25 +621,57 @@ const Store = ({ navigation, route }) => {
                         >
                             {items.length ? items.map(item => (
                                 <SellingItem key={item.id} data={item} toDetail={() => {
-                                    if (type !== 'owner')
-                                        navigation.navigate('DetailItem', { detail: item })
-                                    else
+                                    if (item.uid === data.uid)
                                         navigation.navigate('AddItem', { type: item.type, edit: true, item: item })
+                                    else
+                                        navigation.navigate('DetailItem', { detail: item })
                                 }} />
-                            )) :
+                            )).reverse() :
                                 loading ?
-                                    <>
-                                        <Text>Loading...</Text>
-                                    </>
+                                    <Text>Loading...</Text>
                                     :
-                                    <>
-                                        <Text>Belum ada {activeTab.toLowerCase()}</Text>
-                                    </>
+                                    <Text>Belum ada item {activeTab.toLowerCase()}</Text>
+
                             }
                         </ScrollView>
                     </View>
                 </View>
             </Animated.ScrollView>
+            <EtcAct
+                modalVisible={modalVisible}
+                openEtc={(e) => setModalVisible(e)}
+                navigation={navigation}
+            >
+                <View style={{
+                    backgroundColor: '#ccc',
+                    borderRadius: 20,
+                }}
+                >
+                    <Pressable onPress={handleToEdit}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            height: 45,
+                            paddingHorizontal: 15
+                        }}
+                    >
+                        <Icon name="create-outline" style={{ fontSize: 22, marginRight: 5 }} />
+                        <Text style={styles.modalText}>Edit your store</Text>
+                    </Pressable>
+                    <View style={{ backgroundColor: 'gray', height: 2 }} />
+                    <Pressable onPress={() => navigation.replace(strings.Menu1)}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            height: 45,
+                            paddingHorizontal: 15
+                        }}
+                    >
+                        <Icon name="home-outline" style={{ fontSize: 22, marginRight: 5 }} />
+                        <Text style={styles.modalText}>Back to home</Text>
+                    </Pressable>
+                </View>
+            </EtcAct>
         </ScreenBase >
     );
 };
@@ -682,7 +772,6 @@ const styles = StyleSheet.create({
         marginBottom: 18
     },
     btnTab: {
-        width: '48%',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#a8c8c7',

@@ -37,6 +37,7 @@ const AppFeature = () => {
         })
       } else {
         setIsUser(false)
+        AsyncStorage.clear()
       }
     });
   }, [])
