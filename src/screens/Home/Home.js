@@ -44,25 +44,25 @@ const Home = (props) => {
     getData()
   }, [dataSize, search])
 
-  useEffect(() => {
-    let tourism = productservice.filter(e => e.category === 'Natural' || e.category === 'Cultural')
-    setTourism(tourism)
-  }, [productservice])
-
   const getData = () => {
     fDB.ref('product_service')
       .limitToLast(dataSize)
       .on('value', (values) => {
         if (values.val()) {
-          let allItems = []
-          Object.keys(values.val()).map((value) => {
+          let tourism = []
+          let filteredItems = []
+          Object.keys(values.val()).forEach((value) => {
             let newItem = values.val()[value];
             let re = new RegExp(search.trim(), 'gi');
             if (newItem.title.match(re)) {
-              allItems.push(newItem);
+              filteredItems.push(newItem);
+            }
+            if ((newItem.category === 'Natural' || newItem.category === 'Cultural') && filteredItems.length <= 10) {
+              tourism.push(newItem)
             }
           })
-          setProductService(allItems)
+          setProductService(filteredItems)
+          setTourism(tourism)
         }
         setLoading(false)
       }, (error) => {
@@ -129,12 +129,14 @@ const Home = (props) => {
             onChangeText={(e) => setSearch(e)}
           />
         </Item>
-        <Icon name="heart" style={{
-          color: iconSearch,
-          textShadowColor: "#555",
-          textShadowOffset: { width: -1, height: 1 },
-          textShadowRadius: 5,
-        }} />
+        <TouchableOpacity onPress={() => navigation.navigate('WishList')}>
+          <Icon name="heart" style={{
+            color: iconSearch,
+            textShadowColor: "#555",
+            textShadowOffset: { width: -1, height: 1 },
+            textShadowRadius: 5,
+          }} />
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('ListChat')}>
           <Icon name="mail" style={{
             color: iconSearch,
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
     ],
   }),
   scrollView: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f3f3f3',
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingTop: 25,

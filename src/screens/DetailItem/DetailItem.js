@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking, Pressable } from 'react-native';
-import { View, H3, Text, Button } from 'native-base';
+import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking, Pressable, Alert, ToastAndroid, Share } from 'react-native';
+import { View, H3, Text, Button, Icon } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StarRating from 'react-native-star-rating';
 import strings from '../../assets/Dictionary';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-// import getDirections from 'react-native-google-maps-directions'
 import { parser } from '../../configs/helper';
 import { profile } from '../../configs/profile';
 import { fDB } from '../../configs/firebase';
@@ -15,16 +14,21 @@ import { fDB } from '../../configs/firebase';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const Home = (props) => {
+function Home(props) {
     const scrollA = useRef(new Animated.Value(0)).current;
     const [detailUser, setDetailUser] = useState({})
+    const [detailItem, setDetailItem] = useState({})
     const { navigation } = props;
     const { detail } = props.route.params
+    const [isWish, setIsWish] = useState(false)
     useEffect(() => {
-
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+        setIsWish(profile.wishlist.indexOf(detail.id.toString()) >= 0 ? true : false)
         fDB.ref('users/' + detail.uid).on('value', val => {
             setDetailUser(val.val())
+        })
+        fDB.ref('product_service/' + detail.id).on('value', val => {
+            setDetailItem(val.val())
         })
     }, [detail]);
 
@@ -33,187 +37,258 @@ const Home = (props) => {
         Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${position.subDistrict.nama}`)
     }
 
+    const refreshWishlist = (id) => {
+        if (id) {
+            let newWishListData = profile.wishlistData.filter(e => e.id != id.toString())
+            profile.wishlistData = newWishListData
+            let newWishList = profile.wishlist.filter(e => e != id.toString())
+            profile.wishlist = newWishList
+        } else
+            fDB.ref('wishlist/' + profile.data.uid).on('value', val => {
+                if (val.val()) {
+                    let wishlistData = []
+                    let wishlist = []
+                    Object.keys(val.val()).forEach((item) => {
+                        wishlistData.push(val.val()[item])
+                        wishlist.push(item)
+                    })
+                    profile.wishlistData = wishlistData
+                    profile.wishlist = wishlist
+                }
+            })
+    }
+
+    const setToWishList = () => {
+        Linking.getInitialURL().then(url => {
+            console.log(url)
+        })
+        if (profile.wishlist.indexOf(detail.id.toString()) >= 0)
+            fDB.ref('wishlist/' + profile.data.uid).child(detail.id).remove()
+                .then(() => {
+                    ToastAndroid.showWithGravity(
+                        "Removed from wishlist",
+                        ToastAndroid.SHORT,
+                        ToastAndroid.CENTER
+                    );
+                    refreshWishlist(detail.id)
+                    setIsWish(false)
+                })
+        else
+            fDB.ref('wishlist/' + profile.data.uid).child(detail.id).set({
+                ...detailItem,
+            }).then(() => {
+                ToastAndroid.showWithGravity(
+                    "Added to wishlist",
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                );
+                refreshWishlist()
+                setIsWish(true)
+            })
+    }
+
+    const shareTaruhe = () => {
+        Share.share({
+            message: `https://google.com`,
+            dialogTitle: "lol"
+        });
+    }
+
+    const HeartWish = () => {
+        if (isWish)
+            return <Ionicons name="heart" style={styles.heart} />
+        else
+            return <Ionicons name="heart-outline" style={styles.heart} />
+    }
     return (
         <ScreenBase barStyle="dark-content" >
-            <Animated.ScrollView
-                showsVerticalScrollIndicator={false}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollA } } }],
-                    {
-                        useNativeDriver: true,
-                    }
-                )}
-                scrollEventThrottle={16}
-            >
-                <View style={styles.bannerContainer}>
-                    <Animated.View style={styles.banner(scrollA)}>
-                        <ImageBackground
-                            source={detail.imagesURL[0]}
-                            style={{ height: screenHeight * 0.3, width: screenWidth, position: 'relative' }}
-                        >
-                            <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,.4)" }} />
-                            <View style={{ position: 'absolute', bottom: 45, left: 35 }}>
-                                <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>{detail.title}</Text>
-                                <Pressable onPress={() => {
-                                    if (profile.data.uid === detail.uid) {
-                                        navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
-                                    } else {
-                                        navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detailUser })
-                                    }
-                                }} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Image
-                                        source={require('../../assets/images/storefront.png')}
-                                        style={{ height: 12, width: 12 }}
-                                    />
-                                    <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>{detailUser.storeName}</Text>
+            {detailItem.id &&
+                <Animated.ScrollView
+                    showsVerticalScrollIndicator={false}
+                    onScroll={Animated.event(
+                        [{ nativeEvent: { contentOffset: { y: scrollA } } }],
+                        {
+                            useNativeDriver: true,
+                        }
+                    )}
+                    scrollEventThrottle={16}
+                >
+                    <View style={styles.bannerContainer}>
+                        <Animated.View style={styles.banner(scrollA)}>
+                            <ImageBackground
+                                source={detailItem.imagesURL[0]}
+                                style={{ height: screenHeight * 0.3, width: screenWidth, position: 'relative' }}
+                            >
+                                <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,.4)" }} />
+                                <Pressable style={{ position: 'absolute', top: 45, left: 35 }} onPress={() => navigation.goBack()} >
+                                    <Icon name="arrow-back" style={{ color: '#fff' }} />
                                 </Pressable>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                    <StarRating
-                                        disabled
-                                        maxStars={5}
-                                        rating={3}
-                                        starSize={12}
-                                        fullStarColor="#fdcc0d"
-                                        emptyStarColor="#fdcc0d"
-                                        halfStarColor="#fdcc0d"
-                                    />
-                                    <Text style={{
-                                        fontSize: 10,
-                                        color: '#fff',
-                                        marginLeft: 5,
-                                    }}>
-                                        (123)
-                                    </Text>
-                                </View>
-                            </View>
-                        </ImageBackground>
-                    </Animated.View>
-                </View>
-                <View style={styles.scrollView}>
-                    <View style={styles.scrollContainer}>
-                        <View style={styles.price}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Ionicons name="pricetag-outline" style={{ fontSize: 30 }} />
-                                <View style={{ marginLeft: 10 }}>
-                                    <Text style={{ fontSize: 20, fontWeight: '700', color: '#555' }}>Rp. {parser(detail?.price)}</Text>
-                                    <View style={{
-                                        flexDirection: 'row', alignItems: 'center', marginLeft: -2
-                                    }}>
-                                        <Ionicons name="location-outline"
-                                            size={12} style={{ color: '#555' }} />
-                                        <Text style={{
-                                            fontSize: 12, color: '#555'
-                                        }}>
-                                            {detail.position.district.nama}
-                                        </Text>
-                                    </View>
-                                    <Text style={{ fontSize: 10, color: '#bb2205', fontWeight: '700' }}>1% Off</Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={{ marginTop: 21 }}>
-                            <H3 style={{ fontWeight: '700', color: '#555' }}>{strings.Description}</H3>
-                            <Text style={[{
-                                textAlign: 'justify', color: '#555', fontSize: 14
-                            }, readMore ? { minHeight: 40 } : { height: 40 }]}>
-                                {detail.description}
-                            </Text>
-                            <TouchableOpacity onPress={() => setReadMore(!readMore)}>
-                                <Text style={styles.readMore}>
-                                    {readMore ? strings.ShowLess : strings.ReadMore}...
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={{
-                            flexDirection: 'row', justifyContent: 'space-between', marginTop: 21
-                        }}>
-                            <View style={{
-                                width: '60%', height: 220, justifyContent: 'space-between'
-                            }}>
-                                <Image
-                                    source={detail.imagesURL[0]}
-                                    style={{ height: 105, width: '100%', borderRadius: 18 }}
-                                />
-                                <Image
-                                    source={detail.imagesURL[1] || require('../../assets/images/noimage.jpg')}
-                                    style={{ height: 105, width: '100%', borderRadius: 18 }}
-                                />
-                            </View>
-                            <View style={{ width: '37%' }}>
-                                <Image
-                                    source={detail.imagesURL[2] || require('../../assets/images/noimage.jpg')}
-                                    style={{ height: 220, width: '100%', borderRadius: 18 }}
-                                />
-                            </View>
-                        </View>
-
-                        <View style={{ marginTop: 21 }}>
-                            <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16, paddingHorizontal: 28, alignItems: 'center' }}>
-                                <View style={{ flexDirection: 'row' }}>
-                                    <Image
-                                        source={require('../../assets/images/sarung.jpg')}
-                                        style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
-                                    />
-                                    <View style={{ marginLeft: 10 }}>
-                                        {detailUser.uid &&
-                                            <TouchableOpacity onPress={() => {
-                                                if (profile.data.uid === detail.uid) {
-                                                    navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
-                                                } else {
-                                                    navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detailUser })
-                                                }
-                                            }}>
-                                                <Text style={{ fontSize: 20, color: '#555' }}>{detailUser.storeName}</Text>
-                                                <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detailUser.username}</Text>
-                                            </TouchableOpacity>
+                                <Pressable style={{ position: 'absolute', top: 45, right: 35 }} onPress={shareTaruhe} >
+                                    <Icon name="share-social" style={{ color: '#fff' }} />
+                                </Pressable>
+                                <View style={{ position: 'absolute', bottom: 45, left: 35 }}>
+                                    <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>{detailItem.title}</Text>
+                                    <Pressable onPress={() => {
+                                        if (profile.data.uid === detailItem.uid) {
+                                            navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
+                                        } else {
+                                            navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid, storeData: detailUser })
                                         }
+                                    }} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Image
+                                            source={require('../../assets/images/storefront.png')}
+                                            style={{ height: 12, width: 12 }}
+                                        />
+                                        <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>{detailUser.storeName}</Text>
+                                    </Pressable>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                        <StarRating
+                                            disabled
+                                            maxStars={5}
+                                            rating={3}
+                                            starSize={12}
+                                            fullStarColor="#fdcc0d"
+                                            emptyStarColor="#fdcc0d"
+                                            halfStarColor="#fdcc0d"
+                                        />
+                                        <Text style={{
+                                            fontSize: 10,
+                                            color: '#fff',
+                                            marginLeft: 5,
+                                        }}>
+                                            (123)
+                                    </Text>
                                     </View>
                                 </View>
-                                {detail.uid !== profile.data.uid && detailUser.uid &&
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        {/* <Ionicons name="heart-outline" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} /> */}
-                                        <Pressable onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
-                                            <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
-                                        </Pressable>
+                            </ImageBackground>
+                        </Animated.View>
+                    </View>
+                    <View style={styles.scrollView}>
+                        <View style={styles.scrollContainer}>
+                            <View style={styles.price}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Ionicons name="pricetag-outline" style={{ fontSize: 30 }} />
+                                    <View style={{ marginLeft: 10 }}>
+                                        <Text style={{ fontSize: 20, fontWeight: '700', color: '#555' }}>Rp. {parser(detail?.price)}</Text>
+                                        <View style={{
+                                            flexDirection: 'row', alignItems: 'center', marginLeft: -2
+                                        }}>
+                                            <Ionicons name="location-outline"
+                                                size={12} style={{ color: '#555' }} />
+                                            <Text style={{
+                                                fontSize: 12, color: '#555'
+                                            }}>
+                                                {detailItem.position.district.nama}
+                                            </Text>
+                                        </View>
+                                        <Text style={{ fontSize: 10, color: '#bb2205', fontWeight: '700' }}>1% Off</Text>
                                     </View>
-                                }
+                                </View>
                             </View>
-                        </View>
 
-                        <View style={{ marginTop: 20, height: 180, width: '100%', padding: 5, backgroundColor: '#fff' }}>
-                            <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections(detail.position)} >
-                                <MapView
-                                    liteMode
-                                    style={{ flex: 1 }}
-                                    provider={PROVIDER_GOOGLE}
-                                    showsUserLocation
-                                    initialRegion={{
-                                        latitude: 0.7893,
-                                        longitude: 113.9213,
-                                        latitudeDelta: 1,
-                                        longitudeDelta: 1,
-                                    }}
-                                >
-                                    <Marker
-                                        coordinate={{ latitude: 0.7893, longitude: 113.9213 }}
-                                        title="Kalea Official"
+                            <View style={{ marginTop: 21 }}>
+                                <H3 style={{ fontWeight: '700', color: '#555' }}>{strings.Description}</H3>
+                                <Text style={[{
+                                    textAlign: 'justify', color: '#555', fontSize: 14
+                                }, readMore ? { minHeight: 40 } : { height: 40 }]}>
+                                    {detailItem.description}
+                                </Text>
+                                <TouchableOpacity onPress={() => setReadMore(!readMore)}>
+                                    <Text style={styles.readMore}>
+                                        {readMore ? strings.ShowLess : strings.ReadMore}...
+                                </Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={{
+                                flexDirection: 'row', justifyContent: 'space-between', marginTop: 21
+                            }}>
+                                <View style={{
+                                    width: '60%', height: 220, justifyContent: 'space-between'
+                                }}>
+                                    <Image
+                                        source={detailItem.imagesURL[0]}
+                                        style={{ height: 105, width: '100%', borderRadius: 18 }}
+                                    />
+                                    <Image
+                                        source={detailItem.imagesURL[1] || require('../../assets/images/noimage.jpg')}
+                                        style={{ height: 105, width: '100%', borderRadius: 18 }}
+                                    />
+                                </View>
+                                <View style={{ width: '37%' }}>
+                                    <Image
+                                        source={detailItem.imagesURL[2] || require('../../assets/images/noimage.jpg')}
+                                        style={{ height: 220, width: '100%', borderRadius: 18 }}
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={{ marginTop: 21 }}>
+                                <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16, paddingHorizontal: 28, alignItems: 'center' }}>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Image
+                                            source={require('../../assets/images/sarung.jpg')}
+                                            style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
+                                        />
+                                        <View style={{ marginLeft: 10 }}>
+                                            {detailUser.uid &&
+                                                <TouchableOpacity onPress={() => {
+                                                    if (profile.data.uid === detailItem.uid) {
+                                                        navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
+                                                    } else {
+                                                        navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid, storeData: detailUser })
+                                                    }
+                                                }}>
+                                                    <Text style={{ fontSize: 20, color: '#555' }}>{detailUser.storeName}</Text>
+                                                    <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detailUser.username}</Text>
+                                                </TouchableOpacity>
+                                            }
+                                        </View>
+                                    </View>
+                                    {detailItem.uid !== profile.data.uid && detailUser.uid &&
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            {/* <Ionicons name="heart-outline" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} /> */}
+                                            <Pressable onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
+                                                <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
+                                            </Pressable>
+                                        </View>
+                                    }
+                                </View>
+                            </View>
+
+                            <View style={{ marginTop: 20, height: 180, width: '100%', padding: 5, backgroundColor: '#fff' }}>
+                                <TouchableOpacity style={{ flex: 1 }} onPress={() => handleGetDirections(detailItem.position)} >
+                                    <MapView
+                                        liteMode
+                                        style={{ flex: 1 }}
+                                        provider={PROVIDER_GOOGLE}
+                                        showsUserLocation
+                                        initialRegion={{
+                                            latitude: 0.7893,
+                                            longitude: 113.9213,
+                                            latitudeDelta: 1,
+                                            longitudeDelta: 1,
+                                        }}
                                     >
-                                    </Marker>
-                                </MapView>
-                            </TouchableOpacity>
-                        </View>
+                                        <Marker
+                                            coordinate={{ latitude: 0.7893, longitude: 113.9213 }}
+                                            title="Kalea Official"
+                                        >
+                                        </Marker>
+                                    </MapView>
+                                </TouchableOpacity>
+                            </View>
 
+                        </View>
                     </View>
-                </View>
-            </Animated.ScrollView>
-            {detail.uid !== profile.data.uid && detailUser.uid &&
+                </Animated.ScrollView>
+            }
+            {detail.uid !== profile.data.uid && detailUser.uid && detailItem.id &&
                 <View style={styles.floatingOrder}>
-                    <View style={styles.favorite}>
-                        <Ionicons name="heart-outline" style={styles.heart} />
-                        <Text style={{ fontSize: 8, color: primeColor }}>{strings.Favorite}</Text>
-                    </View>
+                    <Pressable style={styles.favorite} onPress={setToWishList} >
+                        <HeartWish />
+                        <Text style={{ fontSize: 8, color: primeColor }}>{strings.Wishlist}</Text>
+                    </Pressable>
                     <Button style={styles.buttonOrder} onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
                         <Text style={{ fontSize: 14 }}>{strings.Order}</Text>
                     </Button>

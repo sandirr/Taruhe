@@ -182,12 +182,8 @@ export default function Product({ navigation }) {
 
 export const DataList = ({ whenScroll, data, navigation, refreshing, onRefresh }) => {
   return (
-    <View style={{ flex: 1, backgroundColor: '#f3f3f3' }}>
+    <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, }}>
       <ScrollView
-        contentContainerStyle={{
-          borderTopLeftRadius: 18,
-          borderTopRightRadius: 18,
-        }}
         onScroll={(e) => whenScroll(e)}
         showsVerticalScrollIndicator={false}
         refreshControl={

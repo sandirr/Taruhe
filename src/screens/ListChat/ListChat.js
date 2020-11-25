@@ -2,23 +2,27 @@ import React, { Component } from 'react';
 import { Container, Header, Content, List, ListItem, Left, Body, Right, Thumbnail, Text, Icon } from 'native-base';
 import ScreenBase from '../../elements/SecreenBase';
 import { ScrollView } from 'react-native-gesture-handler';
-import { TouchableOpacity, View } from 'react-native';
+import { Linking, RefreshControl, TouchableOpacity, View } from 'react-native';
 import { primeColor } from '../../configs/color';
 import { profile } from '../../configs/profile';
 import { fDB } from '../../configs/firebase';
+import { wait } from '../../configs/helper';
 export default class ListChat extends Component {
     constructor(props) {
         super(props);
         this.state = {
             active: false,
             users: [],
+            refreshing: false
         };
     }
     componentDidMount() {
-        this.getFromFirebase();
+        this.setState({ users: [] })
+        this.getData();
     }
 
-    getFromFirebase = () => {
+    getData = () => {
+        this.setState({ users: [] })
         let dbRef = fDB.ref('users');
         dbRef.on('child_added', val => {
             let person = val.val();
@@ -51,6 +55,26 @@ export default class ListChat extends Component {
         });
     };
 
+    getDay = time => {
+        var weekday = new Array(7);
+        weekday[0] = 'Sunday';
+        weekday[1] = 'Monday';
+        weekday[2] = 'Tuesday';
+        weekday[3] = 'Wednesday';
+        weekday[4] = 'Thursday';
+        weekday[5] = 'Friday';
+        weekday[6] = 'Saturday';
+        return <Text note>{weekday[time]}, </Text>;
+    };
+
+    onRefresh = () => {
+        this.setState({ refreshing: true })
+        this.getData()
+        setTimeout(() => {
+            this.setState({ refreshing: false })
+        }, 1000)
+    }
+
     render() {
         const { navigation } = this.props;
         return (
@@ -60,7 +84,7 @@ export default class ListChat extends Component {
                     alignItems: 'center',
                     paddingTop: 45,
                     paddingBottom: 15,
-                    paddingHorizontal: 35,
+                    paddingHorizontal: 25,
                     justifyContent: 'space-between'
                 }}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -77,7 +101,9 @@ export default class ListChat extends Component {
                         style={{ color: 'transparent', fontSize: 26 }}
                     />
                 </View>
-                <ScrollView>
+                <ScrollView refreshControl={
+                    <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
+                }>
                     {this.state.users.map((user) => (
                         <List>
                             <ListItem avatar onPress={() => navigation.navigate('ChatScreen', { data: user })}>
@@ -87,13 +113,15 @@ export default class ListChat extends Component {
                                             'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-user-30452.png'
                                     }} />
                                 </Left>
-                                <Body>
+                                <Body style={{
+                                    borderBottomWidth: 1,
+                                    paddingBottom: 18
+                                }}>
                                     <Text>{user.storeName}</Text>
-                                    <Text note>{user.last_message.latitude ? 'Location shared' : user.last_message}</Text>
+                                    <Text note>{user.last_message.latitude ? 'Location shared' : user.last_message.substr(0, 22) + '...'}</Text>
                                 </Body>
                                 <Right style={{
-                                    borderBottomWidth: 0,
-                                    padding: 0
+                                    borderBottomWidth: 1,
                                 }}>
                                     {new Date(user.last_time).getMonth() !== new Date().getMonth() ? (
                                         <Text note>

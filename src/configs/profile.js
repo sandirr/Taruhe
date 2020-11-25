@@ -1,3 +1,5 @@
 export let profile = {
-    data: {}
+    data: {},
+    wishlist: [],
+    wishlistData: []
 }

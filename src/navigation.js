@@ -22,6 +22,7 @@ import { fAuth, fDB } from "./configs/firebase";
 import ForgotPassword from "./screens/ForgotPassword";
 import { profile } from "./configs/profile";
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import WishList from "./screens/WishList";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -34,6 +35,18 @@ const AppFeature = () => {
         fDB.ref('users/' + user.uid).on('value', val => {
           profile.data = val.val()
           setIsUser(true)
+        })
+        fDB.ref('wishlist/' + user.uid).on('value', val => {
+          if (val.val()) {
+            let wishlistData = []
+            let wishlist = []
+            Object.keys(val.val()).forEach((item) => {
+              wishlistData.push(val.val()[item])
+              wishlist.push(item)
+            })
+            profile.wishlistData = wishlistData
+            profile.wishlist = wishlist
+          }
         })
       } else {
         setIsUser(false)
@@ -111,6 +124,11 @@ const AppFeature = () => {
       <AppStack.Screen
         name="Welcome"
         component={Welcome}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="WishList"
+        component={WishList}
         options={{ headerShown: false }}
       />
     </AppStack.Navigator>

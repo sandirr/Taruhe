@@ -336,7 +336,7 @@ class ChatSCreen extends Component {
                             <Thumbnail style={{ width: 40, height: 40 }} source={{ uri: person.photoURL }} />
                             <View style={{ marginLeft: 5 }}>
                                 <Text style={{ color: primeColor, fontWeight: '700', fontSize: 18 }}>{person.storeName || 'Loading...'}</Text>
-                                <Text style={{ fontSize: 12, marginTop: -5 }} note>Last Seen 08.17</Text>
+                                <Text style={{ fontSize: 12, marginTop: -5 }} note>Last Seen ...</Text>
                             </View>
                         </View>
                     </View>
