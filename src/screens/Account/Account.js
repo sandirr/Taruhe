@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native'
+import { Dimensions, Image, StyleSheet, TouchableOpacity, Pressable, Modal } from 'react-native'
 import { Icon, Text, View, List, ListItem, Left, Body, Right, Thumbnail, Button } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
@@ -8,6 +8,7 @@ import ScreenBase from '../../elements/SecreenBase'
 import { fAuth } from '../../configs/firebase'
 import { profile } from '../../configs/profile'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { ScrollView } from 'react-native-gesture-handler'
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -25,122 +26,134 @@ export default function Account({ navigation }) {
     }
     return (
         <ScreenBase barStyle="light-content">
-            <View style={styles.root}>
-                <View style={styles.photoThumb}>
-                    <View style={styles.profileThumb}>
-                        {data?.photoURL ?
-                            <Thumbnail
-                                source={{ uri: data?.photoURL }}
-                                style={styles.imageProfile}
-                            /> :
-                            <Icon name="person-circle" style={{ fontSize: 60 }} />
-                        }
-                        <Pressable onPress={() => navigation.navigate('Profile')} style={{ marginLeft: 10, marginTop: -5 }}>
-                            <Text style={styles.storeName}>{data?.username}</Text>
-                            <Text style={styles.toProfile}>{strings.VEP}</Text>
-                        </Pressable>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 55 }}>
+                <View style={styles.root}>
+                    <View style={styles.photoThumb}>
+                        <View style={styles.profileThumb}>
+                            {data?.photoURL ?
+                                <Thumbnail
+                                    source={{ uri: data?.photoURL }}
+                                    style={styles.imageProfile}
+                                /> :
+                                <Icon name="person-circle" style={{ fontSize: 60 }} />
+                            }
+                            <Pressable onPress={() => navigation.navigate('Profile')} style={{ marginLeft: 10, marginTop: -5 }}>
+                                <Text style={styles.storeName}>{data?.username}</Text>
+                                <Text style={styles.toProfile}>{strings.VEP}</Text>
+                            </Pressable>
+                        </View>
+                        <TouchableOpacity onPress={() => navigation.navigate('AccountSetting')}>
+                            <Icon name="settings-outline" style={{ color: '#fff' }} />
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('AccountSetting')}>
-                        <Icon name="settings-outline" style={{ color: '#fff' }} />
-                    </TouchableOpacity>
                 </View>
-            </View>
 
-            <Pressable style={styles.myStore} onPress={toMyStore}>
+                <Pressable style={styles.myStore} onPress={toMyStore}>
 
-                <Image
-                    source={require('../../assets/images/storefront.png')}
-                    tintColor={primeColor}
-                    style={{ height: 42, width: 42 }}
-                />
+                    <Image
+                        source={require('../../assets/images/storefront.png')}
+                        tintColor={primeColor}
+                        style={{ height: 42, width: 42 }}
+                    />
 
-                <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
+                    <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
 
-            </Pressable>
+                </Pressable>
 
-            <View style={styles.featureContainer}>
-                <View style={{ alignItems: 'center' }}>
-                    <Icon style={styles.iconFeature} name="heart" />
-                    <Text style={styles.strFeature}>{strings.Wishlist}</Text>
+                <View style={styles.featureContainer}>
+                    <View style={{ alignItems: 'center' }}>
+                        <Icon style={styles.iconFeature} name="heart" />
+                        <Text style={styles.strFeature}>{strings.Wishlist}</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Icon style={styles.iconFeature} name="time" />
+                        <Text style={styles.strFeature}>{strings.History}</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Icon style={styles.iconFeature} name="share-social" />
+                        <Text style={styles.strFeature}>{strings.Share}</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Icon style={styles.iconFeature} name="star" />
+                        <Text style={styles.strFeature}>{strings.RateUs}</Text>
+                    </View>
                 </View>
-                <View style={{ alignItems: 'center' }}>
-                    <Icon style={styles.iconFeature} name="time" />
-                    <Text style={styles.strFeature}>{strings.History}</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                    <Icon style={styles.iconFeature} name="share-social" />
-                    <Text style={styles.strFeature}>{strings.Share}</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                    <Icon style={styles.iconFeature} name="star" />
-                    <Text style={styles.strFeature}>{strings.RateUs}</Text>
-                </View>
-            </View>
 
-            <ScrollView
-                contentContainerStyle={styles.scrollMenu}
-                showsVerticalScrollIndicator={false} >
-                <List>
-                    <ListItem itemDivider style={styles.itemDivider}>
-                        <Text style={styles.textDivider}>{strings.MyFavorite}</Text>
-                    </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem}>
-                        <Left>
-                            <Icon style={{ fontSize: 22 }} name="heart-outline" />
-                        </Left>
-                        <Body>
-                            <Text>{strings.Wishlist}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem itemDivider style={styles.itemDivider}>
-                        <Text style={styles.textDivider}>{strings.MyAccount}</Text>
-                    </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.push('Profile')}>
-                        <Left>
-                            <Icon style={{ fontSize: 22 }} name="person-outline" />
-                        </Left>
-                        <Body>
-                            <Text>{strings.MyProfile}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem}>
-                        <Left>
-                            <Icon style={{ fontSize: 22 }} name="location-outline" />
-                        </Left>
-                        <Body>
-                            <Text>{strings.MyAddress}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem itemDivider style={styles.itemDivider}>
-                        <Text style={styles.textDivider}>{strings.Support}</Text>
-                    </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem}>
-                        <Left>
-                            <Icon style={{ fontSize: 22 }} name="help-circle-outline" />
-                        </Left>
-                        <Body>
-                            <Text>{strings.HelpCenter}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem}>
-                        <Left>
-                            <Icon style={{ fontSize: 22 }} name="alert-circle-outline" />
-                        </Left>
-                        <Body>
-                            <Text>{strings.About}</Text>
-                        </Body>
-                    </ListItem>
-                    <ListItem icon itemDivider style={styles.menuItem} onPress={logOutPermission}>
-                        <Left>
-                            <Icon style={{ transform: [{ rotate: '180deg' }], fontSize: 22 }} name="log-out-outline" />
-                        </Left>
-                        <Body>
-                            <Text>{strings.LogOut}</Text>
-                        </Body>
-                    </ListItem>
-                </List>
-                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                    <Text style={styles.taruheVer}>Taruhe v 1.0.0</Text>
+                <View style={styles.scrollMenu} >
+                    <List>
+                        <ListItem itemDivider style={styles.itemDivider}>
+                            <Text style={styles.textDivider}>{strings.MyFavorite}</Text>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem}>
+                            <Left>
+                                <Icon style={{ fontSize: 22 }} name="heart-outline" />
+                            </Left>
+                            <Body>
+                                <Text>{strings.Wishlist}</Text>
+                            </Body>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem}>
+                            <Left>
+                                <Icon style={{ fontSize: 22 }} name="heart-outline" />
+                            </Left>
+                            <Body>
+                                <Text>Following</Text>
+                            </Body>
+                        </ListItem>
+                        <ListItem itemDivider style={styles.itemDivider}>
+                            <Text style={styles.textDivider}>{strings.MyAccount}</Text>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.push('Profile')}>
+                            <Left>
+                                <Icon style={{ fontSize: 22 }} name="person-outline" />
+                            </Left>
+                            <Body>
+                                <Text>{strings.MyProfile}</Text>
+                            </Body>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={toMyStore}>
+                            <Left>
+                                <Image
+                                    source={require('../../assets/images/storefront.png')}
+                                    tintColor="#000"
+                                    style={{ height: 22, width: 22 }}
+                                />
+                            </Left>
+                            <Body>
+                                <Text>{strings.MyStore}</Text>
+                            </Body>
+                        </ListItem>
+                        <ListItem itemDivider style={styles.itemDivider}>
+                            <Text style={styles.textDivider}>{strings.Support}</Text>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem}>
+                            <Left>
+                                <Icon style={{ fontSize: 22 }} name="help-circle-outline" />
+                            </Left>
+                            <Body>
+                                <Text>{strings.HelpCenter}</Text>
+                            </Body>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem}>
+                            <Left>
+                                <Icon style={{ fontSize: 22 }} name="alert-circle-outline" />
+                            </Left>
+                            <Body>
+                                <Text>{strings.About}</Text>
+                            </Body>
+                        </ListItem>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={logOutPermission}>
+                            <Left>
+                                <Icon style={{ transform: [{ rotate: '180deg' }], fontSize: 22 }} name="log-out-outline" />
+                            </Left>
+                            <Body>
+                                <Text>{strings.LogOut}</Text>
+                            </Body>
+                        </ListItem>
+                    </List>
+                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                        <Text style={styles.taruheVer}>Taruhe v 1.0.0</Text>
+                    </View>
                 </View>
             </ScrollView>
             <Modal visible={permission} transparent animationType="slide">
@@ -219,7 +232,7 @@ const styles = StyleSheet.create({
     textDivider: { fontSize: 14, color: 'gray', fontWeight: '700', marginTop: 5 },
     header: { flexDirection: 'row', alignItems: 'center', paddingTop: 45, paddingBottom: 15, paddingHorizontal: 32, backgroundColor: '#f3f3f3', justifyContent: 'space-between' },
     root: {
-        minHeight: 210,
+        minHeight: 180,
         backgroundColor: primeColor,
         borderBottomLeftRadius: 50,
         borderBottomRightRadius: 50,
@@ -280,7 +293,5 @@ const styles = StyleSheet.create({
     },
     scrollMenu: {
         backgroundColor: '#f3f3f3',
-        marginTop: 2,
-        minHeight: screenHeight * 0.7
     }
 })

@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Tabs, Tab, Text } from "native-base";
+import { Tabs, Tab, Text, Spinner, Icon } from "native-base";
 import {
-  ScrollView,
   View,
   StyleSheet,
   Dimensions,
   RefreshControl,
+  Image,
 } from "react-native";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
@@ -16,6 +16,9 @@ import EtcAct from "../../elements/EtcAct";
 import ProductItem from "../../elements/ProductItem";
 import { fDB } from "../../configs/firebase";
 import { wait } from '../../configs/helper';
+import LoadData from "../../elements/LoadData";
+import NotFound from "../../elements/NotFound";
+import { ScrollView } from "react-native-gesture-handler";
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -34,6 +37,8 @@ export default function Product({ navigation }) {
 
   const [refreshing, setRefreshing] = useState(false);
   const [dataSize, setDataSize] = useState(6)
+
+  const [loading, setLoading] = useState(true)
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -69,7 +74,7 @@ export default function Product({ navigation }) {
             let allItems = []
             Object.keys(values.val()).map((value) => {
               let newItem = values.val()[value];
-              let re = new RegExp(search, 'gi');
+              let re = new RegExp(search.trim(), 'gi');
               if (newItem.title.match(re)) {
                 allItems.push(newItem);
               }
@@ -83,7 +88,9 @@ export default function Product({ navigation }) {
             else if (item === 'Musical')
               setMusical(allItems)
           }
+          setLoading(false)
         }, (error) => {
+          setLoading(false)
           Alert.alert(error.code)
         })
     })
@@ -112,7 +119,11 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Clothing}
         >
-          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Clothing} />
+          {loading ?
+            <LoadData />
+            :
+            <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Clothing} />
+          }
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -120,8 +131,11 @@ export default function Product({ navigation }) {
           activeTabStyle={{ backgroundColor: "#fff" }}
           activeTextStyle={{ color: primeColor }}
           heading={strings.Accessories}
-        >
+        >{loading ?
+          <LoadData />
+          :
           <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Accessories} />
+          }
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -130,7 +144,11 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Culinar}
         >
-          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Culinar} />
+          {loading ?
+            <LoadData />
+            :
+            <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Culinar} />
+          }
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -139,7 +157,11 @@ export default function Product({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Musical}
         >
-          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Musical} />
+          {loading ?
+            <LoadData />
+            :
+            <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Musical} />
+          }
         </Tab>
       </Tabs>
       <FooterTabs screen={strings.Menu2} navigation={navigation} direction={currentDirection} />
@@ -160,37 +182,37 @@ export default function Product({ navigation }) {
 
 export const DataList = ({ whenScroll, data, navigation, refreshing, onRefresh }) => {
   return (
-    <ScrollView
-      contentContainerStyle={{
-        backgroundColor: "#f3f3f3",
-        borderTopLeftRadius: 18,
-        borderTopRightRadius: 18,
-        flex: 1
-      }}
-      onScroll={(e) => whenScroll(e)}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View
-        style={{
-          paddingHorizontal: 20,
-          paddingTop: 25,
-          paddingBottom: 50,
-          flexDirection: "row",
-          flexWrap: "wrap",
+    <View style={{ flex: 1, backgroundColor: '#f3f3f3' }}>
+      <ScrollView
+        contentContainerStyle={{
+          borderTopLeftRadius: 18,
+          borderTopRightRadius: 18,
         }}
-      >
-        {data.length ?
-          data.map((item) => (
-            <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-          ))
-          :
-          <Text>No Data</Text>
+        onScroll={(e) => whenScroll(e)}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      </View>
-    </ScrollView>
+      >
+        <View
+          style={{
+            paddingHorizontal: 20,
+            paddingTop: 25,
+            paddingBottom: 50,
+            flexDirection: "row",
+            flexWrap: "wrap",
+          }}
+        >
+          {data.length ?
+            data.map((item) => (
+              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
+            ))
+            :
+            <NotFound />
+          }
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

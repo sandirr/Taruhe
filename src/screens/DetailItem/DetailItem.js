@@ -10,21 +10,29 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 // import getDirections from 'react-native-google-maps-directions'
 import { parser } from '../../configs/helper';
 import { profile } from '../../configs/profile';
+import { fDB } from '../../configs/firebase';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 const Home = (props) => {
     const scrollA = useRef(new Animated.Value(0)).current;
-    useEffect(() => {
-        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    }, []);
+    const [detailUser, setDetailUser] = useState({})
     const { navigation } = props;
     const { detail } = props.route.params
+    useEffect(() => {
+
+        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
+        fDB.ref('users/' + detail.uid).on('value', val => {
+            setDetailUser(val.val())
+        })
+    }, [detail]);
+
     const [readMore, setReadMore] = useState(false)
     const handleGetDirections = (position) => {
         Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${position.subDistrict.nama}`)
     }
+
     return (
         <ScreenBase barStyle="dark-content" >
             <Animated.ScrollView
@@ -46,12 +54,18 @@ const Home = (props) => {
                             <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, backgroundColor: "rgba(0,0,0,.4)" }} />
                             <View style={{ position: 'absolute', bottom: 45, left: 35 }}>
                                 <Text style={{ fontSize: 24, fontWeight: '700', color: "#fff" }}>{detail.title}</Text>
-                                <Pressable onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detail.created_by })} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Pressable onPress={() => {
+                                    if (profile.data.uid === detail.uid) {
+                                        navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
+                                    } else {
+                                        navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detailUser })
+                                    }
+                                }} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     <Image
                                         source={require('../../assets/images/storefront.png')}
                                         style={{ height: 12, width: 12 }}
                                     />
-                                    <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>{detail.created_by.storeName}</Text>
+                                    <Text style={{ color: '#fff', fontSize: 12, marginLeft: 5, textDecorationLine: 'underline' }}>{detailUser.storeName}</Text>
                                 </Pressable>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                     <StarRating
@@ -143,22 +157,28 @@ const Home = (props) => {
                                         style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
                                     />
                                     <View style={{ marginLeft: 10 }}>
-                                        <TouchableOpacity onPress={() => {
-                                            if (profile.data.uid === detail.uid) {
-                                                navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
-                                            } else {
-                                                navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detail.created_by })
-                                            }
-                                        }}>
-                                            <Text style={{ fontSize: 20, color: '#555' }}>{detail.created_by.storeName}</Text>
-                                            <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detail.created_by.username}</Text>
-                                        </TouchableOpacity>
+                                        {detailUser.uid &&
+                                            <TouchableOpacity onPress={() => {
+                                                if (profile.data.uid === detail.uid) {
+                                                    navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
+                                                } else {
+                                                    navigation.navigate('StoreAccount', { type: 'visitor', uid: detail.uid, storeData: detailUser })
+                                                }
+                                            }}>
+                                                <Text style={{ fontSize: 20, color: '#555' }}>{detailUser.storeName}</Text>
+                                                <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detailUser.username}</Text>
+                                            </TouchableOpacity>
+                                        }
                                     </View>
                                 </View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Ionicons name="heart" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
-                                    <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
-                                </View>
+                                {detail.uid !== profile.data.uid && detailUser.uid &&
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        {/* <Ionicons name="heart-outline" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} /> */}
+                                        <Pressable onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
+                                            <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
+                                        </Pressable>
+                                    </View>
+                                }
                             </View>
                         </View>
 
@@ -188,15 +208,17 @@ const Home = (props) => {
                     </View>
                 </View>
             </Animated.ScrollView>
-            <View style={styles.floatingOrder}>
-                <View style={styles.favorite}>
-                    <Ionicons name="heart-outline" style={styles.heart} />
-                    <Text style={{ fontSize: 8, color: primeColor }}>{strings.Favorite}</Text>
+            {detail.uid !== profile.data.uid && detailUser.uid &&
+                <View style={styles.floatingOrder}>
+                    <View style={styles.favorite}>
+                        <Ionicons name="heart-outline" style={styles.heart} />
+                        <Text style={{ fontSize: 8, color: primeColor }}>{strings.Favorite}</Text>
+                    </View>
+                    <Button style={styles.buttonOrder} onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
+                        <Text style={{ fontSize: 14 }}>{strings.Order}</Text>
+                    </Button>
                 </View>
-                <Button style={styles.buttonOrder}>
-                    <Text style={{ fontSize: 14 }}>{strings.Order}</Text>
-                </Button>
-            </View>
+            }
         </ScreenBase>
     );
 };

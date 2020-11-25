@@ -6,36 +6,21 @@ import {
   Dimensions,
   ImageBackground,
   Text,
+  Pressable,
 } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
 
 export default class ListFeatured extends Component {
-  state = {
-    search: "",
-    sliderIndex: 0,
-    maxSlider: 2,
-    banners: [
-      {
-        img:
-          "https://ceritadestinasi.files.wordpress.com/2018/04/visit_sulsel-1522754153349.jpg?w=723",
-        title: "Bara",
-        location: "Sulawesi selatan",
-      },
-      {
-        img:
-          "https://cdn.idntimes.com/content-images/community/2018/11/tanjung-bira-1-wwwsenjamoktikacom-7e3b44f27058e7fbad17f2291b368051.jpg",
-        title: "Pantai Bira",
-        location: "Sulawesi selatan",
-      },
-      {
-        img:
-          "https://cdn.idntimes.com/content-images/community/2018/11/pantai-apparalang-1f492f8ed5cc123d4836c370c5ca7952_600x400.jpg",
-        title: "Tebing Apparalang",
-        location: "Sulawesi selatan",
-      },
-    ],
-  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      search: "",
+      sliderIndex: 0,
+      maxSlider: 2,
+      banners: [],
+    };
+  }
 
   setRef = (c) => {
     this.listRef = c;
@@ -45,21 +30,28 @@ export default class ListFeatured extends Component {
     this.listRef && this.listRef.scrollToIndex({ index, animated });
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.data && prevProps.data !== this.props.data) {
+      this.setState({ banners: this.props.data })
+    }
+  }
+
   componentDidMount() {
-    setInterval(
-      function () {
-        const { sliderIndex, maxSlider } = this.state;
-        let nextIndex = 0;
+    if (this.state.banners.length > 1)
+      setInterval(
+        function () {
+          const { sliderIndex, maxSlider } = this.state;
+          let nextIndex = 0;
 
-        if (sliderIndex < maxSlider) {
-          nextIndex = sliderIndex + 1;
-        }
+          if (sliderIndex < maxSlider) {
+            nextIndex = sliderIndex + 1;
+          }
 
-        this.scrollToIndex(nextIndex, true);
-        this.setState({ sliderIndex: nextIndex });
-      }.bind(this),
-      3000
-    );
+          this.scrollToIndex(nextIndex, true);
+          this.setState({ sliderIndex: nextIndex });
+        }.bind(this),
+        3000
+      );
   }
   render() {
     return (
@@ -68,25 +60,27 @@ export default class ListFeatured extends Component {
         data={this.state.banners}
         horizontal={true}
         pagingEnabled={true}
-        keyExtractor={(item) => item.img}
+        keyExtractor={(item) => item.imagesURL[0].uri}
         renderItem={({ item }) => {
           return (
             <ImageBackground
-              source={{ uri: item.img }}
+              source={{ uri: item.imagesURL[0].uri }}
               style={styles.imageBack}
             >
-              <View style={styles.textContainer}>
+              <Pressable style={styles.textContainer} onPress={() => this.props.navigation.navigate('DetailItem', { detail: item })}>
                 <Text style={styles.titleFeatured}>{item.title}</Text>
-                <Text style={styles.locationFeatured}>{item.location}</Text>
-              </View>
+                <Text style={styles.locationFeatured}>{item.position.province.nama}</Text>
+              </Pressable>
             </ImageBackground>
           );
         }}
         onMomentumScrollEnd={(event) => {
-          let sliderIndex = event.nativeEvent.contentOffset.x
-            ? Math.ceil(event.nativeEvent.contentOffset.x / screenWidth)
-            : 0;
-          this.setState({ sliderIndex });
+          if (this.state.banners.length > 1) {
+            let sliderIndex = event.nativeEvent.contentOffset.x
+              ? Math.ceil(event.nativeEvent.contentOffset.x / screenWidth)
+              : 0;
+            this.setState({ sliderIndex });
+          }
         }}
       />
     );
@@ -98,6 +92,7 @@ const styles = StyleSheet.create({
     height: "100%",
     width: screenWidth,
     position: "relative",
+    backgroundColor: '#f3f3f3'
   },
   textContainer: { position: "absolute", bottom: 50, left: 25 },
   titleFeatured: {

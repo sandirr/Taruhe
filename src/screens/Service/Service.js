@@ -10,6 +10,8 @@ import EtcAct from "../../elements/EtcAct";
 import ProductItem from "../../elements/ProductItem";
 import { fDB } from "../../configs/firebase";
 import { wait } from '../../configs/helper';
+import LoadData from "../../elements/LoadData";
+import NotFound from "../../elements/NotFound";
 
 export default function Service({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,6 +25,8 @@ export default function Service({ navigation }) {
 
   const [refreshing, setRefreshing] = useState(false);
   const [dataSize, setDataSize] = useState(6)
+
+  const [loading, setLoading] = useState(true)
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -45,7 +49,7 @@ export default function Service({ navigation }) {
             let allItems = []
             Object.keys(values.val()).map((value) => {
               let newItem = values.val()[value];
-              let re = new RegExp(search, 'gi');
+              let re = new RegExp(search.trim(), 'gi');
               if (newItem.title.match(re)) {
                 allItems.push(newItem);
               }
@@ -55,7 +59,9 @@ export default function Service({ navigation }) {
             else if (item === 'Travel')
               setTravel(allItems)
           }
+          setLoading(false)
         }, (error) => {
+          setLoading(false)
           Alert.alert(error.code)
         })
     })
@@ -97,8 +103,11 @@ export default function Service({ navigation }) {
           activeTabStyle={{ backgroundColor: "#fff" }}
           activeTextStyle={{ color: primeColor }}
           heading={strings.ArtShow}
-        >
+        >{loading ?
+          <LoadData />
+          :
           <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={ArtShow} />
+          }
         </Tab>
         <Tab
           textStyle={{ color: "rgba(0.0, 109.0, 109.0, 0.4)" }}
@@ -107,7 +116,11 @@ export default function Service({ navigation }) {
           activeTextStyle={{ color: primeColor }}
           heading={strings.Travel}
         >
-          <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Travel} />
+          {loading ?
+            <LoadData />
+            :
+            <DataList refreshing={refreshing} onRefresh={onRefresh} whenScroll={handleScroll} navigation={navigation} data={Travel} />
+          }
         </Tab>
       </Tabs>
       <FooterTabs
@@ -131,37 +144,37 @@ export default function Service({ navigation }) {
 
 export const DataList = ({ whenScroll, data, navigation, refreshing, onRefresh }) => {
   return (
-    <ScrollView
-      contentContainerStyle={{
-        backgroundColor: "#f3f3f3",
-        borderTopLeftRadius: 18,
-        borderTopRightRadius: 18,
-        flex: 1
-      }}
-      onScroll={(e) => whenScroll(e)}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View
-        style={{
-          paddingHorizontal: 20,
-          paddingTop: 25,
-          paddingBottom: 50,
-          flexDirection: "row",
-          flexWrap: "wrap",
+    <View style={{ flex: 1, backgroundColor: '#f3f3f3' }}>
+      <ScrollView
+        contentContainerStyle={{
+          borderTopLeftRadius: 18,
+          borderTopRightRadius: 18,
         }}
-      >
-        {data.length ?
-          data.map((item) => (
-            <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} type="lebar" />
-          ))
-          :
-          <Text>No Data</Text>
+        onScroll={(e) => whenScroll(e)}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      </View>
-    </ScrollView>
+      >
+        <View
+          style={{
+            paddingHorizontal: 20,
+            paddingTop: 25,
+            paddingBottom: 50,
+            flexDirection: "row",
+            flexWrap: "wrap",
+          }}
+        >
+          {data.length ?
+            data.map((item) => (
+              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} type="lebar" />
+            ))
+            :
+            <NotFound />
+          }
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Icon, Left, List, ListItem, Right, Text, View } from 'native-base'
 import ScreenBase from '../../elements/SecreenBase'
-import { StyleSheet, TouchableOpacity, Switch, ScrollView, Dimensions } from 'react-native'
+import { StyleSheet, TouchableOpacity, Switch, Dimensions, ScrollView } from 'react-native'
 import { primeColor } from '../../configs/color'
 import strings from '../../assets/Dictionary'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,7 +34,7 @@ export default function AccountSetting({ navigation }) {
                     style={{ color: 'transparent', fontSize: 26 }}
                 />
             </View>
-            <ScrollView contentContainerStyle={{ minHeight: screenHeight, backgroundColor: '#f3f3f3' }} showsVerticalScrollIndicator={false} >
+            <ScrollView contentContainerStyle={{ backgroundColor: '#f3f3f3', minHeight: screenHeight }} showsVerticalScrollIndicator={false} >
                 <List>
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.MyAccount}</Text>

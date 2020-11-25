@@ -22,6 +22,7 @@ import Axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import EtcAct from '../../elements/EtcAct';
 import { admin } from '../../configs/adminList';
+import LoadData from '../../elements/LoadData';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -312,7 +313,6 @@ const Store = ({ navigation, route, handleToEdit }) => {
     }, [type, profile.data])
 
     useEffect(() => {
-        setLoading(true)
         fDB.ref('product_service')
             .orderByChild('uid')
             .equalTo(uid)
@@ -328,8 +328,8 @@ const Store = ({ navigation, route, handleToEdit }) => {
                 }
                 setLoading(false)
             }, (error) => {
-                Alert.alert(error.code)
                 setLoading(false)
+                Alert.alert(error.code)
             })
     }, [type, activeTab])
 
@@ -524,7 +524,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                                 </View>
                                             </Pressable>
                                         }
-                                        {isAdd && admin.indexOf(profile.data.email) >= 0 &&
+                                        {isAdd && admin.indexOf(profile.data.uid) >= 0 &&
                                             <Pressable onPress={() => navigation.navigate('AddItem', { type: 'tourism' })}>
                                                 <View
                                                     style={{
@@ -582,7 +582,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         <TouchableOpacity
                             style={[styles.btnTab, activeTab === tabs[0] &&
                                 { backgroundColor: primeColor },
-                            ((type === 'visitor' && admin.indexOf(storeData.email) >= 0) || (type === 'owner' && admin.indexOf(data.email) >= 0)) ?
+                            ((type === 'visitor' && admin.indexOf(storeData.uid) >= 0) || (type === 'owner' && admin.indexOf(data.uid) >= 0)) ?
                                 { width: '32%' } : { width: '48%' }]}
                             onPress={() => setActiveTab(tabs[0])}
                         >
@@ -593,7 +593,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         <TouchableOpacity
                             style={[styles.btnTab, activeTab === tabs[1] &&
                                 { backgroundColor: primeColor },
-                            ((type === 'visitor' && admin.indexOf(storeData.email) >= 0) || (type === 'owner' && admin.indexOf(data.email) >= 0)) ?
+                            ((type === 'visitor' && admin.indexOf(storeData.uid) >= 0) || (type === 'owner' && admin.indexOf(data.uid) >= 0)) ?
                                 { width: '32%' } : { width: '48%' }]}
                             onPress={() => setActiveTab(tabs[1])}
                         >
@@ -601,7 +601,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                 {strings.Menu3}
                             </Text>
                         </TouchableOpacity>
-                        {((type === 'visitor' && admin.indexOf(storeData.email) >= 0) || (type === 'owner' && admin.indexOf(data.email) >= 0)) &&
+                        {((type === 'visitor' && admin.indexOf(storeData.uid) >= 0) || (type === 'owner' && admin.indexOf(data.uid) >= 0)) &&
                             <TouchableOpacity
                                 style={[styles.btnTab, activeTab === tabs[2] &&
                                     { backgroundColor: primeColor },
@@ -615,25 +615,26 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         }
                     </View>
                     <View style={{ paddingBottom: 50 }}>
-                        <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            scrollEnabled={isScroll}
-                        >
-                            {items.length ? items.map(item => (
-                                <SellingItem key={item.id} data={item} toDetail={() => {
-                                    if (item.uid === data.uid)
-                                        navigation.navigate('AddItem', { type: item.type, edit: true, item: item })
-                                    else
-                                        navigation.navigate('DetailItem', { detail: item })
-                                }} />
-                            )).reverse() :
-                                loading ?
-                                    <Text>Loading...</Text>
-                                    :
-                                    <Text>Belum ada item {activeTab.toLowerCase()}</Text>
+                        {loading ?
+                            <LoadData />
+                            :
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
+                                scrollEnabled={isScroll}
+                            >
 
-                            }
-                        </ScrollView>
+                                {items.length ? items.map(item => (
+                                    <SellingItem key={item.id} data={item} toDetail={() => {
+                                        if (item.uid === data.uid)
+                                            navigation.navigate('AddItem', { type: item.type, edit: true, item: item })
+                                        else
+                                            navigation.navigate('DetailItem', { detail: item })
+                                    }} />
+                                )).reverse() :
+                                    <Text>Belum ada item {activeTab.toLowerCase()}</Text>
+                                }
+                            </ScrollView>
+                        }
                     </View>
                 </View>
             </Animated.ScrollView>

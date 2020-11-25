@@ -1,3 +1,3 @@
 export const admin = [
-    'andi.irsandi765@gmail.com',
+    'XL6kfmVyg4b75Gu6och1Jtu2tSh1',
 ]

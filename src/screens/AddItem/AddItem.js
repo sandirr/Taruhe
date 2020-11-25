@@ -181,7 +181,6 @@ class AddItem extends Component {
                     .ref('product_service/' + id).set({
                         imagesURL, title, category, price, description, location, position,
                         id: id,
-                        created_by: { ...profile.data, password: '', email: '' },
                         type: this.props.route.params.type,
                         uid: profile.data.uid,
                         created_at: new Date().toISOString(),
@@ -564,7 +563,7 @@ class AddItem extends Component {
                                             .ref('product_service/' + item.id).remove()
                                             .then(() => {
                                                 Alert.alert('Sukses', 'Item berhasil dihapus')
-                                                this.props.navigation.goBack()
+                                                this.props.navigation.navigate(strings.Menu5)
                                             })
                                     }}
                                 >

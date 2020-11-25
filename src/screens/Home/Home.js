@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Dimensions, StyleSheet, Animated, LogBox, TouchableOpacity, RefreshControl } from 'react-native';
 import strings from '../../assets/Dictionary';
-import { Item, Input, Icon, View, Text } from 'native-base';
+import { Item, Input, Icon, View, Text, Spinner } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import FooterTabs from '../../elements/FooterTabs/FooterTabs';
@@ -9,6 +9,8 @@ import ListFeatured from "./ListFeatured";
 import ProductItem from '../../elements/ProductItem';
 import { fDB } from '../../configs/firebase';
 import { wait } from '../../configs/helper';
+import LoadData from '../../elements/LoadData';
+import NotFound from '../../elements/NotFound';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -28,6 +30,9 @@ const Home = (props) => {
   const [refreshing, setRefreshing] = useState(false);
   const [dataSize, setDataSize] = useState(6)
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true)
+
+  const [tourisms, setTourism] = useState([])
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -39,6 +44,11 @@ const Home = (props) => {
     getData()
   }, [dataSize, search])
 
+  useEffect(() => {
+    let tourism = productservice.filter(e => e.category === 'Natural' || e.category === 'Cultural')
+    setTourism(tourism)
+  }, [productservice])
+
   const getData = () => {
     fDB.ref('product_service')
       .limitToLast(dataSize)
@@ -47,27 +57,31 @@ const Home = (props) => {
           let allItems = []
           Object.keys(values.val()).map((value) => {
             let newItem = values.val()[value];
-            let re = new RegExp(search, 'gi');
+            let re = new RegExp(search.trim(), 'gi');
             if (newItem.title.match(re)) {
               allItems.push(newItem);
             }
           })
           setProductService(allItems)
         }
+        setLoading(false)
       }, (error) => {
         Alert.alert(error.code)
+        setLoading(false)
       })
   }
 
   const handleScroll = (e) => {
     const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent
-    if (e.nativeEvent.contentOffset.y > 40) {
-      const alpha = e.nativeEvent.contentOffset.y * 0.009;
-      setBgSearch(`rgba(255,255,255,${alpha < 1 ? alpha : 1})`);
+    let yOffset = contentOffset.y;
+    if (yOffset > 40) {
+      const alpha = yOffset * 0.01;
       if (alpha >= 0.9) {
+        setBgSearch(`#fff`);
         setIconSearch('#ccc');
         setColorSearch('#f3f3f3');
       } else {
+        setBgSearch(`transparent`);
         setIconSearch('#fff');
         setColorSearch('#fff');
       }
@@ -76,13 +90,12 @@ const Home = (props) => {
       setColorSearch('#fff');
       setIconSearch('#fff');
     }
-    let currentOffset = e.nativeEvent.contentOffset.y;
-    let direction = currentOffset > offset + 20 ? 'down' : 'up';
-    if (currentOffset > offset + 20 || currentOffset + 20 < offset) {
-      setOffset(currentOffset);
+    let direction = yOffset > offset + 20 ? 'down' : 'up';
+    if (yOffset > offset + 20 || yOffset + 20 < offset) {
+      setOffset(yOffset);
       setDirection(direction);
     }
-    if ((layoutMeasurement.height + contentOffset.y) >= (contentSize.height - 20)) {
+    if ((layoutMeasurement.height + yOffset) >= (contentSize.height - 20)) {
       setDataSize(dataSize + 6)
     }
   };
@@ -146,22 +159,25 @@ const Home = (props) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-
       >
         <View style={styles.bannerContainer}>
           <Animated.View style={styles.banner(scrollA)}>
-            <ListFeatured />
+            <ListFeatured data={tourisms} navigation={navigation} />
           </Animated.View>
         </View>
-        <View style={styles.scrollView}>
-          {productservice.length ?
-            productservice.map((item) => (
-              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-            )).reverse()
-            :
-            <Text>No Data</Text>
-          }
-        </View>
+        {loading ?
+          <LoadData />
+          :
+          <View style={styles.scrollView}>
+            {productservice.length ?
+              productservice.map((item) => (
+                <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
+              )).reverse()
+              :
+              <NotFound />
+            }
+          </View>
+        }
       </Animated.ScrollView>
       <FooterTabs
         screen={strings.Menu1}
