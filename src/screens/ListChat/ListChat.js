@@ -106,10 +106,10 @@ export default class ListChat extends Component {
                         style={{ color: 'transparent', fontSize: 26 }}
                     />
                 </View>
-                {loading ?
-                    <LoadData />
-                    :
-                    <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
+                <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
+                    {loading ?
+                        <LoadData />
+                        :
                         <ScrollView refreshControl={
                             <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
                         }>
@@ -161,8 +161,8 @@ export default class ListChat extends Component {
                                 <NotFound m="No Messages Found" />
                             }
                         </ScrollView>
-                    </View>
-                }
+                    }
+                </View>
             </ScreenBase>
         );
     }

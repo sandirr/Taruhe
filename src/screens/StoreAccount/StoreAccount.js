@@ -244,21 +244,17 @@ class FormStore extends Component {
                         />
                     </View>
                     <TouchableOpacity
-                        style={[
-                            {
-                                backgroundColor: primeColor,
-                                marginVertical: 16,
-                                borderRadius: 50
-                            },
-                            {
-                                alignSelf: "center",
-                                width: "90%",
-                                alignItems: "center",
-                                display: "flex",
-                                justifyContent: "center",
-                                height: 55,
-                            }
-                        ]}
+                        style={{
+                            backgroundColor: primeColor,
+                            marginVertical: 16,
+                            borderRadius: 50,
+                            alignSelf: "center",
+                            width: "90%",
+                            alignItems: "center",
+                            display: "flex",
+                            justifyContent: "center",
+                            height: 55,
+                        }}
                         onPress={this.saveStore}
                     >
                         <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>

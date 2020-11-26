@@ -12,11 +12,12 @@ import LoadData from "../../elements/LoadData";
 import NotFound from "../../elements/NotFound";
 import { profile } from "../../configs/profile";
 
-export default function WishList({ navigation }) {
+export default function History({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [search, setSearch] = useState("");
+    const [dataSize, setDataSize] = useState(10)
 
-    const [WishList, setWishList] = useState([])
+    const [History, setHistory] = useState([])
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -30,24 +31,42 @@ export default function WishList({ navigation }) {
 
     useEffect(() => {
         getData()
-    }, [search])
+    }, [search, dataSize])
 
     const getData = () => {
-        let re = new RegExp(search.trim(), 'gi');
-        if (profile.wishlistData.length) {
-            let wishListData = profile.wishlistData.filter(data => data.title.match(re))
-            setWishList(wishListData)
-            setLoading(false)
-        } else {
-            setWishList([])
-            setLoading(false)
-        }
+        fDB.ref('history')
+            .child(profile.data.uid)
+            .limitToLast(dataSize)
+            .on('value', values => {
+                if (values.val()) {
+                    let filteredItems = []
+                    Object.keys(values.val()).forEach((value) => {
+                        let newItem = values.val()[value];
+                        let re = new RegExp(search.trim(), 'gi');
+                        if (newItem.title.match(re)) {
+                            filteredItems.push(newItem);
+                        }
+                    })
+                    setHistory(filteredItems)
+                }
+                setLoading(false)
+            }, (error) => {
+                Alert.alert(error.code)
+                setLoading(false)
+            })
     }
+
+    const whenScroll = (e) => {
+        const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent
+        if ((layoutMeasurement.height + contentOffset.y) >= (contentSize.height - 20)) {
+            setDataSize(dataSize + 10)
+        }
+    };
 
     return (
         <ScreenBase>
             <Header
-                title="Wishlist"
+                title="History"
                 openEtc={(e) => setModalVisible(e)}
                 navigation={navigation}
                 searchValue={search}
@@ -58,6 +77,7 @@ export default function WishList({ navigation }) {
                     <LoadData />
                     :
                     <ScrollView
+                        onScroll={(e) => whenScroll(e)}
                         showsVerticalScrollIndicator={false}
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -72,10 +92,12 @@ export default function WishList({ navigation }) {
                                 flexWrap: "wrap",
                             }}
                         >
-                            {WishList.length ?
-                                WishList.map((item) => (
-                                    <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-                                ))
+                            {History.length ?
+                                History
+                                    .sort((a, b) => b.history_at - a.history_at)
+                                    .map((item) => (
+                                        <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
+                                    ))
                                 :
                                 <NotFound />
                             }

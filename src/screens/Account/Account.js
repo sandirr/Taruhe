@@ -65,10 +65,10 @@ export default function Account({ navigation }) {
                         <Icon style={styles.iconFeature} name="heart" />
                         <Text style={styles.strFeature}>{strings.Wishlist}</Text>
                     </Pressable>
-                    <View style={{ alignItems: 'center' }}>
+                    <Pressable style={{ alignItems: 'center' }} onPress={() => navigation.navigate('History')}>
                         <Icon style={styles.iconFeature} name="time" />
                         <Text style={styles.strFeature}>{strings.History}</Text>
-                    </View>
+                    </Pressable>
                     <View style={{ alignItems: 'center' }}>
                         <Icon style={styles.iconFeature} name="share-social" />
                         <Text style={styles.strFeature}>{strings.Share}</Text>

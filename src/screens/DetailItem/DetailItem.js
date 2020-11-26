@@ -28,9 +28,17 @@ function Home(props) {
             setDetailUser(val.val())
         })
         fDB.ref('product_service/' + detail.id).on('value', val => {
-            setDetailItem(val.val())
+            let ps = val.val()
+            setDetailItem(ps)
+            checkInHistory(ps)
         })
     }, [detail]);
+
+    const checkInHistory = (ps) => {
+        fDB.ref('history/' + profile.data.uid)
+            .child(ps.id)
+            .set({ ...ps, history_at: Date.now() })
+    }
 
     const [readMore, setReadMore] = useState(false)
     const handleGetDirections = (position) => {

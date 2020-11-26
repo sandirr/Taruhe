@@ -25,6 +25,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import WishList from "./screens/WishList";
 import EtcAct from "./elements/EtcAct";
 import Following from "./screens/Following";
+import History from "./screens/History";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -63,6 +64,7 @@ const AppFeature = () => {
         profile.data = {}
         profile.wishlistData = []
         profile.wishlist = []
+        profile.following = []
         setIsUser(false)
         AsyncStorage.clear()
       }
@@ -148,6 +150,11 @@ const AppFeature = () => {
       <AppStack.Screen
         name="Following"
         component={isUser ? Following : Welcome}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="History"
+        component={isUser ? History : Welcome}
         options={{ headerShown: false }}
       />
     </AppStack.Navigator>

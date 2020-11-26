@@ -58,7 +58,6 @@ export default function Following({ navigation }) {
                 :
                 <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
                     <ScrollView
-                        onScroll={(e) => whenScroll(e)}
                         showsVerticalScrollIndicator={false}
                         refreshControl={
                             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
