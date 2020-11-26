@@ -132,12 +132,7 @@ export default function Tourism({ navigation }) {
         modalVisible={modalVisible}
         openEtc={(e) => setModalVisible(e)}
         navigation={navigation}
-      >
-        <Text style={styles.modalText}>Pesanan</Text>
-        <Text style={styles.modalText}>Bantuan</Text>
-        <Text style={styles.modalText}>FAQ</Text>
-        <Text style={styles.modalText}>Pengaturan</Text>
-      </EtcAct>
+      />
     </ScreenBase>
   );
 }

@@ -21,7 +21,7 @@ export default function ProductItem({ type, toDetail, row }) {
                     <StarRating
                         disabled
                         maxStars={5}
-                        rating={2.5}
+                        rating={4.5}
                         starSize={12}
                         fullStarColor="#fdcc0d"
                         emptyStarColor="#fdcc0d"

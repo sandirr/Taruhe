@@ -61,10 +61,10 @@ export default function Account({ navigation }) {
                 </Pressable>
 
                 <View style={styles.featureContainer}>
-                    <View style={{ alignItems: 'center' }}>
+                    <Pressable style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Following')}>
                         <Icon style={styles.iconFeature} name="heart" />
                         <Text style={styles.strFeature}>{strings.Wishlist}</Text>
-                    </View>
+                    </Pressable>
                     <View style={{ alignItems: 'center' }}>
                         <Icon style={styles.iconFeature} name="time" />
                         <Text style={styles.strFeature}>{strings.History}</Text>
@@ -84,7 +84,7 @@ export default function Account({ navigation }) {
                         <ListItem itemDivider style={styles.itemDivider}>
                             <Text style={styles.textDivider}>{strings.MyFavorite}</Text>
                         </ListItem>
-                        <ListItem icon itemDivider style={styles.menuItem}>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.navigate('WishList')}>
                             <Left>
                                 <Icon style={{ fontSize: 22 }} name="heart-outline" />
                             </Left>
@@ -92,9 +92,9 @@ export default function Account({ navigation }) {
                                 <Text>{strings.Wishlist}</Text>
                             </Body>
                         </ListItem>
-                        <ListItem icon itemDivider style={styles.menuItem}>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.navigate('Following')}>
                             <Left>
-                                <Icon style={{ fontSize: 22 }} name="heart-outline" />
+                                <Icon style={{ fontSize: 22 }} name="flag-outline" />
                             </Left>
                             <Body>
                                 <Text>Following</Text>

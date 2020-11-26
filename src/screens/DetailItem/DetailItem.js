@@ -59,38 +59,41 @@ function Home(props) {
     }
 
     const setToWishList = () => {
-        Linking.getInitialURL().then(url => {
-            console.log(url)
-        })
-        if (profile.wishlist.indexOf(detail.id.toString()) >= 0)
-            fDB.ref('wishlist/' + profile.data.uid).child(detail.id).remove()
-                .then(() => {
+        if (profile.data.uid) {
+            if (profile.wishlist.indexOf(detail.id.toString()) >= 0) {
+                setIsWish(false)
+                fDB.ref('wishlist/' + profile.data.uid).child(detail.id).remove()
+                    .then(() => {
+                        ToastAndroid.showWithGravity(
+                            "Removed from wishlist",
+                            ToastAndroid.SHORT,
+                            ToastAndroid.CENTER
+                        );
+                        refreshWishlist(detail.id)
+                    })
+            } else {
+                setIsWish(true)
+                fDB.ref('wishlist/' + profile.data.uid).child(detail.id).set({
+                    ...detailItem,
+                }).then(() => {
                     ToastAndroid.showWithGravity(
-                        "Removed from wishlist",
+                        "Added to wishlist",
                         ToastAndroid.SHORT,
                         ToastAndroid.CENTER
                     );
-                    refreshWishlist(detail.id)
-                    setIsWish(false)
+                    refreshWishlist()
                 })
-        else
-            fDB.ref('wishlist/' + profile.data.uid).child(detail.id).set({
-                ...detailItem,
-            }).then(() => {
-                ToastAndroid.showWithGravity(
-                    "Added to wishlist",
-                    ToastAndroid.SHORT,
-                    ToastAndroid.CENTER
-                );
-                refreshWishlist()
-                setIsWish(true)
-            })
+            }
+        } else {
+            navigation.navigate('Welcome')
+        }
     }
 
     const shareTaruhe = () => {
         Share.share({
-            message: `https://google.com`,
-            dialogTitle: "lol"
+            url: 'https://google.com',
+            message: `Explore tentang ${detailItem.title} di Taruhe App! https://google.com`,
+            title: 'Taruhe Art & Media'
         });
     }
 
@@ -132,7 +135,7 @@ function Home(props) {
                                         if (profile.data.uid === detailItem.uid) {
                                             navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
                                         } else {
-                                            navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid, storeData: detailUser })
+                                            navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid })
                                         }
                                     }} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Image
@@ -145,7 +148,7 @@ function Home(props) {
                                         <StarRating
                                             disabled
                                             maxStars={5}
-                                            rating={3}
+                                            rating={4.5}
                                             starSize={12}
                                             fullStarColor="#fdcc0d"
                                             emptyStarColor="#fdcc0d"
@@ -236,7 +239,7 @@ function Home(props) {
                                                     if (profile.data.uid === detailItem.uid) {
                                                         navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })
                                                     } else {
-                                                        navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid, storeData: detailUser })
+                                                        navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid })
                                                     }
                                                 }}>
                                                     <Text style={{ fontSize: 20, color: '#555' }}>{detailUser.storeName}</Text>
@@ -248,7 +251,7 @@ function Home(props) {
                                     {detailItem.uid !== profile.data.uid && detailUser.uid &&
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             {/* <Ionicons name="heart-outline" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} /> */}
-                                            <Pressable onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
+                                            <Pressable onPress={() => navigation.navigate('ChatScreen', { data: detailUser, item: detailItem })}>
                                                 <Ionicons name="mail" style={{ color: primeColor, fontSize: 26, marginHorizontal: 6 }} />
                                             </Pressable>
                                         </View>
@@ -285,11 +288,11 @@ function Home(props) {
             }
             {detail.uid !== profile.data.uid && detailUser.uid && detailItem.id &&
                 <View style={styles.floatingOrder}>
-                    <Pressable style={styles.favorite} onPress={setToWishList} >
+                    <TouchableOpacity style={styles.favorite} onPress={setToWishList} >
                         <HeartWish />
                         <Text style={{ fontSize: 8, color: primeColor }}>{strings.Wishlist}</Text>
-                    </Pressable>
-                    <Button style={styles.buttonOrder} onPress={() => navigation.navigate('ChatScreen', { data: detailUser })}>
+                    </TouchableOpacity>
+                    <Button style={styles.buttonOrder} onPress={() => navigation.navigate('ChatScreen', { data: detailUser, item: detailItem })}>
                         <Text style={{ fontSize: 14 }}>{strings.Order}</Text>
                     </Button>
                 </View>

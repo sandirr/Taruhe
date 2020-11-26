@@ -1,14 +1,20 @@
+import { Icon, Text } from "native-base";
 import React from "react";
 import {
   View,
   StyleSheet,
   Modal,
   TouchableWithoutFeedback,
+  Pressable,
 } from "react-native";
 import { primeColor } from "../../configs/color";
 
 export default function EtcAct(props) {
-  const { children, openEtc, modalVisible } = props;
+  const { children, openEtc, modalVisible, navigation } = props;
+  const navigateTo = (to) => {
+    navigation.navigate(to)
+    openEtc(false)
+  }
   return (
     <Modal
       animationType="fade"
@@ -23,7 +29,37 @@ export default function EtcAct(props) {
       </TouchableWithoutFeedback>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          {children}
+          {children
+            ||
+            <View style={{
+              backgroundColor: '#f3f3f3',
+              borderRadius: 20,
+            }}
+            >
+              <Pressable
+                style={styles.pressable}
+                onPress={() => navigateTo('ListChat')}
+              >
+                <Icon name="mail-outline" style={{ fontSize: 22, marginRight: 5 }} />
+                <Text style={styles.modalText}>Pesan</Text>
+              </Pressable>
+              <View style={{ backgroundColor: 'gray', height: 2 }} />
+              <Pressable
+                style={styles.pressable}
+                onPress={() => navigateTo('HelpCenter')}
+              >
+                <Icon name="information-circle-outline" style={{ fontSize: 22, marginRight: 5 }} />
+                <Text style={styles.modalText}>Bantuan</Text>
+              </Pressable>
+              <View style={{ backgroundColor: 'gray', height: 2 }} />
+              <Pressable
+                style={styles.pressable}
+                onPress={() => navigateTo('AccountSetting')}
+              >
+                <Icon name="settings-outline" style={{ fontSize: 22, marginRight: 5 }} />
+                <Text style={styles.modalText}>Pengaturan</Text>
+              </Pressable>
+            </View>}
         </View>
       </View>
     </Modal>
@@ -33,7 +69,6 @@ export default function EtcAct(props) {
 const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
-    justifyContent: "flex-start",
     alignItems: "flex-end",
     marginTop: 20,
   },
@@ -51,6 +86,13 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  pressable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 45,
+    paddingHorizontal: 15,
+
+  },
   closeButton: {
     backgroundColor: primeColor,
     borderRadius: 20,
@@ -61,9 +103,6 @@ const styles = StyleSheet.create({
   textStyle: {
     color: "white",
     fontWeight: '700'
-  },
-  modalText: {
-    marginBottom: 15,
   },
 
   modalOverlay: {

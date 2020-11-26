@@ -1,4 +1,4 @@
-import { Icon, Input, Text, Thumbnail } from 'native-base';
+import { Body, Icon, Input, Left, List, ListItem, Right, Text, Thumbnail } from 'native-base';
 import React, { Component } from 'react';
 import { Alert, FlatList, Linking, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { primeColor } from '../../configs/color';
@@ -8,6 +8,7 @@ import ScreenBase from '../../elements/SecreenBase';
 import { profile } from '../../configs/profile';
 import MapView from 'react-native-maps';
 import { ScrollView } from 'react-native-gesture-handler';
+import { parser } from '../../configs/helper';
 
 class ChatSCreen extends Component {
     state = {
@@ -16,6 +17,7 @@ class ChatSCreen extends Component {
         dbRef: fDB.ref('messages'),
         image: '',
         person: this.props.route.params.data,
+        item: this.props.route.params.item || {},
         messageList: [],
         imageSource: profile.data.photoURL
             ? { uri: profile.data.photoURL }
@@ -36,38 +38,23 @@ class ChatSCreen extends Component {
                     };
                 });
             });
+        setTimeout(() => {
+            this.checkItem()
+        }, 500)
     }
-    convertTime = time => {
-        let d = new Date(time);
-        let c = new Date();
-        let result = (d.getHours() < 10 ? '0' : '') + d.getHours() + '.';
-        result += (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
-        var weekday = new Array(7);
-        weekday[0] = 'Sunday';
-        weekday[1] = 'Monday';
-        weekday[2] = 'Tuesday';
-        weekday[3] = 'Wednesday';
-        weekday[4] = 'Thursday';
-        weekday[5] = 'Friday';
-        weekday[6] = 'Saturday';
-        if (c.getDay() !== d.getDay()) {
-            result = weekday[d.getDay()] + ', ' + result;
-        } else if (c.getMonth() !== d.getMonth()) {
-            result = d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+    checkItem = () => {
+        if (this.state.item.id) {
+            this.sendCustomMessage(this.state.item)
         }
-        return result;
-    };
-    handleChangeText = key => val => {
-        this.setState({ [key]: val });
-    };
-    sendLocation = async location => {
+    }
+    sendCustomMessage = async (customMssgs) => {
         let msgId = this.state.dbRef
             .child(`${profile.data.uid}`)
             .child(this.state.person.uid)
             .push().key;
         let updates = {};
         let message = {
-            message: location,
+            message: customMssgs,
             time: new Date().toISOString(),
             from: profile.data.uid,
         };
@@ -102,6 +89,29 @@ class ChatSCreen extends Component {
             this.setState({ textMessage: '' });
         }
     };
+    convertTime = time => {
+        let d = new Date(time);
+        let c = new Date();
+        let result = (d.getHours() < 10 ? '0' : '') + d.getHours() + '.';
+        result += (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+        var weekday = new Array(7);
+        weekday[0] = 'Sunday';
+        weekday[1] = 'Monday';
+        weekday[2] = 'Tuesday';
+        weekday[3] = 'Wednesday';
+        weekday[4] = 'Thursday';
+        weekday[5] = 'Friday';
+        weekday[6] = 'Saturday';
+        if (c.getDay() !== d.getDay()) {
+            result = weekday[d.getDay()] + ', ' + result;
+        } else if (c.getMonth() !== d.getMonth()) {
+            result = d.getDate() + '/' + d.getMonth() + '/' + d.getFullYear();
+        }
+        return result;
+    };
+    handleChangeText = key => val => {
+        this.setState({ [key]: val });
+    };
     shareLocation = () => {
         Geolocation.getCurrentPosition(info => {
             var { latitude, longitude, accuracy } = info.coords;
@@ -121,16 +131,18 @@ class ChatSCreen extends Component {
                                 latitude: latitude,
                                 longitude: longitude,
                             };
-                            this.sendLocation(location);
+                            this.sendCustomMessage(location);
                         },
                     },
                 ],
             );
+        }, err => {
+            Alert.alert('Lokasi tidak ditemukan', 'Mohon aktifkan lokasi/GPS Anda')
         });
     };
 
     renderRow = ({ item }) => {
-        if (!item.message.latitude || !item.message.longitude) {
+        if (typeof item.message === "string") {
             if (item.from === profile.data.uid) {
                 return (
                     <View style={style.sendingChat}>
@@ -156,7 +168,7 @@ class ChatSCreen extends Component {
                     </View>
                 );
             }
-        } else {
+        } else if (item.message.latitude || item.message.longitude) {
             if (item.from === profile.data.uid) {
                 return (
                     <View style={{ marginBottom: 5, }}>
@@ -313,6 +325,29 @@ class ChatSCreen extends Component {
                     </View>
                 );
             }
+        } else {
+            return (
+                <Pressable avatar style={{
+                    alignSelf: 'center',
+                    marginBottom: 5,
+                    borderWidth: 2,
+                    borderColor: '#ccc',
+                    padding: 5,
+                    borderRadius: 18,
+                    marginHorizontal: 25,
+                    flexDirection: 'row'
+                }}
+                    onPress={() => this.props.navigation.navigate('DetailItem', { detail: item.message })}
+                >
+                    <Left>
+                        <Thumbnail source={item.message.imagesURL[0]} />
+                    </Left>
+                    <Body style={{ borderBottomWidth: 0 }}>
+                        <Text>{item.message.title}</Text>
+                        <Text note>Rp. {parser(item.message.price)}</Text>
+                    </Body>
+                </Pressable>
+            )
         }
     };
     render() {

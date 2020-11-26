@@ -6,6 +6,7 @@ import {
   Dimensions,
   RefreshControl,
   Image,
+  Pressable,
 } from "react-native";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
@@ -170,12 +171,7 @@ export default function Product({ navigation }) {
         modalVisible={modalVisible}
         openEtc={(e) => setModalVisible(e)}
         navigation={navigation}
-      >
-        <Text>Pesanan</Text>
-        <Text>Bantuan</Text>
-        <Text>FAQ</Text>
-        <Text>Pengaturan</Text>
-      </EtcAct>
+      />
     </ScreenBase>
   );
 }

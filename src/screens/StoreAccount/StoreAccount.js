@@ -9,6 +9,7 @@ import {
     Pressable,
     Alert,
     Linking,
+    ToastAndroid,
 } from 'react-native';
 import strings from '../../assets/Dictionary';
 import { Item, Input, Icon, View, Button, Text, Textarea, Thumbnail, Picker } from 'native-base';
@@ -21,7 +22,6 @@ import ImagePicker from 'react-native-image-picker';
 import Axios from 'axios';
 import { ScrollView } from 'react-native-gesture-handler';
 import EtcAct from '../../elements/EtcAct';
-import { admin } from '../../configs/adminList';
 import LoadData from '../../elements/LoadData';
 
 const screenHeight = Dimensions.get('window').height;
@@ -287,12 +287,9 @@ const Store = ({ navigation, route, handleToEdit }) => {
     const [isScroll, setIsScroll] = useState(false)
     const [items, setItems] = useState([])
     const [modalVisible, setModalVisible] = useState(false)
-    const [visited, setVisited] = useState({
-        photoURL: '',
-        username: '',
-        storeName: ''
-    })
+    const [visited, setVisited] = useState({})
     const [loading, setLoading] = useState(true)
+    const [isFollow, setIsFollow] = useState(false)
     const handleScroll = (e) => {
         const { contentSize, contentInset, contentOffset } = e.nativeEvent
         const maxOffset = contentSize.height - screenHeight + contentInset.bottom - 50;
@@ -302,15 +299,23 @@ const Store = ({ navigation, route, handleToEdit }) => {
             setIsScroll(false)
         }
     }
-    const { type, uid, storeData } = route.params;
-    const { data } = profile
+    const { type, uid } = route.params;
+    const { data, following } = profile;
     useEffect(() => {
         if (type === 'owner') {
             setVisited({ photoURL: data.photoURL, username: data.username, storeName: data.storeName })
         } else {
-            setVisited({ photoURL: storeData.photoURL, username: storeData.username, storeName: storeData.storeName })
+            let followed = following.filter(f => f.uid === uid);
+            if (followed.length) {
+                setIsFollow(true)
+            } else {
+                setIsFollow(false)
+            }
+            fDB.ref('users/' + uid).on('value', val => {
+                setVisited(val.val())
+            })
         }
-    }, [type, profile.data])
+    }, [type, profile.data, uid, following])
 
     useEffect(() => {
         fDB.ref('product_service')
@@ -401,6 +406,47 @@ const Store = ({ navigation, route, handleToEdit }) => {
             xhr.send(null);
         });
     };
+    const refreshFollowing = (id) => {
+        if (id) {
+            let newFollowing = profile.following.filter(e => e.uid != id)
+            profile.following = newFollowing
+        } else
+            fDB.ref('following/' + profile.data.uid).on('value', val => {
+                if (val.val()) {
+                    let following = []
+                    Object.keys(val.val()).forEach((item) => {
+                        following.push(val.val()[item])
+                    })
+                    profile.following = following
+                }
+            })
+    }
+    const setToFollow = () => {
+        if (isFollow) {
+            fDB.ref('following/' + profile.data.uid).child(visited.uid).remove()
+                .then(() => {
+                    ToastAndroid.showWithGravity(
+                        "Unfollowed",
+                        ToastAndroid.SHORT,
+                        ToastAndroid.CENTER
+                    );
+                    refreshFollowing(visited.uid)
+                    setIsFollow(false)
+                })
+        } else {
+            fDB.ref('following/' + profile.data.uid).child(visited.uid).set({
+                ...visited,
+            }).then(() => {
+                ToastAndroid.showWithGravity(
+                    "Followed",
+                    ToastAndroid.SHORT,
+                    ToastAndroid.CENTER
+                );
+                refreshFollowing()
+                setIsFollow(true)
+            })
+        }
+    }
     return (
         <ScreenBase barStyle="light-content">
             <Animated.ScrollView
@@ -425,9 +471,14 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                 </TouchableOpacity>
                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     {uid !== profile.data.uid &&
-                                        <Button rounded small bordered
-                                            style={styles.followBtn}>
-                                            <Text style={styles.followText} >Follow</Text>
+                                        <Button
+                                            rounded
+                                            small
+                                            bordered
+                                            style={styles.followBtn}
+                                            onPress={setToFollow}
+                                        >
+                                            <Text style={styles.followText} >{isFollow ? 'Followed' : 'Follow'}</Text>
                                         </Button>
                                     }
                                     <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -462,25 +513,9 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                     <>
                                         {isAdd &&
                                             <Pressable onPress={() => navigation.navigate('AddItem', { type: 'product' })}>
-                                                <View
-                                                    style={{
-                                                        backgroundColor: '#fff',
-                                                        marginHorizontal: 10,
-                                                        flexDirection: 'column',
-                                                        alignItems: 'center',
-                                                        borderRadius: 25,
-                                                        width: 75,
-                                                        paddingVertical: 3
-                                                    }}
-                                                    rounded
-                                                >
+                                                <View style={styles.addItem} rounded>
                                                     <Icon name="cube-outline" style={styles.iToConnect} />
-                                                    <Text style={{
-                                                        color: '#000',
-                                                        fontSize: 12,
-                                                        marginTop: -3
-                                                    }}
-                                                    >
+                                                    <Text style={styles.addItemText}>
                                                         {strings.Menu2}
                                                     </Text>
                                                 </View>
@@ -500,51 +535,19 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                         }
                                         {isAdd &&
                                             <Pressable onPress={() => navigation.navigate('AddItem', { type: 'service' })}>
-                                                <View
-                                                    style={{
-                                                        backgroundColor: '#fff',
-                                                        marginHorizontal: 10,
-                                                        flexDirection: 'column',
-                                                        alignItems: 'center',
-                                                        borderRadius: 25,
-                                                        width: 75,
-                                                        paddingVertical: 3
-                                                    }}
-                                                    rounded
-                                                >
+                                                <View style={styles.addItem} rounded>
                                                     <Icon name="people-outline" style={styles.iToConnect} />
-                                                    <Text style={{
-                                                        color: '#000',
-                                                        fontSize: 12,
-                                                        marginTop: -3
-                                                    }}
-                                                    >
+                                                    <Text style={styles.addItemText}>
                                                         {strings.Menu3}
                                                     </Text>
                                                 </View>
                                             </Pressable>
                                         }
-                                        {isAdd && admin.indexOf(profile.data.uid) >= 0 &&
+                                        {isAdd && profile.data.admin &&
                                             <Pressable onPress={() => navigation.navigate('AddItem', { type: 'tourism' })}>
-                                                <View
-                                                    style={{
-                                                        backgroundColor: '#fff',
-                                                        marginHorizontal: 10,
-                                                        flexDirection: 'column',
-                                                        alignItems: 'center',
-                                                        borderRadius: 25,
-                                                        width: 75,
-                                                        paddingVertical: 3
-                                                    }}
-                                                    rounded
-                                                >
+                                                <View style={styles.addItem} rounded>
                                                     <Icon name="trail-sign-outline" style={styles.iToConnect} />
-                                                    <Text style={{
-                                                        color: '#000',
-                                                        fontSize: 12,
-                                                        marginTop: -3
-                                                    }}
-                                                    >
+                                                    <Text style={styles.addItemText}>
                                                         {strings.Menu4}
                                                     </Text>
                                                 </View>
@@ -553,18 +556,18 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                     </>
                                     :
                                     <>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity onPress={() => navigation.navigate('ChatScreen', { data: visited })}>
                                             <View style={styles.toConnect}>
                                                 <Icon name="mail-outline" style={styles.iToConnect} />
                                             </View>
                                         </TouchableOpacity>
                                         <TouchableOpacity onPress={() =>
-                                            Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${storeData.position.subDistrict.nama}`)}>
+                                            Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${visited.position.subDistrict.nama}`)}>
                                             <View style={styles.toConnect}>
                                                 <Icon name="location-outline" style={styles.iToConnect} />
                                             </View>
                                         </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => Linking.openURL(`tel:${storeData.phoneNumber}`)}>
+                                        <TouchableOpacity onPress={() => Linking.openURL(`tel:${visited.phoneNumber}`)}>
                                             <View style={styles.toConnect}>
                                                 <Icon name="call-outline" style={styles.iToConnect} />
                                             </View>
@@ -582,7 +585,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         <TouchableOpacity
                             style={[styles.btnTab, activeTab === tabs[0] &&
                                 { backgroundColor: primeColor },
-                            ((type === 'visitor' && admin.indexOf(storeData.uid) >= 0) || (type === 'owner' && admin.indexOf(data.uid) >= 0)) ?
+                            ((type === 'visitor' && visited.admin) || (type === 'owner' && profile.data.admin)) ?
                                 { width: '32%' } : { width: '48%' }]}
                             onPress={() => setActiveTab(tabs[0])}
                         >
@@ -593,7 +596,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         <TouchableOpacity
                             style={[styles.btnTab, activeTab === tabs[1] &&
                                 { backgroundColor: primeColor },
-                            ((type === 'visitor' && admin.indexOf(storeData.uid) >= 0) || (type === 'owner' && admin.indexOf(data.uid) >= 0)) ?
+                            ((type === 'visitor' && visited.admin) || (type === 'owner' && profile.data.admin)) ?
                                 { width: '32%' } : { width: '48%' }]}
                             onPress={() => setActiveTab(tabs[1])}
                         >
@@ -601,7 +604,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                                 {strings.Menu3}
                             </Text>
                         </TouchableOpacity>
-                        {((type === 'visitor' && admin.indexOf(storeData.uid) >= 0) || (type === 'owner' && admin.indexOf(data.uid) >= 0)) &&
+                        {((type === 'visitor' && visited.admin) || (type === 'owner' && profile.data.admin)) &&
                             <TouchableOpacity
                                 style={[styles.btnTab, activeTab === tabs[2] &&
                                     { backgroundColor: primeColor },
@@ -644,7 +647,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                 navigation={navigation}
             >
                 <View style={{
-                    backgroundColor: '#ccc',
+                    backgroundColor: '#f3f3f3',
                     borderRadius: 20,
                 }}
                 >
@@ -815,6 +818,20 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         borderRadius: 20
     },
+    addItem: {
+        backgroundColor: '#fff',
+        marginHorizontal: 10,
+        flexDirection: 'column',
+        alignItems: 'center',
+        borderRadius: 25,
+        width: 85,
+        paddingVertical: 3
+    },
+    addItemText: {
+        color: '#000',
+        fontSize: 12,
+        marginTop: -3
+    }
 });
 
 export default StoreAccount;

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Tabs, Tab, Text } from "native-base";
+import { Tabs, Tab, Text, ListItem, Left, Thumbnail, Body } from "native-base";
 import { ScrollView, View, StyleSheet, RefreshControl } from "react-native";
 import strings from "../../assets/Dictionary";
 import ScreenBase from "../../elements/SecreenBase";
@@ -12,11 +12,11 @@ import LoadData from "../../elements/LoadData";
 import NotFound from "../../elements/NotFound";
 import { profile } from "../../configs/profile";
 
-export default function WishList({ navigation }) {
+export default function Following({ navigation }) {
     const [modalVisible, setModalVisible] = useState(false);
     const [search, setSearch] = useState("");
 
-    const [WishList, setWishList] = useState([])
+    const [Following, setFollowing] = useState([])
 
     const [refreshing, setRefreshing] = useState(false);
 
@@ -34,12 +34,12 @@ export default function WishList({ navigation }) {
 
     const getData = () => {
         let re = new RegExp(search.trim(), 'gi');
-        if (profile.wishlistData.length) {
-            let wishListData = profile.wishlistData.filter(data => data.title.match(re))
-            setWishList(wishListData)
+        if (profile.following.length) {
+            let following = profile.following.filter(data => data.storeName.match(re) || data.username.match(re))
+            setFollowing(following)
             setLoading(false)
         } else {
-            setWishList([])
+            setFollowing([])
             setLoading(false)
         }
     }
@@ -47,7 +47,7 @@ export default function WishList({ navigation }) {
     return (
         <ScreenBase>
             <Header
-                title="Wishlist"
+                title="Following"
                 openEtc={(e) => setModalVisible(e)}
                 navigation={navigation}
                 searchValue={search}
@@ -64,23 +64,27 @@ export default function WishList({ navigation }) {
                             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                         }
                     >
-                        <View
-                            style={{
-                                paddingHorizontal: 20,
-                                paddingTop: 25,
-                                paddingBottom: 50,
-                                flexDirection: "row",
-                                flexWrap: "wrap",
-                            }}
-                        >
-                            {WishList.length ?
-                                WishList.map((item) => (
-                                    <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-                                ))
-                                :
-                                <NotFound />
-                            }
-                        </View>
+                        {Following.length ?
+                            Following.map((item) => (
+                                <ListItem avatar onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: item.uid })}>
+                                    <Left>
+                                        <Thumbnail source={{
+                                            uri: item.photoURL ||
+                                                'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-item-30452.png'
+                                        }} />
+                                    </Left>
+                                    <Body style={{
+                                        borderBottomWidth: 1,
+                                        paddingBottom: 18
+                                    }}>
+                                        <Text>{item.storeName}</Text>
+                                        <Text note>{item.username}</Text>
+                                    </Body>
+                                </ListItem>
+                            ))
+                            :
+                            <NotFound />
+                        }
                     </ScrollView>
                 </View>
             }

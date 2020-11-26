@@ -5,6 +5,7 @@ import { StyleSheet, TouchableOpacity, Switch, Dimensions, ScrollView } from 're
 import { primeColor } from '../../configs/color'
 import strings from '../../assets/Dictionary'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { profile } from '../../configs/profile'
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -42,14 +43,17 @@ export default function AccountSetting({ navigation }) {
                     <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('Profile')}>
                         <Text>{strings.MyProfile}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
-                        <Text>{strings.MyAddress}</Text>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('StoreAccount', { type: 'owner', uid: profile.data.uid })}>
+                        <Text>{strings.MyStore}</Text>
                     </ListItem>
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.MyFavorite}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('WishList')}>
                         <Text>{strings.Wishlist}</Text>
+                    </ListItem>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('Following')}>
+                        <Text>Following</Text>
                     </ListItem>
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.Settings}</Text>

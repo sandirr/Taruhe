@@ -23,12 +23,14 @@ import ForgotPassword from "./screens/ForgotPassword";
 import { profile } from "./configs/profile";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import WishList from "./screens/WishList";
+import EtcAct from "./elements/EtcAct";
+import Following from "./screens/Following";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
 
 const AppFeature = () => {
-  const [isUser, setIsUser] = useState(false)
+  const [isUser, setIsUser] = useState(true)
   useEffect(() => {
     fAuth.onAuthStateChanged(function (user) {
       if (user) {
@@ -48,7 +50,19 @@ const AppFeature = () => {
             profile.wishlist = wishlist
           }
         })
+        fDB.ref('following/' + user.uid).on('value', val => {
+          if (val.val()) {
+            let following = []
+            Object.keys(val.val()).forEach((item) => {
+              following.push(val.val()[item])
+            })
+            profile.following = following
+          }
+        })
       } else {
+        profile.data = {}
+        profile.wishlistData = []
+        profile.wishlist = []
         setIsUser(false)
         AsyncStorage.clear()
       }
@@ -128,7 +142,12 @@ const AppFeature = () => {
       />
       <AppStack.Screen
         name="WishList"
-        component={WishList}
+        component={isUser ? WishList : Welcome}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="Following"
+        component={isUser ? Following : Welcome}
         options={{ headerShown: false }}
       />
     </AppStack.Navigator>
