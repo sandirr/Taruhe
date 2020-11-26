@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking, Pressable, Alert, ToastAndroid, Share } from 'react-native';
+import { Dimensions, StyleSheet, Animated, LogBox, ImageBackground, Image, TouchableOpacity, Linking, Pressable, Alert, ToastAndroid, Share, Modal, StatusBar } from 'react-native';
 import { View, H3, Text, Button, Icon } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
@@ -10,6 +10,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { parser } from '../../configs/helper';
 import { profile } from '../../configs/profile';
 import { fDB } from '../../configs/firebase';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -17,10 +18,21 @@ const screenWidth = Dimensions.get('window').width;
 function Home(props) {
     const scrollA = useRef(new Animated.Value(0)).current;
     const [detailUser, setDetailUser] = useState({})
-    const [detailItem, setDetailItem] = useState({})
+    const [detailItem, setDetailItem] = useState({ imagesURL: [] })
     const { navigation } = props;
     const { detail } = props.route.params
     const [isWish, setIsWish] = useState(false)
+    const [gallery, setGallery] = useState(false)
+    const [imageUrls, setImageUrls] = useState([])
+
+    useEffect(() => {
+        let data = []
+        detailItem.imagesURL.forEach(e => {
+            data.push({ url: e.uri })
+        })
+        setImageUrls(data)
+    }, [detailItem])
+
     useEffect(() => {
         LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
         setIsWish(profile.wishlist.indexOf(detail.id.toString()) >= 0 ? true : false)
@@ -214,9 +226,11 @@ function Home(props) {
                             <View style={{
                                 flexDirection: 'row', justifyContent: 'space-between', marginTop: 21
                             }}>
-                                <View style={{
-                                    width: '60%', height: 220, justifyContent: 'space-between'
-                                }}>
+                                <Pressable
+                                    onPress={() => setGallery(true)}
+                                    style={{
+                                        width: '60%', height: 220, justifyContent: 'space-between'
+                                    }}>
                                     <Image
                                         source={detailItem.imagesURL[0]}
                                         style={{ height: 105, width: '100%', borderRadius: 18 }}
@@ -225,13 +239,15 @@ function Home(props) {
                                         source={detailItem.imagesURL[1] || require('../../assets/images/noimage.jpg')}
                                         style={{ height: 105, width: '100%', borderRadius: 18 }}
                                     />
-                                </View>
-                                <View style={{ width: '37%' }}>
+                                </Pressable>
+                                <Pressable
+                                    onPress={() => setGallery(true)}
+                                    style={{ width: '37%' }}>
                                     <Image
                                         source={detailItem.imagesURL[2] || require('../../assets/images/noimage.jpg')}
                                         style={{ height: 220, width: '100%', borderRadius: 18 }}
                                     />
-                                </View>
+                                </Pressable>
                             </View>
 
                             <View style={{ marginTop: 21 }}>
@@ -292,6 +308,24 @@ function Home(props) {
 
                         </View>
                     </View>
+                    <Modal visible={gallery} transparent={true} animationType="slide">
+                        <StatusBar backgroundColor="#000" />
+                        <ImageViewer
+                            renderHeader={() => {
+                                return (
+                                    <Pressable onPress={() => setGallery(false)} style={{ justifyContent: 'flex-end', flexDirection: 'row', paddingRight: 25 }}>
+                                        <Icon style={{ color: '#f05454', fontSize: 38, alignSelf: 'center' }} name="close" />
+                                    </Pressable>
+                                )
+                            }}
+                            imageUrls={imageUrls}
+                            style={{
+                                flex: 1,
+                                width: null,
+                                height: null,
+                                resizeMode: 'contain'
+                            }} />
+                    </Modal>
                 </Animated.ScrollView>
             }
             {detail.uid !== profile.data.uid && detailUser.uid && detailItem.id &&
