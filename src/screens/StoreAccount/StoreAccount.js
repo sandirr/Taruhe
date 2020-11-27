@@ -656,7 +656,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         }}
                     >
                         <Icon name="create-outline" style={{ fontSize: 22, marginRight: 5 }} />
-                        <Text style={styles.modalText}>Edit your store</Text>
+                        <Text style={styles.modalText}>{strings.EditY}</Text>
                     </Pressable>
                     <View style={{ backgroundColor: 'gray', height: 2 }} />
                     <Pressable onPress={() => navigation.replace(strings.Menu1)}
@@ -668,7 +668,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         }}
                     >
                         <Icon name="home-outline" style={{ fontSize: 22, marginRight: 5 }} />
-                        <Text style={styles.modalText}>Back to home</Text>
+                        <Text style={styles.modalText}>{strings.BackToHome}</Text>
                     </Pressable>
                 </View>
             </EtcAct>

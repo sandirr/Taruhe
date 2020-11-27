@@ -9,6 +9,7 @@ import { profile } from '../../configs/profile';
 import MapView from 'react-native-maps';
 import { ScrollView } from 'react-native-gesture-handler';
 import { parser } from '../../configs/helper';
+import strings from '../../assets/Dictionary';
 
 class ChatSCreen extends Component {
     state = {
@@ -117,7 +118,7 @@ class ChatSCreen extends Component {
             var { latitude, longitude, accuracy } = info.coords;
             Alert.alert(
                 'CONFIRM !',
-                `Share your location ?\nAccuracy: ${Math.floor(accuracy) > 100 ? 99 : Math.floor(accuracy)
+                `${strings.ShareLocation} ?\nAccuracy: ${Math.floor(accuracy) > 100 ? 99 : Math.floor(accuracy)
                 }%`,
                 [
                     {
@@ -137,7 +138,7 @@ class ChatSCreen extends Component {
                 ],
             );
         }, err => {
-            Alert.alert('Lokasi tidak ditemukan', 'Mohon aktifkan lokasi/GPS Anda')
+            Alert.alert(strings.LocationNF, strings.PAYL)
         });
     };
 
@@ -423,7 +424,7 @@ class ChatSCreen extends Component {
                             backgroundColor: '#f3f3f3',
                         }}
                         value={this.state.textMessage}
-                        placeholder="Message"
+                        placeholder={strings.Message}
                         onChangeText={this.handleChangeText('textMessage')}
                     />
                     <TouchableOpacity

@@ -3,5 +3,6 @@ export let profile = {
     wishlist: [],
     wishlistData: [],
     following: [],
-    history: []
+    history: [],
+    others: {}
 }

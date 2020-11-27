@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Dimensions, Image, StyleSheet, TouchableOpacity, Pressable, Modal } from 'react-native'
+import { Dimensions, Image, StyleSheet, TouchableOpacity, Pressable, Modal, Linking, Alert, Share, TouchableWithoutFeedback } from 'react-native'
 import { Icon, Text, View, List, ListItem, Left, Body, Right, Thumbnail, Button } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
@@ -61,7 +61,7 @@ export default function Account({ navigation }) {
                 </Pressable>
 
                 <View style={styles.featureContainer}>
-                    <Pressable style={{ alignItems: 'center' }} onPress={() => navigation.navigate('Following')}>
+                    <Pressable style={{ alignItems: 'center' }} onPress={() => navigation.navigate('WishList')}>
                         <Icon style={styles.iconFeature} name="heart" />
                         <Text style={styles.strFeature}>{strings.Wishlist}</Text>
                     </Pressable>
@@ -69,14 +69,24 @@ export default function Account({ navigation }) {
                         <Icon style={styles.iconFeature} name="time" />
                         <Text style={styles.strFeature}>{strings.History}</Text>
                     </Pressable>
-                    <View style={{ alignItems: 'center' }}>
+                    <Pressable style={{ alignItems: 'center' }} onPress={() => {
+                        Share.share({
+                            url: `${profile.others.linkTaruhe}`,
+                            message: `${profile.others.pitch} ${profile.others.linkTaruhe}`,
+                            title: 'Taruhe Art & Media'
+                        });
+                    }}>
                         <Icon style={styles.iconFeature} name="share-social" />
                         <Text style={styles.strFeature}>{strings.Share}</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
+                    </Pressable>
+                    <Pressable style={{ alignItems: 'center' }} onPress={() => {
+                        Linking.openURL(profile.others.rateURL).catch(() =>
+                            Alert.alert('Error', 'Please check your Google Play Store')
+                        );
+                    }}>
                         <Icon style={styles.iconFeature} name="star" />
                         <Text style={styles.strFeature}>{strings.RateUs}</Text>
-                    </View>
+                    </Pressable>
                 </View>
 
                 <View style={styles.scrollMenu} >
@@ -97,7 +107,7 @@ export default function Account({ navigation }) {
                                 <Icon style={{ fontSize: 22 }} name="flag-outline" />
                             </Left>
                             <Body>
-                                <Text>Following</Text>
+                                <Text>{strings.Following}</Text>
                             </Body>
                         </ListItem>
                         <ListItem itemDivider style={styles.itemDivider}>
@@ -126,7 +136,7 @@ export default function Account({ navigation }) {
                         <ListItem itemDivider style={styles.itemDivider}>
                             <Text style={styles.textDivider}>{strings.Support}</Text>
                         </ListItem>
-                        <ListItem icon itemDivider style={styles.menuItem}>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.navigate('HelpCenter')}>
                             <Left>
                                 <Icon style={{ fontSize: 22 }} name="help-circle-outline" />
                             </Left>
@@ -134,7 +144,7 @@ export default function Account({ navigation }) {
                                 <Text>{strings.HelpCenter}</Text>
                             </Body>
                         </ListItem>
-                        <ListItem icon itemDivider style={styles.menuItem}>
+                        <ListItem icon itemDivider style={styles.menuItem} onPress={() => navigation.navigate('About')}>
                             <Left>
                                 <Icon style={{ fontSize: 22 }} name="alert-circle-outline" />
                             </Left>
@@ -152,71 +162,79 @@ export default function Account({ navigation }) {
                         </ListItem>
                     </List>
                     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                        <Text style={styles.taruheVer}>Taruhe v 1.0.0</Text>
+                        <Text style={styles.taruheVer}>Taruhe v {profile.others.version}</Text>
                     </View>
                 </View>
             </ScrollView>
             <Modal visible={permission} transparent animationType="slide">
-                {permission &&
+                <TouchableWithoutFeedback onPress={() => setPermission(false)}>
                     <View style={{
-                        flex: 1,
-                        justifyContent: "flex-end",
-                        alignItems: 'center',
-                        backgroundColor: 'transparent'
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        backgroundColor: "rgba(0,0,0,.5)",
+                    }} />
+                </TouchableWithoutFeedback>
+                <View style={{
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    alignItems: 'center',
+                    backgroundColor: 'transparent'
+                }}>
+                    <View style={{
+                        backgroundColor: '#fff',
+                        width: '90%',
+                        borderRadius: 18,
+                        paddingVertical: 16,
+                        paddingHorizontal: 45,
+                        marginBottom: 20,
+                        borderColor: '#ccc',
+                        borderWidth: 1
                     }}>
-                        <View style={{
-                            backgroundColor: '#fff',
-                            width: '90%',
-                            borderRadius: 18,
-                            paddingVertical: 16,
-                            paddingHorizontal: 45,
-                            marginBottom: 20,
-                            borderColor: '#ccc',
-                            borderWidth: 1
+                        <Text style={{
+                            textAlign: 'center',
+                            fontWeight: '700',
+                            fontSize: 18
                         }}>
-                            <Text style={{
-                                textAlign: 'center',
-                                fontWeight: '700',
-                                fontSize: 18
-                            }}>
-                                {strings.SureLogOut}?
+                            {strings.SureLogOut}?
                             </Text>
-                            <View style={{
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                marginTop: 16
-                            }}>
-                                <Button
-                                    rounded
-                                    bordered
-                                    style={{
-                                        marginHorizontal: 10,
-                                        borderColor: primeColor
-                                    }}
-                                    small
-                                    onPress={() => setPermission(false)}
-                                >
-                                    <Text style={{ textTransform: 'capitalize', color: primeColor }}>{strings.Cancel}</Text>
-                                </Button>
-                                <Button
-                                    rounded
-                                    style={{ marginHorizontal: 10, backgroundColor: primeColor }}
-                                    small
-                                    onPress={() => {
-                                        fAuth.signOut().then(function () {
-                                            removeUid()
-                                            profile.data = {}
-                                        }).catch(function (error) {
-                                            Alert.alert(error.code, error.message)
-                                        });
-                                    }}
-                                >
-                                    <Text style={{ textTransform: 'capitalize' }}>{strings.LogOut}</Text>
-                                </Button>
-                            </View>
+                        <View style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            marginTop: 16
+                        }}>
+                            <Button
+                                rounded
+                                bordered
+                                style={{
+                                    marginHorizontal: 10,
+                                    borderColor: primeColor
+                                }}
+                                small
+                                onPress={() => setPermission(false)}
+                            >
+                                <Text style={{ textTransform: 'capitalize', color: primeColor }}>{strings.Cancel}</Text>
+                            </Button>
+                            <Button
+                                rounded
+                                style={{ marginHorizontal: 10, backgroundColor: primeColor }}
+                                small
+                                onPress={() => {
+                                    fAuth.signOut().then(function () {
+                                        removeUid()
+                                        profile.data = {}
+                                    }).catch(function (error) {
+                                        Alert.alert(error.code, error.message)
+                                    });
+                                }}
+                            >
+                                <Text style={{ textTransform: 'capitalize' }}>{strings.LogOut}</Text>
+                            </Button>
                         </View>
                     </View>
-                }
+                </View>
             </Modal>
             <FooterTabs
                 screen={strings.Menu5}

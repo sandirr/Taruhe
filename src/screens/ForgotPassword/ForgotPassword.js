@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   Alert,
   Dimensions,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,7 +14,6 @@ import { primeColor } from "../../configs/color";
 import { fAuth } from "../../configs/firebase";
 import ScreenBase from "../../elements/SecreenBase";
 
-const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 export default function ForgotPassword({ navigation }) {
@@ -32,7 +30,7 @@ export default function ForgotPassword({ navigation }) {
     } else {
       fAuth.sendPasswordResetEmail(emailAddress).then(function () {
         setField({ ...field, password: '' })
-        Alert.alert('Permintaan sukses', 'Please check your email inbox')
+        Alert.alert(strings.Success, 'Please check your email inbox')
       }).catch(function (error) {
         let errorCode = error.code;
         let errorMessage = error.message;
@@ -57,10 +55,6 @@ export default function ForgotPassword({ navigation }) {
           <Text style={{ fontSize: 24, color: "#555", fontWeight: '700' }}>
             {strings.ForgotPass}
           </Text>
-          {/* <Image
-            style={{ width: 83, height: 25, marginTop: 5, marginRight: 5 }}
-            source={require("../../assets/images/taruhe_splash.png")}
-          /> */}
         </View>
 
         <Text style={styles.label}>Email</Text>
@@ -85,7 +79,7 @@ export default function ForgotPassword({ navigation }) {
           onPress={login}
         >
           <Text style={{ color: "#fff", fontWeight: '700', fontSize: 16 }}>
-            SELANJUTNYA
+            {strings.Next}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity

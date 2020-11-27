@@ -9,6 +9,7 @@ import { fDB } from '../../configs/firebase';
 import { wait } from '../../configs/helper';
 import LoadData from '../../elements/LoadData';
 import NotFound from '../../elements/NotFound';
+import strings from '../../assets/Dictionary';
 export default class ListChat extends Component {
     constructor(props) {
         super(props);
@@ -99,7 +100,7 @@ export default class ListChat extends Component {
                         />
                     </TouchableOpacity>
                     <Text style={{ fontWeight: '700', fontSize: 24, color: primeColor }}>
-                        Messages
+                        {strings.Message === 'Message' ? 'Messages' : 'Pesan'}
                     </Text>
                     <Icon
                         name="caret-back"

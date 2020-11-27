@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Icon, Left, List, ListItem, Right, Text, View } from 'native-base'
 import ScreenBase from '../../elements/SecreenBase'
-import { StyleSheet, TouchableOpacity, Switch, Dimensions, ScrollView } from 'react-native'
+import { StyleSheet, TouchableOpacity, Switch, Dimensions, ScrollView, Share, Linking, Alert } from 'react-native'
 import { primeColor } from '../../configs/color'
 import strings from '../../assets/Dictionary'
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -53,15 +53,25 @@ export default function AccountSetting({ navigation }) {
                         <Text>{strings.Wishlist}</Text>
                     </ListItem>
                     <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('Following')}>
-                        <Text>Following</Text>
+                        <Text>{strings.Following}</Text>
                     </ListItem>
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.Settings}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => {
+                        Share.share({
+                            url: `${profile.others.linkTaruhe}`,
+                            message: `${profile.others.pitch} ${profile.others.linkTaruhe}`,
+                            title: 'Taruhe Art & Media'
+                        });
+                    }}>
                         <Text>{strings.ShareApp}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => {
+                        Linking.openURL(profile.others.rateURL).catch(() =>
+                            Alert.alert(strings.Error, strings.error1)
+                        );
+                    }}>
                         <Text>{strings.RateUs}</Text>
                     </ListItem>
                     <ListItem itemDivider style={styles.menuItem}>
@@ -86,19 +96,14 @@ export default function AccountSetting({ navigation }) {
                     <ListItem itemDivider style={styles.itemDivider}>
                         <Text style={styles.textDivider}>{strings.Support}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('HelpCenter')}>
                         <Text>{strings.HelpCenter}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem}>
+                    <ListItem itemDivider style={styles.menuItem} onPress={() => navigation.navigate('About')}>
                         <Text>{strings.About}</Text>
                     </ListItem>
-                    <ListItem itemDivider style={styles.menuItem} onPress={() => {
-                        navigation.navigate('Welcome')
-                    }}>
-                        <Text>{strings.LogOut}</Text>
-                    </ListItem>
                 </List>
-                <Text style={{ fontSize: 12, alignSelf: 'center', color: 'gray', marginTop: 14 }}>Taruhe v 1.0.0</Text>
+                <Text style={{ fontSize: 12, alignSelf: 'center', color: 'gray', marginTop: 14 }}>Taruhe v {profile.others.version}</Text>
             </ScrollView>
         </ScreenBase>
     )

@@ -26,6 +26,8 @@ import WishList from "./screens/WishList";
 import EtcAct from "./elements/EtcAct";
 import Following from "./screens/Following";
 import History from "./screens/History";
+import About from "./screens/About";
+import HelpCenter from "./screens/HelpCenter";
 
 const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
@@ -59,6 +61,10 @@ const AppFeature = () => {
             })
             profile.following = following
           }
+        })
+        fDB.ref('others/').on('value', val => {
+          if (val.val())
+            profile.others = val.val()
         })
       } else {
         profile.data = {}
@@ -155,6 +161,16 @@ const AppFeature = () => {
       <AppStack.Screen
         name="History"
         component={isUser ? History : Welcome}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="About"
+        component={About}
+        options={{ headerShown: false }}
+      />
+      <AppStack.Screen
+        name="HelpCenter"
+        component={HelpCenter}
         options={{ headerShown: false }}
       />
     </AppStack.Navigator>

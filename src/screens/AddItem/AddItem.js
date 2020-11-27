@@ -114,7 +114,7 @@ class AddItem extends Component {
                 })
             }
         } else {
-            Alert.alert('Sudah mencapai batas', 'Maksimal 5 photo')
+            Alert.alert('Limit', 'Max 5 photo')
         }
     }
     uploadFile = async (uri) => {
@@ -170,7 +170,7 @@ class AddItem extends Component {
                         created_at: item.created_at,
                         updated_at: new Date().toISOString()
                     }).then(() => {
-                        Alert.alert('Sukses', 'Berhasil mengupdate item')
+                        Alert.alert(strings.Success, strings.ItemUpdated)
                         this.props.navigation.goBack()
                     }).catch((err) => {
                         Alert.alert(err.code, err.message)
@@ -186,7 +186,7 @@ class AddItem extends Component {
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString()
                     }).then(() => {
-                        Alert.alert('Sukses', 'Berhasil menambahkan item')
+                        Alert.alert(strings.Success, strings.ItemAdded)
                         this.props.navigation.goBack()
                     }).catch((err) => {
                         Alert.alert(err.code, err.message)
@@ -196,7 +196,7 @@ class AddItem extends Component {
         }
         else {
             this.setState({ disabled: false })
-            Alert.alert('Belum lengkap', 'Mohon lengkapi isian yang disediakan sebelum mengupload produk/jasa anda')
+            Alert.alert(strings.NotComplete, strings.error2)
         }
     }
     render() {
@@ -535,7 +535,7 @@ class AddItem extends Component {
                                 fontWeight: '700',
                                 fontSize: 18
                             }}>
-                                Yakin ingin menghapus item?
+                                {strings.SureDeleteItem}?
                             </Text>
                             <View style={{
                                 flexDirection: 'row',
@@ -562,7 +562,7 @@ class AddItem extends Component {
                                         fDB
                                             .ref('product_service/' + item.id).remove()
                                             .then(() => {
-                                                Alert.alert('Sukses', 'Item berhasil dihapus')
+                                                Alert.alert(strings.Success, 'Item berhasil dihapus')
                                                 this.props.navigation.navigate(strings.Menu5)
                                             })
                                     }}

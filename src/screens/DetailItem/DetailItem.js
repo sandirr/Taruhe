@@ -11,6 +11,8 @@ import { parser } from '../../configs/helper';
 import { profile } from '../../configs/profile';
 import { fDB } from '../../configs/firebase';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import NotFound from '../../elements/NotFound';
+import LoadData from '../../elements/LoadData';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -24,6 +26,7 @@ function Home(props) {
     const [isWish, setIsWish] = useState(false)
     const [gallery, setGallery] = useState(false)
     const [imageUrls, setImageUrls] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         let data = []
@@ -40,16 +43,20 @@ function Home(props) {
             setDetailUser(val.val())
         })
         fDB.ref('product_service/' + detail.id).on('value', val => {
-            let ps = val.val()
-            setDetailItem(ps)
-            checkInHistory(ps)
+            if (val.val()) {
+                let ps = val.val()
+                setDetailItem(ps)
+                checkInHistory(ps)
+            }
+            setLoading(false)
         })
     }, [detail]);
 
     const checkInHistory = (ps) => {
-        fDB.ref('history/' + profile.data.uid)
-            .child(ps.id)
-            .set({ ...ps, history_at: Date.now() })
+        if (profile.data.uid !== detail.uid)
+            fDB.ref('history/' + profile.data.uid)
+                .child(ps.id)
+                .set({ ...ps, history_at: Date.now() })
     }
 
     const [readMore, setReadMore] = useState(false)
@@ -85,7 +92,7 @@ function Home(props) {
                 fDB.ref('wishlist/' + profile.data.uid).child(detail.id).remove()
                     .then(() => {
                         ToastAndroid.showWithGravity(
-                            "Removed from wishlist",
+                            strings.RemovedFWish,
                             ToastAndroid.SHORT,
                             ToastAndroid.CENTER
                         );
@@ -97,7 +104,7 @@ function Home(props) {
                     ...detailItem,
                 }).then(() => {
                     ToastAndroid.showWithGravity(
-                        "Added to wishlist",
+                        strings.AddedTWish,
                         ToastAndroid.SHORT,
                         ToastAndroid.CENTER
                     );
@@ -111,8 +118,8 @@ function Home(props) {
 
     const shareTaruhe = () => {
         Share.share({
-            url: 'https://google.com',
-            message: `Explore tentang ${detailItem.title} di Taruhe App! https://google.com`,
+            url: `${profile.others.linkTaruhe}`,
+            message: `Explore tentang ${detailItem.title} di Taruhe App! ${profile.others.linkTaruhe}`,
             title: 'Taruhe Art & Media'
         });
     }
@@ -125,7 +132,7 @@ function Home(props) {
     }
     return (
         <ScreenBase barStyle="dark-content" >
-            {detailItem.id &&
+            {detailItem.id ?
                 <Animated.ScrollView
                     showsVerticalScrollIndicator={false}
                     onScroll={Animated.event(
@@ -327,6 +334,14 @@ function Home(props) {
                             }} />
                     </Modal>
                 </Animated.ScrollView>
+                : !loading ?
+                    <View style={{ marginTop: 50 }}>
+                        <NotFound m={detail.category + " has been deleted"} />
+                    </View>
+                    :
+                    <View style={{ marginTop: 50 }}>
+                        <LoadData />
+                    </View>
             }
             {detail.uid !== profile.data.uid && detailUser.uid && detailItem.id &&
                 <View style={styles.floatingOrder}>

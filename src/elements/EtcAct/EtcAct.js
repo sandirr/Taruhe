@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from "react-native";
+import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
 
 export default function EtcAct(props) {
@@ -41,7 +42,7 @@ export default function EtcAct(props) {
                 onPress={() => navigateTo('ListChat')}
               >
                 <Icon name="mail-outline" style={{ fontSize: 22, marginRight: 5 }} />
-                <Text style={styles.modalText}>Pesan</Text>
+                <Text style={styles.modalText}>{strings.Message}</Text>
               </Pressable>
               <View style={{ backgroundColor: 'gray', height: 2 }} />
               <Pressable
@@ -49,7 +50,7 @@ export default function EtcAct(props) {
                 onPress={() => navigateTo('HelpCenter')}
               >
                 <Icon name="information-circle-outline" style={{ fontSize: 22, marginRight: 5 }} />
-                <Text style={styles.modalText}>Bantuan</Text>
+                <Text style={styles.modalText}>{strings.HelpCenter}</Text>
               </Pressable>
               <View style={{ backgroundColor: 'gray', height: 2 }} />
               <Pressable
@@ -57,7 +58,7 @@ export default function EtcAct(props) {
                 onPress={() => navigateTo('AccountSetting')}
               >
                 <Icon name="settings-outline" style={{ fontSize: 22, marginRight: 5 }} />
-                <Text style={styles.modalText}>Pengaturan</Text>
+                <Text style={styles.modalText}>{strings.Setting}</Text>
               </Pressable>
             </View>}
         </View>

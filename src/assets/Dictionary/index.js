@@ -106,7 +106,34 @@ const strings = new LocalizedStrings({
     SDF: 'Pilih kabupaten/kota terlebih dahulu',
     ISN: 'Nama jalan/perumahan/dll...',
     SureLogOut: 'Anda yakin ingin keluar',
-    Delete: 'Hapus'
+    Delete: 'Hapus',
+
+    Message: 'Pesan',
+    Setting: 'Pengaturan',
+    EditY: 'Edit toko kamu',
+    BackToHome: 'Kembali ke beranda',
+    Following: 'Diikuti',
+    Error: 'Ada yang salah',
+    Failed: 'Gagal',
+
+    error1: 'Mohon Periksa Google Play Store Anda',
+
+    Success: 'Sukses',
+    Success1: 'Berhasil',
+    ItemUpdated: 'Berhasil mengupdate item',
+    ItemAdded: 'Berhasil menambahkan item',
+    NotComplete: 'Belum lengkap',
+    error2: 'Mohon lengkapi isian yang disediakan sebelum mengupload produk/jasa anda',
+    SureDeleteItem: 'Yakin ingin menghapus item',
+
+    LocationNF: 'Lokasi tidak ditemukan',
+    PAYL: 'Mohon aktifkan lokasi/GPS Anda',
+    ShareLocation: 'Bagikan lokasi anda',
+
+    RemovedFWish: 'Dihapus dari wishlist',
+    AddedTWish: 'Ditambahkan ke wishlist',
+
+    Next: 'Selanjutnya'
   },
   en: {
     Menu1: "Home",
@@ -213,7 +240,34 @@ const strings = new LocalizedStrings({
     SDF: 'Select the district / city first',
     ISN: 'Street name/home number/etc...',
     SureLogOut: 'Are you sure',
-    Delete: 'Delete'
+    Delete: 'Delete',
+
+    Message: 'Message',
+    Setting: 'Setting',
+    EditY: 'Edit your store',
+    BackToHome: 'Back to home',
+    Following: 'Following',
+    Error: 'Error',
+    Failed: 'Failed',
+
+    error1: 'Please Check your Google Play Store',
+
+    Success: 'Success',
+    Success1: 'Success',
+    ItemUpdated: 'Item updated',
+    ItemAdded: 'Item added',
+    NotComplete: 'Not Complete',
+    error2: 'Please complete all fields before submit your product/service',
+    SureDeleteItem: 'Are you sure want to delete this item',
+
+    LocationNF: 'Lokasi tidak ditemukan',
+    PAYL: 'Please activate your location/GPS',
+    ShareLocation: 'Share your location',
+
+    RemovedFWish: 'Removed from wishlist',
+    AddedTWish: 'Added to wishlist',
+
+    Next: 'Next'
   },
 });
 

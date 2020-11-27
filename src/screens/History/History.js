@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Tabs, Tab, Text } from "native-base";
 import { ScrollView, View, StyleSheet, RefreshControl } from "react-native";
-import strings from "../../assets/Dictionary";
 import ScreenBase from "../../elements/SecreenBase";
 import Header from "../../elements/Header";
 import EtcAct from "../../elements/EtcAct";

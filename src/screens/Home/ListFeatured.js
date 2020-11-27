@@ -37,9 +37,9 @@ export default class ListFeatured extends Component {
   }
 
   componentDidMount() {
-    if (this.state.banners.length > 1)
-      setInterval(
-        function () {
+    setInterval(
+      function () {
+        if (this.state.banners.length > 1) {
           const { sliderIndex, maxSlider } = this.state;
           let nextIndex = 0;
 
@@ -49,9 +49,10 @@ export default class ListFeatured extends Component {
 
           this.scrollToIndex(nextIndex, true);
           this.setState({ sliderIndex: nextIndex });
-        }.bind(this),
-        3000
-      );
+        }
+      }.bind(this),
+      3000
+    );
   }
   render() {
     return (
