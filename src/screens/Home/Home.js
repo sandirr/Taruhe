@@ -78,7 +78,7 @@ const Home = (props) => {
       const alpha = yOffset * 0.01;
       if (alpha >= 0.9) {
         setBgSearch(`#fff`);
-        setIconSearch('#ccc');
+        setIconSearch(primeColor);
         setColorSearch('#f3f3f3');
       } else {
         setBgSearch(`transparent`);
@@ -132,17 +132,11 @@ const Home = (props) => {
         <TouchableOpacity onPress={() => navigation.navigate('WishList')}>
           <Icon name="heart" style={{
             color: iconSearch,
-            textShadowColor: "#555",
-            textShadowOffset: { width: -1, height: 1 },
-            textShadowRadius: 5,
           }} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('ListChat')}>
           <Icon name="mail" style={{
             color: iconSearch,
-            textShadowColor: "#555",
-            textShadowOffset: { width: -1, height: 1 },
-            textShadowRadius: 5,
           }} />
         </TouchableOpacity>
       </View>
@@ -176,7 +170,9 @@ const Home = (props) => {
                 <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
               )).reverse()
               :
-              <NotFound />
+              <View style={{ marginTop: 50, flex: 1 }}>
+                <NotFound />
+              </View>
             }
           </View>
         }
@@ -220,7 +216,7 @@ const styles = StyleSheet.create({
     ],
   }),
   scrollView: {
-    backgroundColor: '#f3f3f3',
+    backgroundColor: '#fff',
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingTop: 25,
@@ -228,7 +224,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: -25,
     flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   scrollHandler: {
     marginTop: 10,

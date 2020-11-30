@@ -70,39 +70,40 @@ export default function History({ navigation }) {
                 searchValue={search}
                 onChangeSearch={(e) => setSearch(e)}
             />
-            <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
-                {loading ?
-                    <LoadData />
-                    :
-                    <ScrollView
-                        onScroll={(e) => whenScroll(e)}
-                        showsVerticalScrollIndicator={false}
-                        refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                        }
-                    >
-                        <View
-                            style={{
-                                paddingHorizontal: 20,
-                                paddingTop: 25,
-                                paddingBottom: 50,
-                                flexDirection: "row",
-                                flexWrap: "wrap",
-                            }}
+            {loading ?
+                <LoadData />
+                :
+                <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
+                    {History.length ?
+                        <ScrollView
+                            onScroll={(e) => whenScroll(e)}
+                            showsVerticalScrollIndicator={false}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                            }
                         >
-                            {History.length ?
-                                History
+                            <View
+                                style={{
+                                    paddingHorizontal: 20,
+                                    paddingTop: 25,
+                                    paddingBottom: 50,
+                                    flexDirection: "row",
+                                    flexWrap: "wrap",
+                                }}
+                            >
+                                {History
                                     .sort((a, b) => b.history_at - a.history_at)
                                     .map((item) => (
                                         <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
                                     ))
-                                :
-                                <NotFound />
-                            }
-                        </View>
-                    </ScrollView>
-                }
-            </View>
+                                }
+                            </View>
+                        </ScrollView>
+                        :
+                        <NotFound />
+                    }
+                </View>
+            }
             <EtcAct
                 modalVisible={modalVisible}
                 openEtc={(e) => setModalVisible(e)}
@@ -115,7 +116,6 @@ export default function History({ navigation }) {
 const styles = StyleSheet.create({
     scrollContainer: {
         display: "flex",
-
         paddingBottom: 75,
     },
 });

@@ -6,23 +6,18 @@ import { Linking, RefreshControl, TouchableOpacity, View } from 'react-native';
 import { primeColor } from '../../configs/color';
 import { profile } from '../../configs/profile';
 import { fDB } from '../../configs/firebase';
-import { wait } from '../../configs/helper';
 import LoadData from '../../elements/LoadData';
 import NotFound from '../../elements/NotFound';
 import strings from '../../assets/Dictionary';
 export default class ListChat extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            active: false,
-            users: [],
-            refreshing: false,
-            loading: true
-        };
-    }
+    state = {
+        active: false,
+        users: [],
+        refreshing: false,
+        loading: true,
+    };
     componentDidMount() {
-        this.setState({ users: [] })
-        this.getData();
+        this.setState({ users: [] }, this.getData)
     }
 
     getData = () => {
@@ -56,7 +51,9 @@ export default class ListChat extends Component {
                         }
                     });
             }
-            this.setState({ loading: false })
+            setTimeout(() => {
+                this.setState({ loading: false })
+            }, 1000)
         });
     };
 
@@ -82,7 +79,6 @@ export default class ListChat extends Component {
 
     render() {
         const { navigation } = this.props;
-        const { loading } = this.state
         return (
             <ScreenBase>
                 <View style={{
@@ -93,7 +89,7 @@ export default class ListChat extends Component {
                     paddingHorizontal: 25,
                     justifyContent: 'space-between'
                 }}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={() => navigation.replace(strings.Menu1)}>
                         <Icon
                             name="caret-back"
                             style={{ color: primeColor, fontSize: 26 }}
@@ -107,63 +103,67 @@ export default class ListChat extends Component {
                         style={{ color: 'transparent', fontSize: 26 }}
                     />
                 </View>
-                <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
-                    {loading ?
-                        <LoadData />
-                        :
-                        <ScrollView refreshControl={
-                            <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
-                        }>
-                            {this.state.users.length ? this.state.users.map((user) => (
-
-                                <ListItem avatar onPress={() => navigation.navigate('ChatScreen', { data: user })}>
-                                    <Left>
-                                        <Thumbnail source={{
-                                            uri: user.photoURL ||
-                                                'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-user-30452.png'
-                                        }} />
-                                    </Left>
-                                    <Body style={{
-                                        borderBottomWidth: 1,
-                                        paddingBottom: 18
-                                    }}>
-                                        <Text>{user.storeName}</Text>
-                                        <Text note>{user.last_message.latitude ?
-                                            'Location shared' :
-                                            user.last_message.id ?
-                                                user.last_message.title :
-                                                user.last_message.substr(0, 22) + '...'}</Text>
-                                    </Body>
-                                    <Right style={{
-                                        borderBottomWidth: 1,
-                                    }}>
-                                        {new Date(user.last_time).getMonth() !== new Date().getMonth() ? (
-                                            <Text note>
-                                                {new Date(user.last_time).getDate()}/
-                                                {new Date(user.last_time).getMonth()}/
-                                                {new Date(user.last_time).getFullYear()}
-                                            </Text>
-                                        ) : (
+                {this.state.loading ?
+                    <LoadData />
+                    :
+                    <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
+                        {this.state.users.length ?
+                            <ScrollView refreshControl={
+                                <RefreshControl refreshing={this.state.refreshing} onRefresh={this.onRefresh} />
+                            }>
+                                {this.state.users.sort((a, b) => {
+                                    return (a.last_time > b.last_time) ? -1 : ((a.last_time < b.last_time) ? 1 : 0);
+                                }).map((user) => (
+                                    <ListItem avatar onPress={() => navigation.replace('ChatScreen', { data: user })}>
+                                        <Left>
+                                            <Thumbnail source={{
+                                                uri: user.photoURL ||
+                                                    'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-user-30452.png'
+                                            }} />
+                                        </Left>
+                                        <Body style={{
+                                            borderBottomWidth: 1,
+                                            paddingBottom: 18
+                                        }}>
+                                            <Text>{user.storeName}</Text>
+                                            <Text note>{user.last_message.latitude ?
+                                                'Location shared' :
+                                                user.last_message.id ?
+                                                    user.last_message.title :
+                                                    user.last_message.imageSend ?
+                                                        'Image attached' :
+                                                        user.last_message.substr(0, 22) + '...'}</Text>
+                                        </Body>
+                                        <Right style={{
+                                            borderBottomWidth: 1,
+                                        }}>
+                                            {new Date(user.last_time).getMonth() !== new Date().getMonth() ? (
                                                 <Text note>
-                                                    {new Date(user.last_time).getDay() !== new Date().getDay() ? (
-                                                        this.getDay(new Date(user.last_time).getDay())
-                                                    ) : null}
-                                                    {new Date(user.last_time).getHours() < 10 ? '0' : null}
-                                                    {new Date(user.last_time).getHours()}
-                                                    {'.'}
-                                                    {new Date(user.last_time).getMinutes() < 10 ? '0' : null}
-                                                    {new Date(user.last_time).getMinutes()}
+                                                    {new Date(user.last_time).getDate()}/
+                                                    {new Date(user.last_time).getMonth()}/
+                                                    {new Date(user.last_time).getFullYear()}
                                                 </Text>
-                                            )}
-                                    </Right>
-                                </ListItem>
-                            ))
-                                :
-                                <NotFound m="No Messages Found" />
-                            }
-                        </ScrollView>
-                    }
-                </View>
+                                            ) : (
+                                                    <Text note>
+                                                        {new Date(user.last_time).getDay() !== new Date().getDay() ? (
+                                                            this.getDay(new Date(user.last_time).getDay())
+                                                        ) : null}
+                                                        {new Date(user.last_time).getHours() < 10 ? '0' : null}
+                                                        {new Date(user.last_time).getHours()}
+                                                        {'.'}
+                                                        {new Date(user.last_time).getMinutes() < 10 ? '0' : null}
+                                                        {new Date(user.last_time).getMinutes()}
+                                                    </Text>
+                                                )}
+                                        </Right>
+                                    </ListItem>
+                                ))}
+                            </ScrollView>
+                            :
+                            <NotFound m={strings.NoMessage} />
+                        }
+                    </View>
+                }
             </ScreenBase>
         );
     }

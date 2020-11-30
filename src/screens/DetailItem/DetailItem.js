@@ -53,7 +53,7 @@ function Home(props) {
     }, [detail]);
 
     const checkInHistory = (ps) => {
-        if (profile.data.uid !== detail.uid)
+        if (profile.data.uid && (profile.data.uid !== detail.uid))
             fDB.ref('history/' + profile.data.uid)
                 .child(ps.id)
                 .set({ ...ps, history_at: Date.now() })
@@ -318,10 +318,12 @@ function Home(props) {
                     <Modal visible={gallery} transparent={true} animationType="slide">
                         <StatusBar backgroundColor="#000" />
                         <ImageViewer
+                            onSwipeDown={() => setGallery(false)}
+                            enableSwipeDown
                             renderHeader={() => {
                                 return (
                                     <Pressable onPress={() => setGallery(false)} style={{ justifyContent: 'flex-end', flexDirection: 'row', paddingRight: 25 }}>
-                                        <Icon style={{ color: '#f05454', fontSize: 38, alignSelf: 'center' }} name="close" />
+                                        <Icon style={{ color: primeColor, fontSize: 38, alignSelf: 'center' }} name="close" />
                                     </Pressable>
                                 )
                             }}

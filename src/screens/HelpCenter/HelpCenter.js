@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, Text, View } from 'native-base'
 import ScreenBase from '../../elements/SecreenBase'
-import { StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { StyleSheet, TouchableOpacity, ScrollView, Pressable, Linking } from 'react-native'
 import { primeColor } from '../../configs/color'
 import strings from '../../assets/Dictionary'
 
@@ -28,7 +28,11 @@ export default function HelpCenter({ navigation }) {
                     <View style={{ paddingHorizontal: 20, marginVertical: 12 }}>
                         <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>Kami di sini untuk kamu!</Text>
                         <Text style={{ textAlign: 'justify' }}>Setiap kamu butuh bantuan atau memiliki pertanyaan mengenai Taruhe, kamu bisa menghubungi kami melalui:</Text>
-                        <Text style={{ alignSelf: 'center', marginTop: 28 }}>contact.taruhe@gmail.com</Text>
+                        <Pressable onPress={() => Linking.openURL('mailto:contact.taruhe@gmail.com')} style={{ paddingVertical: 12 }}>
+                            <Text style={{ alignSelf: 'center', marginTop: 28, textDecorationLine: 'underline' }}>
+                                contact.taruhe@gmail.com
+                        </Text>
+                        </Pressable>
                     </View>
                 </ScrollView>
             </View>

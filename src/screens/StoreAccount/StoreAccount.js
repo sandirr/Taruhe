@@ -299,7 +299,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
     const { data, following } = profile;
     useEffect(() => {
         if (type === 'owner') {
-            setVisited({ photoURL: data.photoURL, username: data.username, storeName: data.storeName })
+            setVisited({ storePhotoURL: data.storePhotoURL, username: data.username, storeName: data.storeName })
         } else {
             let followed = following.filter(f => f.uid === uid);
             if (followed.length) {
@@ -340,9 +340,9 @@ const Store = ({ navigation, route, handleToEdit }) => {
             .child(data.uid)
             .update(newData)
             .then(() => {
-                Alert.alert('Sukses', 'Perubahan tersimpan, mungkin aplikasi perlu di refresh untuk melihat perubahan');
+                Alert.alert(strings.Success)
                 profile.data = newData;
-                setVisited({ photoURL: newData.photoURL, username: newData.username, storeName: newData.storeName })
+                setVisited({ ...visited, storePhotoURL: newData.storePhotoURL })
             }).catch(err => {
                 Alert.alert(err.code, err.message)
             })
@@ -381,7 +381,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
             .put(file)
             .then(snapshot => snapshot.ref.getDownloadURL())
             .then(url => {
-                updateData({ ...data, photoURL: url })
+                updateData({ ...data, storePhotoURL: url })
             })
             .catch(error => {
                 Alert.alert(error.code, error.message);
@@ -485,7 +485,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
 
                             <View style={styles.avatarContainer}>
                                 <Thumbnail
-                                    source={visited.photoURL ? { uri: visited.photoURL } : require('../../assets/images/storefront.png')}
+                                    source={visited.storePhotoURL ? { uri: visited.storePhotoURL } : require('../../assets/images/storefront.png')}
                                     style={{ height: 120, width: 120 }}
                                 />
                                 {uid === profile.data.uid &&
@@ -659,7 +659,10 @@ const Store = ({ navigation, route, handleToEdit }) => {
                         <Text style={styles.modalText}>{strings.EditY}</Text>
                     </Pressable>
                     <View style={{ backgroundColor: 'gray', height: 2 }} />
-                    <Pressable onPress={() => navigation.replace(strings.Menu1)}
+                    <Pressable onPress={() => {
+                        setModalVisible(false)
+                        navigation.replace(strings.Menu1)
+                    }}
                         style={{
                             flexDirection: 'row',
                             alignItems: 'center',
@@ -696,7 +699,7 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     banner: (scrollA) => ({
-        height: screenHeight * 0.46,
+        height: screenHeight * 0.50,
         width: '100%',
         position: 'relative',
         transform: [
@@ -748,12 +751,13 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#fff',
         textDecorationLine: 'underline',
+        marginTop: -3
     },
     contactContainer: {
         alignItems: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 16
+        marginTop: 8
     },
     userInfo: { alignItems: 'center', marginTop: 10 },
     toConnect: {

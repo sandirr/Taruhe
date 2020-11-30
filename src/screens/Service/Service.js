@@ -139,32 +139,32 @@ export default function Service({ navigation }) {
 
 export const DataList = ({ whenScroll, data, navigation, refreshing, onRefresh }) => {
   return (
-    <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, }}>
-      <ScrollView
-        onScroll={(e) => whenScroll(e)}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View
-          style={{
-            paddingHorizontal: 20,
-            paddingTop: 25,
-            paddingBottom: 50,
-            flexDirection: "row",
-            flexWrap: "wrap",
-          }}
-        >
-          {data.length ?
-            data.map((item) => (
-              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} type="lebar" />
-            ))
-            :
-            <NotFound />
+    <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18 }}>
+      {data.length ?
+        <ScrollView
+          onScroll={(e) => whenScroll(e)}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-        </View>
-      </ScrollView>
+        >
+          <View
+            style={{
+              paddingHorizontal: 20,
+              paddingTop: 25,
+              paddingBottom: 50,
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
+          >
+            {data.map((item) => (
+              <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} type="lebar" />
+            ))}
+          </View>
+        </ScrollView>
+        :
+        <NotFound />
+      }
     </View>
   );
 };

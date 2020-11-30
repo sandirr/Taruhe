@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { Dimensions, Image, StyleSheet, TouchableOpacity, Pressable, Modal, Linking, Alert, Share, TouchableWithoutFeedback } from 'react-native'
-import { Icon, Text, View, List, ListItem, Left, Body, Right, Thumbnail, Button } from 'native-base'
+import { Image, StyleSheet, TouchableOpacity, Pressable, Modal, Linking, Alert, Share, TouchableWithoutFeedback } from 'react-native'
+import { Icon, Text, View, List, ListItem, Left, Body, Thumbnail, Button } from 'native-base'
 import strings from '../../assets/Dictionary'
 import { primeColor } from '../../configs/color'
 import FooterTabs from '../../elements/FooterTabs/FooterTabs'
@@ -10,8 +10,6 @@ import { profile } from '../../configs/profile'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ScrollView } from 'react-native-gesture-handler'
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
 export default function Account({ navigation }) {
     const { data } = profile;
     const [permission, setPermission] = useState(false)
@@ -29,7 +27,7 @@ export default function Account({ navigation }) {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 55 }}>
                 <View style={styles.root}>
                     <View style={styles.photoThumb}>
-                        <View style={styles.profileThumb}>
+                        <Pressable onPress={() => navigation.navigate('Profile')} style={styles.profileThumb}>
                             {data?.photoURL ?
                                 <Thumbnail
                                     source={{ uri: data?.photoURL }}
@@ -37,11 +35,11 @@ export default function Account({ navigation }) {
                                 /> :
                                 <Icon name="person-circle" style={{ fontSize: 60 }} />
                             }
-                            <Pressable onPress={() => navigation.navigate('Profile')} style={{ marginLeft: 10, marginTop: -5 }}>
+                            <View style={{ marginLeft: 10, marginTop: -5 }}>
                                 <Text style={styles.storeName}>{data?.username}</Text>
                                 <Text style={styles.toProfile}>{strings.VEP}</Text>
-                            </Pressable>
-                        </View>
+                            </View>
+                        </Pressable>
                         <TouchableOpacity onPress={() => navigation.navigate('AccountSetting')}>
                             <Icon name="settings-outline" style={{ color: '#fff' }} />
                         </TouchableOpacity>
@@ -53,7 +51,7 @@ export default function Account({ navigation }) {
                     <Image
                         source={require('../../assets/images/storefront.png')}
                         tintColor={primeColor}
-                        style={{ height: 42, width: 42 }}
+                        style={{ height: 34, width: 34 }}
                     />
 
                     <Text style={styles.myStoreStr}>{strings.MyStore}</Text>
@@ -282,7 +280,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 10,
+        paddingVertical: 12,
         marginTop: -36
     },
     myStoreStr: {

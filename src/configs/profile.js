@@ -4,5 +4,6 @@ export let profile = {
     wishlistData: [],
     following: [],
     history: [],
-    others: {}
+    others: {},
+    loadData: true
 }

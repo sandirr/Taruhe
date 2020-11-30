@@ -133,7 +133,11 @@ const strings = new LocalizedStrings({
     RemovedFWish: 'Dihapus dari wishlist',
     AddedTWish: 'Ditambahkan ke wishlist',
 
-    Next: 'Selanjutnya'
+    Next: 'Selanjutnya',
+
+    NoData: 'Data tidak ditemukan',
+    Sorry: 'Maaf',
+    NoMessage: 'Belum ada pesan'
   },
   en: {
     Menu1: "Home",
@@ -267,7 +271,11 @@ const strings = new LocalizedStrings({
     RemovedFWish: 'Removed from wishlist',
     AddedTWish: 'Added to wishlist',
 
-    Next: 'Next'
+    Next: 'Next',
+
+    NoData: 'No Data Found',
+    Sorry: 'Sorry',
+    NoMessage: 'No Message'
   },
 });
 

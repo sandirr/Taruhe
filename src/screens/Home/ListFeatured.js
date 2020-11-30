@@ -17,8 +17,8 @@ export default class ListFeatured extends Component {
     this.state = {
       search: "",
       sliderIndex: 0,
-      maxSlider: 2,
       banners: [],
+      forScroll: true
     };
   }
 
@@ -27,7 +27,7 @@ export default class ListFeatured extends Component {
   };
 
   scrollToIndex = (index, animated) => {
-    this.listRef && this.listRef.scrollToIndex({ index, animated });
+    this.listRef && this.listRef?.scrollToIndex({ index, animated });
   };
 
   componentDidUpdate(prevProps) {
@@ -39,19 +39,18 @@ export default class ListFeatured extends Component {
   componentDidMount() {
     setInterval(
       function () {
-        if (this.state.banners.length > 1) {
-          const { sliderIndex, maxSlider } = this.state;
+        if (this.state.banners.length > 1 && this.state.forScroll) {
+          const { sliderIndex } = this.state;
           let nextIndex = 0;
 
-          if (sliderIndex < maxSlider) {
+          if (sliderIndex < (this.state.banners.length - 1)) {
             nextIndex = sliderIndex + 1;
           }
-
           this.scrollToIndex(nextIndex, true);
           this.setState({ sliderIndex: nextIndex });
         }
       }.bind(this),
-      3000
+      4000
     );
   }
   render() {
@@ -80,8 +79,14 @@ export default class ListFeatured extends Component {
             let sliderIndex = event.nativeEvent.contentOffset.x
               ? Math.ceil(event.nativeEvent.contentOffset.x / screenWidth)
               : 0;
-            this.setState({ sliderIndex });
+            this.setState({ sliderIndex, forScroll: false });
           }
+        }}
+        onScrollToIndexFailed={info => {
+          const wait = new Promise(resolve => setTimeout(resolve, 500));
+          wait.then(() => {
+            this.componentDidMount()
+          });
         }}
       />
     );

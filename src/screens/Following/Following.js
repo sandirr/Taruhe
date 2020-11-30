@@ -57,14 +57,14 @@ export default function Following({ navigation }) {
                 <LoadData />
                 :
                 <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                        refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                        }
-                    >
-                        {Following.length ?
-                            Following.map((item) => (
+                    {Following.length ?
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                            }
+                        >
+                            {Following.map((item) => (
                                 <ListItem avatar onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: item.uid })}>
                                     <Left>
                                         <Thumbnail source={{
@@ -81,10 +81,11 @@ export default function Following({ navigation }) {
                                     </Body>
                                 </ListItem>
                             ))
-                            :
-                            <NotFound />
-                        }
-                    </ScrollView>
+                            }
+                        </ScrollView>
+                        :
+                        <NotFound />
+                    }
                 </View>
             }
             <EtcAct
@@ -99,7 +100,6 @@ export default function Following({ navigation }) {
 const styles = StyleSheet.create({
     scrollContainer: {
         display: "flex",
-
         paddingBottom: 75,
     },
 });

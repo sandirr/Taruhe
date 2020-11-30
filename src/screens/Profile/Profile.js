@@ -10,12 +10,11 @@ import { fAuth, fDB, fStorage } from '../../configs/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Profile({ navigation }) {
-    const { data } = profile;
     const [passwordVisible, setPasswordVisisble] = useState(false);
     const [profileData, setProfileData] = useState({})
     useEffect(() => {
-        setProfileData(data)
-    }, [])
+        setProfileData(profile.data)
+    }, [profile.data])
     const [modalVisible, setModalVisible] = useState('');
     const [imageUri, setImageUri] = useState({ uri: '' })
     const [inputValue, setInputValue] = useState('')
@@ -43,7 +42,6 @@ export default function Profile({ navigation }) {
                                 setProfileData({ ...profileData, email: cE.email })
                                 updateData({ ...profileData, email: cE.email })
                                 removeUid()
-                                profile.data = {}
                                 fAuth.currentUser.sendEmailVerification()
                                 Alert.alert('Success', `Please check your email ${cE.email} inbox to verify your new email`)
                                 fAuth.signOut().then(function () {
@@ -70,7 +68,6 @@ export default function Profile({ navigation }) {
                             setProfileData({ ...profileData, password: cP.newPassword })
                             updateData({ ...profileData, password: cP.newPassword })
                             removeUid()
-                            profile.data = {}
                             fAuth.currentUser.sendEmailVerification()
                             Alert.alert('Success', `Password berhasil diubah`)
                             fAuth.signOut().then(function () {
@@ -85,7 +82,6 @@ export default function Profile({ navigation }) {
         } else {
             if (inputValue.toString().length) {
                 updateData({ ...profileData, [modalVisible.toLowerCase()]: inputValue })
-                setProfileData({ ...profileData, [modalVisible.toLowerCase()]: inputValue })
             } else {
                 Alert.alert('Isi Input', 'Inputan tidak boleh kosong')
             }
@@ -99,7 +95,6 @@ export default function Profile({ navigation }) {
             .then(() => {
                 setModalVisible('')
                 setImageUri({ uri: '' })
-                profile.data = data
             }).catch(err => {
                 Alert.alert(err.code, err.message)
             })

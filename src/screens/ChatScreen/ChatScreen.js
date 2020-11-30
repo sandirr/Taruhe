@@ -1,8 +1,8 @@
 import { Body, Icon, Input, Left, List, ListItem, Right, Text, Thumbnail } from 'native-base';
 import React, { Component } from 'react';
-import { Alert, FlatList, Linking, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Image, Linking, Modal, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { primeColor } from '../../configs/color';
-import { fDB } from '../../configs/firebase';
+import { fDB, fStorage } from '../../configs/firebase';
 import Geolocation from '@react-native-community/geolocation';
 import ScreenBase from '../../elements/SecreenBase';
 import { profile } from '../../configs/profile';
@@ -10,6 +10,9 @@ import MapView from 'react-native-maps';
 import { ScrollView } from 'react-native-gesture-handler';
 import { parser } from '../../configs/helper';
 import strings from '../../assets/Dictionary';
+import ImagePicker from 'react-native-image-picker';
+import ImageViewer from './ImageViewer';
+import EtcAct from '../../elements/EtcAct';
 
 class ChatSCreen extends Component {
     state = {
@@ -26,6 +29,8 @@ class ChatSCreen extends Component {
                 uri:
                     'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-user-30452.png',
             },
+        modalVisible: '',
+        etcAct: false
     };
 
     componentDidMount() {
@@ -67,28 +72,6 @@ class ChatSCreen extends Component {
         ] = message;
         this.state.dbRef.update(updates);
         this.setState({ textMessage: '' });
-    };
-    sendMessage = () => {
-        if (this.state.textMessage.length > 0) {
-            let msgId = this.state.dbRef
-                .child(`${profile.data.uid}`)
-                .child(this.state.person.uid)
-                .push().key;
-            let updates = {};
-            let message = {
-                message: this.state.textMessage,
-                time: new Date().toISOString(),
-                from: profile.data.uid,
-            };
-            updates[
-                `${profile.data.uid}` + '/' + this.state.person.uid + '/' + msgId
-            ] = message;
-            updates[
-                this.state.person.uid + '/' + `${profile.data.uid}` + '/' + msgId
-            ] = message;
-            this.state.dbRef.update(updates);
-            this.setState({ textMessage: '' });
-        }
     };
     convertTime = time => {
         let d = new Date(time);
@@ -139,6 +122,64 @@ class ChatSCreen extends Component {
             );
         }, err => {
             Alert.alert(strings.LocationNF, strings.PAYL)
+        });
+    };
+
+
+    uploadImage = () => {
+        const options = {
+            quality: 0.5,
+            allowsEditing: true,
+            mediaType: 'photo',
+            noData: true,
+            storageOptions: {
+                skipBackup: true,
+                waitUntilSaved: true,
+                path: 'images',
+                cameraRoll: true,
+            },
+        };
+        ImagePicker.showImagePicker(options, (response) => {
+            if (response.didCancel) {
+                // console.log('User cancelled image picker');
+            } else if (response.error) {
+                // console.log('ImagePicker Error: ', response.error);
+            } else if (response.customButton) {
+                // console.log('User tapped custom button: ', response.customButton);
+            } else {
+                this.uploadFile(response.uri)
+            }
+        })
+    }
+    uploadFile = async (uri) => {
+        const file = await this.uriToBlob(uri)
+        const extArr = file._data.name.split('.')
+        const ext = extArr[extArr.length - 1]
+        fStorage
+            .ref(`chat_screen/${Date.now()}.${ext}`)
+            .put(file)
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then(url => {
+                this.sendCustomMessage({ imageSend: url })
+                // updateData({ ...data, storePhotoURL: url })
+            })
+            .catch(error => {
+                Alert.alert(error.code, error.message);
+            })
+    };
+    uriToBlob = uri => {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+                resolve(xhr.response);
+            };
+            xhr.onerror = function () {
+                reject(new Error('Upload Image Failed'));
+            };
+
+            xhr.responseType = 'blob';
+            xhr.open('GET', uri, true);
+            xhr.send(null);
         });
     };
 
@@ -326,6 +367,78 @@ class ChatSCreen extends Component {
                     </View>
                 );
             }
+        } else if (item.message.imageSend) {
+            if (item.from === profile.data.uid) {
+                return (
+                    <View style={{ marginBottom: 5 }}>
+                        <Pressable
+                            onPress={() => this.setState({ modalVisible: item.message.imageSend })}
+                            style={{
+                                flex: 1,
+                                paddingHorizontal: 10,
+                                paddingVertical: 8,
+                                borderRadius: 15,
+                                alignSelf: 'flex-end',
+                                width: '70%',
+                                height: 200
+                            }}>
+                            <Image source={{ uri: item.message.imageSend }}
+                                style={{
+                                    height: null,
+                                    width: null,
+                                    resizeMode: 'contain',
+                                    flex: 1,
+                                    borderRadius: 26,
+                                }}
+                            />
+                            <Text
+                                note
+                                style={{
+                                    alignSelf: 'flex-end',
+                                    fontSize: 12,
+                                    color: '#000'
+                                }}>
+                                {this.convertTime(item.time)}
+                            </Text>
+                        </Pressable>
+                    </View>
+                );
+            } else if (item.from !== profile.data.uid) {
+                return (
+                    <View style={{ marginBottom: 5 }}>
+                        <Pressable
+                            onPress={() => this.setState({ modalVisible: item.message.imageSend })}
+                            style={{
+                                flex: 1,
+                                paddingHorizontal: 10,
+                                paddingVertical: 8,
+                                borderRadius: 15,
+                                alignSelf: 'flex-start',
+                                width: '70%',
+                                height: 200
+                            }}>
+                            <Image source={{ uri: item.message.imageSend }}
+                                style={{
+                                    height: null,
+                                    width: null,
+                                    resizeMode: 'contain',
+                                    flex: 1,
+                                    borderRadius: 26,
+                                }}
+                            />
+                            <Text
+                                note
+                                style={{
+                                    alignSelf: 'flex-start',
+                                    fontSize: 12,
+                                    color: '#000'
+                                }}>
+                                {this.convertTime(item.time)}
+                            </Text>
+                        </Pressable>
+                    </View>
+                );
+            }
         } else {
             return (
                 <Pressable avatar style={{
@@ -365,7 +478,7 @@ class ChatSCreen extends Component {
                     justifyContent: 'space-between'
                 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ListChat', { reload: true })}>
                             <Icon name="caret-back" style={{ color: primeColor, fontSize: 26 }} />
                         </TouchableOpacity>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 15 }}>
@@ -376,7 +489,7 @@ class ChatSCreen extends Component {
                             </View>
                         </View>
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => this.setState({ etcAct: true })}>
                         <Icon name="ellipsis-vertical" style={{ color: primeColor, fontSize: 26 }} />
                     </TouchableOpacity>
                 </View>
@@ -413,6 +526,17 @@ class ChatSCreen extends Component {
                         }}>
                         <Icon name="compass" style={{ color: primeColor, marginLeft: 4 }} />
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={this.uploadImage}
+                        style={{
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            height: 30,
+                            width: 30,
+                            marginRight: 10,
+                        }}>
+                        <Icon name="camera" style={{ color: primeColor, marginLeft: 4 }} />
+                    </TouchableOpacity>
                     <Input
                         multiline
                         style={{
@@ -428,7 +552,10 @@ class ChatSCreen extends Component {
                         onChangeText={this.handleChangeText('textMessage')}
                     />
                     <TouchableOpacity
-                        onPress={this.sendMessage}
+                        onPress={() => {
+                            if (this.state.textMessage)
+                                this.sendCustomMessage(this.state.textMessage)
+                        }}
                         style={{
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -439,6 +566,13 @@ class ChatSCreen extends Component {
                         <Icon name="send" style={{ color: primeColor }} />
                     </TouchableOpacity>
                 </View>
+
+                <ImageViewer modalVisible={this.state.modalVisible} closeModal={() => this.setState({ modalVisible: '' })} />
+                <EtcAct
+                    modalVisible={this.state.etcAct}
+                    openEtc={(e) => this.setState({ etcAct: e })}
+                    navigation={navigation}
+                />
             </ScreenBase>
         )
     }

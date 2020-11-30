@@ -23,7 +23,6 @@ import ForgotPassword from "./screens/ForgotPassword";
 import { profile } from "./configs/profile";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import WishList from "./screens/WishList";
-import EtcAct from "./elements/EtcAct";
 import Following from "./screens/Following";
 import History from "./screens/History";
 import About from "./screens/About";
@@ -33,13 +32,12 @@ const Stack = createStackNavigator();
 const AppStack = createStackNavigator();
 
 const AppFeature = () => {
-  const [isUser, setIsUser] = useState(true)
+  const [isUser, setIsUser] = useState(false)
   useEffect(() => {
     fAuth.onAuthStateChanged(function (user) {
       if (user) {
         fDB.ref('users/' + user.uid).on('value', val => {
           profile.data = val.val()
-          setIsUser(true)
         })
         fDB.ref('wishlist/' + user.uid).on('value', val => {
           if (val.val()) {
@@ -66,18 +64,21 @@ const AppFeature = () => {
           if (val.val())
             profile.others = val.val()
         })
+        profile.loadData = false
+        setIsUser(true)
       } else {
         profile.data = {}
         profile.wishlistData = []
         profile.wishlist = []
         profile.following = []
+        profile.loadData = false
         setIsUser(false)
         AsyncStorage.clear()
       }
     });
   }, [])
   return (
-    <AppStack.Navigator>
+    <AppStack.Navigator initialRouteName={strings.Menu2}>
       <AppStack.Screen
         name={strings.Menu1}
         component={Home}

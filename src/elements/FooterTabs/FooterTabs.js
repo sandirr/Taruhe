@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { Container, View, Text } from "native-base";
+import { Text } from "native-base";
 import {
-  Dimensions,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   Animated,
@@ -10,6 +8,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import strings from "../../assets/Dictionary";
 import { primeColor } from "../../configs/color";
+import { profile } from "../../configs/profile";
 
 const styles = StyleSheet.create({
   menuContainer: {
@@ -32,14 +31,14 @@ const styles = StyleSheet.create({
 });
 const iconSize = 24;
 export default function FooterTabs(props) {
-  const { screen, children, navigation, direction = "up" } = props;
+  const { screen, navigation, direction = "up" } = props;
   const [fadeAnim] = React.useState(new Animated.Value(0));
   const [listMenu, setListMenu] = useState([
     { title: strings.Menu1, icon: "home" },
     { title: strings.Menu2, icon: "cube" },
     { title: strings.Menu3, icon: "people" },
     { title: strings.Menu4, icon: "trail-sign" },
-    { title: strings.Menu5, icon: "person-circle" },
+    { title: strings.Menu5, icon: "person-circle" }
   ])
   React.useEffect(() => {
     if (direction === "up")
@@ -57,8 +56,10 @@ export default function FooterTabs(props) {
     <Animated.View style={[styles.menuContainer, { marginBottom: fadeAnim }]}>
       {listMenu.map((menu) => (
         <TouchableOpacity
+          disabled
           style={styles.menuItem}
           key={menu.title}
+          disabled={menu.title === strings.Menu5 && profile.loadData}
           onPress={() => navigation.navigate(menu.title)}
         >
           <Ionicons

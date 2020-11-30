@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Tabs, Tab, Text } from "native-base";
 import { ScrollView, View, StyleSheet, RefreshControl } from "react-native";
-import strings from "../../assets/Dictionary";
 import ScreenBase from "../../elements/SecreenBase";
 import Header from "../../elements/Header";
 import EtcAct from "../../elements/EtcAct";
 import ProductItem from "../../elements/ProductItem";
-import { fDB } from "../../configs/firebase";
 import { wait } from '../../configs/helper';
 import LoadData from "../../elements/LoadData";
 import NotFound from "../../elements/NotFound";
@@ -53,36 +50,38 @@ export default function WishList({ navigation }) {
                 searchValue={search}
                 onChangeSearch={(e) => setSearch(e)}
             />
-            <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
-                {loading ?
-                    <LoadData />
-                    :
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                        refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                        }
-                    >
-                        <View
-                            style={{
-                                paddingHorizontal: 20,
-                                paddingTop: 25,
-                                paddingBottom: 50,
-                                flexDirection: "row",
-                                flexWrap: "wrap",
-                            }}
+            {loading ?
+                <LoadData />
+                :
+                <View style={{ flex: 1, backgroundColor: '#f3f3f3', borderTopLeftRadius: 18, borderTopRightRadius: 18, marginTop: 10 }}>
+                    {WishList.length ?
+                        <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                            }
                         >
-                            {WishList.length ?
-                                WishList.map((item) => (
+                            <View
+                                style={{
+                                    paddingHorizontal: 20,
+                                    paddingTop: 25,
+                                    paddingBottom: 50,
+                                    flexDirection: "row",
+                                    flexWrap: "wrap",
+                                }}
+                            >
+                                {WishList.map((item) => (
                                     <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
                                 ))
-                                :
-                                <NotFound />
-                            }
-                        </View>
-                    </ScrollView>
-                }
-            </View>
+
+                                }
+                            </View>
+                        </ScrollView>
+                        :
+                        <NotFound />
+                    }
+                </View>
+            }
             <EtcAct
                 modalVisible={modalVisible}
                 openEtc={(e) => setModalVisible(e)}
