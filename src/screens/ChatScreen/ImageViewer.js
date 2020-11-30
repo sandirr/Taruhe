@@ -1,4 +1,4 @@
-import { Image, Modal, Pressable, TouchableWithoutFeedback } from "react-native";
+import { Image, Modal, Pressable, StatusBar, TouchableWithoutFeedback } from "react-native";
 import React, { Component } from 'react';
 import { Icon, View } from "native-base";
 import { primeColor } from "../../configs/color";
@@ -13,6 +13,7 @@ class ImageViewer extends Component {
                 onRequestClose={() => this.props.closeModal()}
                 visible={this.props.modalVisible ? true : false}
             >
+                <StatusBar backgroundColor="#000" />
                 <TouchableWithoutFeedback onPress={() => this.props.closeModal()}>
                     <View style={{
                         position: "absolute",
