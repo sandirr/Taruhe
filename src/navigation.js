@@ -78,7 +78,7 @@ const AppFeature = () => {
     });
   }, [])
   return (
-    <AppStack.Navigator initialRouteName={strings.Menu2}>
+    <AppStack.Navigator initialRouteName={strings.Menu1}>
       <AppStack.Screen
         name={strings.Menu1}
         component={Home}
