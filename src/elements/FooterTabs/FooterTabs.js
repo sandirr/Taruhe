@@ -33,7 +33,7 @@ const iconSize = 24;
 export default function FooterTabs(props) {
   const { screen, navigation, direction = "up" } = props;
   const [fadeAnim] = React.useState(new Animated.Value(0));
-  const [listMenu, setListMenu] = useState([
+  const [listMenu] = useState([
     { title: strings.Menu1, icon: "home" },
     { title: strings.Menu2, icon: "cube" },
     { title: strings.Menu3, icon: "people" },

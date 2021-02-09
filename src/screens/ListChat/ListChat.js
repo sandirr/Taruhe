@@ -117,7 +117,7 @@ export default class ListChat extends Component {
                                     <ListItem avatar onPress={() => navigation.replace('ChatScreen', { data: user })}>
                                         <Left>
                                             <Thumbnail source={{
-                                                uri: user.photoURL ||
+                                                uri: user.storePhotoURL ||
                                                     'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-user-30452.png'
                                             }} />
                                         </Left>

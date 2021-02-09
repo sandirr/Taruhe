@@ -68,7 +68,7 @@ export default function Following({ navigation }) {
                                 <ListItem avatar onPress={() => navigation.navigate('StoreAccount', { type: 'visitor', uid: item.uid })}>
                                     <Left>
                                         <Thumbnail source={{
-                                            uri: item.photoURL ||
+                                            uri: item.storePhotoURL ||
                                                 'https://cdn.iconscout.com/icon/free/png-256/account-profile-avatar-man-circle-round-item-30452.png'
                                         }} />
                                     </Left>

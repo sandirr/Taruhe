@@ -258,13 +258,13 @@ function Home(props) {
                             </View>
 
                             <View style={{ marginTop: 21 }}>
-                                <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 16, paddingHorizontal: 28, alignItems: 'center' }}>
-                                    <View style={{ flexDirection: 'row' }}>
+                                <View style={{ backgroundColor: '#ccc', borderRadius: 50, flexDirection: 'row', justifyContent: 'space-between', padding: 16, alignItems: 'center' }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Image
-                                            source={require('../../assets/images/sarung.jpg')}
+                                            source={detailUser.storePhotoURL || require('../../assets/images/noimage.jpg')}
                                             style={{ height: 45, width: 45, borderRadius: 50, marginLeft: 6 }}
                                         />
-                                        <View style={{ marginLeft: 10 }}>
+                                        <View style={{ marginLeft: 10, alignItems: 'center' }}>
                                             {detailUser.uid &&
                                                 <TouchableOpacity onPress={() => {
                                                     if (profile.data.uid === detailItem.uid) {
@@ -272,8 +272,9 @@ function Home(props) {
                                                     } else {
                                                         navigation.navigate('StoreAccount', { type: 'visitor', uid: detailItem.uid })
                                                     }
-                                                }}>
-                                                    <Text style={{ fontSize: 20, color: '#555' }}>{detailUser.storeName}</Text>
+                                                }}
+                                                >
+                                                    <Text style={{ fontSize: 16, color: '#555', fontWeight: 'bold', width: screenWidth * 0.45, height: 22 }}>{detailUser.storeName}</Text>
                                                     <Text style={{ fontSize: 12, color: '#555', textDecorationLine: 'underline', marginTop: -5 }}>{detailUser.username}</Text>
                                                 </TouchableOpacity>
                                             }
@@ -306,7 +307,7 @@ function Home(props) {
                                     >
                                         <Marker
                                             coordinate={{ latitude: 0.7893, longitude: 113.9213 }}
-                                            title="Kalea Official"
+                                            title={detailItem.storeName}
                                         >
                                         </Marker>
                                     </MapView>

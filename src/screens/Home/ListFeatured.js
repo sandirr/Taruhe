@@ -37,27 +37,29 @@ export default class ListFeatured extends Component {
   }
 
   componentDidMount() {
-    setInterval(
-      function () {
-        if (this.state.banners.length > 1 && this.state.forScroll) {
-          const { sliderIndex } = this.state;
-          let nextIndex = 0;
-
-          if (sliderIndex < (this.state.banners.length - 1)) {
-            nextIndex = sliderIndex + 1;
-          }
-          this.scrollToIndex(nextIndex, true);
-          this.setState({ sliderIndex: nextIndex });
-        }
-      }.bind(this),
-      4000
-    );
+    this.handleScrollH()
   }
+
+  handleScrollH = () => {
+    setInterval(() => {
+      if (this.props.data.length > 1) {
+        const { sliderIndex } = this.state;
+        let nextIndex = 0;
+
+        if (sliderIndex < (this.props.data.length - 1)) {
+          nextIndex = sliderIndex + 1;
+        }
+        this.scrollToIndex(nextIndex, true);
+        this.setState({ sliderIndex: nextIndex });
+      }
+    }, 3000);
+  }
+
   render() {
     return (
       <FlatList
         ref={this.setRef}
-        data={this.state.banners}
+        data={this.props.data}
         horizontal={true}
         pagingEnabled={true}
         keyExtractor={(item) => item.imagesURL[0].uri}
@@ -75,17 +77,17 @@ export default class ListFeatured extends Component {
           );
         }}
         onMomentumScrollEnd={(event) => {
-          if (this.state.banners.length > 1) {
+          if (this.props.data.length > 1) {
             let sliderIndex = event.nativeEvent.contentOffset.x
               ? Math.ceil(event.nativeEvent.contentOffset.x / screenWidth)
               : 0;
             this.setState({ sliderIndex, forScroll: false });
           }
         }}
-        onScrollToIndexFailed={info => {
+        onScrollToIndexFailed={() => {
           const wait = new Promise(resolve => setTimeout(resolve, 500));
           wait.then(() => {
-            this.componentDidMount()
+            this.handleScrollH()
           });
         }}
       />

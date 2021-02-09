@@ -1,14 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, } from 'react';
 import { Dimensions, StyleSheet, Animated, LogBox, TouchableOpacity, RefreshControl } from 'react-native';
 import strings from '../../assets/Dictionary';
-import { Item, Input, Icon, View, Text, Spinner } from 'native-base';
+import { Item, Input, Icon, View, } from 'native-base';
 import { primeColor } from '../../configs/color';
 import ScreenBase from '../../elements/SecreenBase';
 import FooterTabs from '../../elements/FooterTabs/FooterTabs';
 import ListFeatured from "./ListFeatured";
 import ProductItem from '../../elements/ProductItem';
 import { fDB } from '../../configs/firebase';
-import { wait } from '../../configs/helper';
 import LoadData from '../../elements/LoadData';
 import NotFound from '../../elements/NotFound';
 
@@ -31,17 +30,17 @@ const Home = (props) => {
   const [dataSize, setDataSize] = useState(6)
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true)
-
   const [tourisms, setTourism] = useState([])
 
-  const onRefresh = useCallback(() => {
+
+  const onRefresh = () => {
     setRefreshing(true);
-    setDataSize(6)
-    wait(1000).then(() => setRefreshing(false));
-  }, []);
+    setDataSize(6, getData())
+  }
 
   useEffect(() => {
     getData()
+    getDataTou()
   }, [dataSize, search])
 
   const getData = () => {
@@ -49,7 +48,6 @@ const Home = (props) => {
       .limitToLast(dataSize)
       .on('value', (values) => {
         if (values.val()) {
-          let tourism = []
           let filteredItems = []
           Object.keys(values.val()).forEach((value) => {
             let newItem = values.val()[value];
@@ -57,17 +55,32 @@ const Home = (props) => {
             if (newItem.title.match(re)) {
               filteredItems.push(newItem);
             }
-            if ((newItem.category === 'Natural' || newItem.category === 'Cultural') && filteredItems.length <= 10) {
-              tourism.push(newItem)
-            }
           })
           setProductService(filteredItems)
-          setTourism(tourism)
         }
         setLoading(false)
+        setRefreshing(false)
       }, (error) => {
         Alert.alert(error.code)
         setLoading(false)
+        setRefreshing(false)
+      })
+  }
+  const getDataTou = () => {
+    fDB.ref('product_service')
+      .on('value', (values) => {
+        if (values.val()) {
+          let tourism = []
+          Object.keys(values.val()).forEach((value) => {
+            let newItem = values.val()[value];
+            if ((newItem.category === 'Natural' || newItem.category === 'Cultural') && tourism.length <= 10) {
+              tourism.push(newItem)
+            }
+          })
+          setTourism(tourism)
+        }
+      }, (error) => {
+        Alert.alert(error.code)
       })
   }
 
@@ -102,44 +115,46 @@ const Home = (props) => {
 
   return (
     <ScreenBase>
-      <View
-        style={[
-          styles.searchItem,
-          {
-            backgroundColor: bgSearch,
-          },
-          bgSearch === 'rgba(255,255,255,1)' ? styles.shadowSearch : null,
-        ]}
-      >
-        <Item
-          rounded
-          style={{
-            width: '75%',
-            backgroundColor: colorSearch,
-            borderColor: colorSearch,
-            height: 40,
-          }}
+      {tourisms.length > 0 &&
+        <View
+          style={[
+            styles.searchItem,
+            {
+              backgroundColor: bgSearch,
+            },
+            bgSearch === 'rgba(255,255,255,1)' ? styles.shadowSearch : null,
+          ]}
         >
-          <Icon active name="search-outline" style={{ color: primeColor }} />
-          <Input
-            placeholder={strings.Search}
-            placeholderTextColor={primeColor}
-            style={{ color: primeColor }}
-            value={search}
-            onChangeText={(e) => setSearch(e)}
-          />
-        </Item>
-        <TouchableOpacity onPress={() => navigation.navigate('WishList')}>
-          <Icon name="heart" style={{
-            color: iconSearch,
-          }} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('ListChat')}>
-          <Icon name="mail" style={{
-            color: iconSearch,
-          }} />
-        </TouchableOpacity>
-      </View>
+          <Item
+            rounded
+            style={{
+              width: '75%',
+              backgroundColor: colorSearch,
+              borderColor: colorSearch,
+              height: 40,
+            }}
+          >
+            <Icon active name="search-outline" style={{ color: primeColor }} />
+            <Input
+              placeholder={strings.Search}
+              placeholderTextColor={primeColor}
+              style={{ color: primeColor }}
+              value={search}
+              onChangeText={(e) => setSearch(e)}
+            />
+          </Item>
+          <TouchableOpacity onPress={() => navigation.navigate('WishList')}>
+            <Icon name="heart" style={{
+              color: iconSearch,
+            }} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('ListChat')}>
+            <Icon name="mail" style={{
+              color: iconSearch,
+            }} />
+          </TouchableOpacity>
+        </View>
+      }
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         onScroll={Animated.event(
@@ -216,7 +231,7 @@ const styles = StyleSheet.create({
     ],
   }),
   scrollView: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f3f3f3',
     borderTopLeftRadius: 18,
     borderTopRightRadius: 18,
     paddingTop: 25,

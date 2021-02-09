@@ -198,7 +198,7 @@ export const DataList = ({ whenScroll, data, navigation, refreshing, onRefresh }
           >
             {data.map((item) => (
               <ProductItem row={item} key={item.id} toDetail={() => navigation.navigate('DetailItem', { detail: item })} />
-            ))}
+            )).reverse()}
           </View>
         </ScrollView>
         :

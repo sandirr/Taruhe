@@ -349,7 +349,7 @@ const Store = ({ navigation, route, handleToEdit }) => {
     }
     const uploadImage = () => {
         const options = {
-            quality: 0.7,
+            quality: 0.3,
             allowsEditing: true,
             mediaType: 'photo',
             noData: true,

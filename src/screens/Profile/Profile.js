@@ -11,10 +11,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Profile({ navigation }) {
     const [passwordVisible, setPasswordVisisble] = useState(false);
-    const [profileData, setProfileData] = useState({})
-    useEffect(() => {
-        setProfileData(profile.data)
-    }, [profile.data])
     const [modalVisible, setModalVisible] = useState('');
     const [imageUri, setImageUri] = useState({ uri: '' })
     const [inputValue, setInputValue] = useState('')
@@ -27,7 +23,7 @@ export default function Profile({ navigation }) {
         if (modalVisible === 'Picture') {
             uploadFile()
         } else if (modalVisible === 'Change Email') {
-            if (cE.password !== profileData.password) {
+            if (cE.password !== profile.data.password) {
                 Alert.alert('Gagal', 'Password yang anda masukkan salah')
             } else if (!cE.email.length) {
                 Alert.alert('Gagal', 'Mohon masukkan email anda')
@@ -36,11 +32,10 @@ export default function Profile({ navigation }) {
                 if (b !== '@') {
                     Alert.alert('Email validation !', 'Wrong Email');
                 } else {
-                    fAuth.signInWithEmailAndPassword(profileData.email, profileData.password)
+                    fAuth.signInWithEmailAndPassword(profile.data.email, profile.data.password)
                         .then(() => {
                             fAuth.currentUser.updateEmail(cE.email).then(() => {
-                                setProfileData({ ...profileData, email: cE.email })
-                                updateData({ ...profileData, email: cE.email })
+                                updateData({ ...profile.data, email: cE.email })
                                 removeUid()
                                 fAuth.currentUser.sendEmailVerification()
                                 Alert.alert('Success', `Please check your email ${cE.email} inbox to verify your new email`)
@@ -57,16 +52,15 @@ export default function Profile({ navigation }) {
         } else if (modalVisible === 'Change Password') {
             if (!cP.newPassword.length || !cP.oldPassword) {
                 Alert.alert('Gagal', 'Lengkapi password anda')
-            } else if (cP.oldPassword !== profileData.password) {
+            } else if (cP.oldPassword !== profile.data.password) {
                 Alert.alert('Gagal', 'Password sebelumnya salah')
-            } else if (cP.newPassword === profileData.password) {
+            } else if (cP.newPassword === profile.data.password) {
                 Alert.alert('Gagal', 'Password baru tidak boleh sama dengan password sebelumnya')
             } else {
-                fAuth.signInWithEmailAndPassword(profileData.email, profileData.password)
+                fAuth.signInWithEmailAndPassword(profile.data.email, profile.data.password)
                     .then(() => {
                         fAuth.currentUser.updatePassword(cP.newPassword).then(() => {
-                            setProfileData({ ...profileData, password: cP.newPassword })
-                            updateData({ ...profileData, password: cP.newPassword })
+                            updateData({ ...profile.data, password: cP.newPassword })
                             removeUid()
                             fAuth.currentUser.sendEmailVerification()
                             Alert.alert('Success', `Password berhasil diubah`)
@@ -81,7 +75,7 @@ export default function Profile({ navigation }) {
             }
         } else {
             if (inputValue.toString().length) {
-                updateData({ ...profileData, [modalVisible.toLowerCase()]: inputValue })
+                updateData({ ...profile.data, [modalVisible.toLowerCase()]: inputValue })
             } else {
                 Alert.alert('Isi Input', 'Inputan tidak boleh kosong')
             }
@@ -90,9 +84,10 @@ export default function Profile({ navigation }) {
     const updateData = (data) => {
         fDB
             .ref('users')
-            .child(profileData.uid)
+            .child(profile.data.uid)
             .update(data)
             .then(() => {
+                profile.data = data
                 setModalVisible('')
                 setImageUri({ uri: '' })
             }).catch(err => {
@@ -101,7 +96,7 @@ export default function Profile({ navigation }) {
     }
     const uploadImage = () => {
         const options = {
-            quality: 0.7,
+            quality: 0.3,
             allowsEditing: true,
             mediaType: 'photo',
             noData: true,
@@ -131,13 +126,12 @@ export default function Profile({ navigation }) {
         const extArr = file._data.name.split('.')
         const ext = extArr[extArr.length - 1]
         fStorage
-            .ref(`profile_pictures/${profileData.uid}.${ext}`)
+            .ref(`profile_pictures/${profile.data.uid}.${ext}`)
             .put(file)
             .then(snapshot => snapshot.ref.getDownloadURL())
             .then(url => {
                 setImageUri({ uri: url })
-                updateData({ ...profileData, photoURL: url })
-                setProfileData({ ...profileData, photoURL: url })
+                updateData({ ...profile.data, photoURL: url })
             })
             .catch(error => {
                 setImageUri({ uri: '' })
@@ -185,9 +179,9 @@ export default function Profile({ navigation }) {
                             <Text>{strings.ProfilePicture}</Text>
                         </Left>
                         <Right>
-                            {profileData.photoURL ?
+                            {profile.data.photoURL ?
                                 <Thumbnail
-                                    source={{ uri: profileData.photoURL }}
+                                    source={{ uri: profile.data.photoURL }}
                                     style={{ height: 55, width: 55 }}
                                 /> :
                                 <Icon name="person-circle" style={{ fontSize: 55 }} />
@@ -196,7 +190,7 @@ export default function Profile({ navigation }) {
                     </ListItem>
                     <ListItem
                         onPress={() => {
-                            setInputValue(profileData.username)
+                            setInputValue(profile.data.username)
                             setModalVisible('Username')
                         }}
                         itemDivider
@@ -205,22 +199,22 @@ export default function Profile({ navigation }) {
                             <Text>{strings.username}</Text>
                         </Left>
                         <Right>
-                            <Text style={{ color: 'gray', marginLeft: -15 }}>{profileData.username}</Text>
+                            <Text style={{ color: 'gray', marginLeft: -15 }}>{profile.data.username}</Text>
                         </Right>
                     </ListItem>
                     <ListItem onPress={() => {
-                        setInputValue(profileData.gender)
+                        setInputValue(profile.data.gender)
                         setModalVisible('Gender')
                     }} itemDivider style={styles.menuItem}>
                         <Left>
                             <Text>{strings.Gender}</Text>
                         </Left>
                         <Right>
-                            <Text style={{ color: 'gray', marginLeft: -15 }}>{profileData.gender || '-'}</Text>
+                            <Text style={{ color: 'gray', marginLeft: -15 }}>{profile.data.gender || '-'}</Text>
                         </Right>
                     </ListItem>
                     <ListItem onPress={() => {
-                        setInputValue(profileData.birthday)
+                        setInputValue(profile.data.birthday)
                         setModalVisible('Birthday')
                     }} itemDivider
                         style={styles.menuItem}>
@@ -229,8 +223,8 @@ export default function Profile({ navigation }) {
                         </Left>
                         <Right>
                             <Text style={{ color: 'gray', marginLeft: -15 }}>
-                                {profileData.birthday ?
-                                    new Date(profileData.birthday).toISOString().substring(0, 10)
+                                {profile.data.birthday ?
+                                    new Date(profile.data.birthday).toISOString().substring(0, 10)
                                     : '-'}</Text>
                         </Right>
                     </ListItem>
@@ -263,9 +257,9 @@ export default function Profile({ navigation }) {
                             <TouchableOpacity
                                 onPress={uploadImage}
                             >
-                                {profileData.photoURL || imageUri.uri ?
+                                {profile.data.photoURL || imageUri.uri ?
                                     <ImageBackground
-                                        source={{ uri: imageUri.uri || profileData.photoURL }}
+                                        source={{ uri: imageUri.uri || profile.data.photoURL }}
                                         style={{ height: 80, width: 80, justifyContent: 'flex-end' }}
                                     >
                                         <View style={{
